@@ -5,1132 +5,812 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>TechWords · 科技英语闯关</title>
 <style>
-  :root {
-    --primary: #6C63FF;
-    --primary-dark: #5A52D5;
-    --primary-light: #EAE8FF;
-    --accent: #FF6B6B;
-    --accent-light: #FFE8E8;
-    --yellow: #FFD93D;
-    --yellow-light: #FFF8DC;
-    --green: #6BCB77;
-    --green-light: #E8F8EA;
-    --bg: #F7F8FF;
-    --card: #FFFFFF;
-    --text: #2D2D3A;
-    --text-muted: #8B8B9E;
-    --border: #E8E8F0;
-    --radius: 18px;
-    --radius-sm: 12px;
-    --shadow: 0 4px 20px rgba(108,99,255,0.12);
-    --shadow-lg: 0 8px 40px rgba(108,99,255,0.18);
-  }
+:root {
+  --p:#6C63FF;--pd:#5A52D5;--pl:#EAE8FF;
+  --r:#FF6B6B;--rl:#FFE8E8;
+  --y:#FFD93D;--yl:#FFF8DC;
+  --g:#6BCB77;--gl:#E8F8EA;
+  --t:#3AAFA9;--tl:#E0F7F6;
+  --o:#FF9F43;--ol:#FFF3E0;
+  --bg:#F7F8FF;--card:#fff;
+  --tx:#2D2D3A;--mu:#8B8B9E;--br:#E8E8F0;
+  --rad:18px;--rads:12px;
+  --sh:0 4px 20px rgba(108,99,255,.12);
+  --shl:0 8px 40px rgba(108,99,255,.18);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;max-width:480px;margin:0 auto;overflow-x:hidden}
 
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+/* TOPBAR */
+.topbar{background:#fff;padding:12px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid var(--br);position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(108,99,255,.08)}
+.logo{font-size:20px;font-weight:900;color:var(--p);letter-spacing:-.5px}.logo span{color:var(--r)}
+.stats{display:flex;gap:10px;align-items:center}
+.chip{display:flex;align-items:center;gap:4px;background:var(--bg);border-radius:20px;padding:5px 10px;font-size:13px;font-weight:700}
 
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    max-width: 480px;
-    margin: 0 auto;
-    position: relative;
-    overflow-x: hidden;
-  }
+/* SCREENS */
+.screen{display:none;padding-bottom:80px;min-height:100vh}
+.screen.active{display:block}
 
-  /* ── TOP BAR ── */
-  .topbar {
-    background: white;
-    padding: 14px 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: 2px solid var(--border);
-    position: sticky; top: 0; z-index: 100;
-  }
-  .topbar-logo { font-size: 20px; font-weight: 900; color: var(--primary); letter-spacing: -0.5px; }
-  .topbar-logo span { color: var(--accent); }
-  .topbar-stats { display: flex; gap: 14px; align-items: center; }
-  .stat-chip {
-    display: flex; align-items: center; gap: 5px;
-    background: var(--bg); border-radius: 20px; padding: 5px 10px;
-    font-size: 13px; font-weight: 700; color: var(--text);
-  }
-  .stat-chip .icon { font-size: 15px; }
+/* HOME */
+.hero{background:linear-gradient(135deg,var(--p) 0%,#9B59B6 100%);padding:24px 20px 32px;color:#fff;text-align:center;border-radius:0 0 28px 28px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-50px;right:-40px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.07)}
+.hero::after{content:'';position:absolute;bottom:-40px;left:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.05)}
+.hero h1{font-size:24px;font-weight:900;margin-bottom:6px}
+.hero p{font-size:13px;opacity:.85;margin-bottom:18px}
+.xp-wrap{background:rgba(255,255,255,.2);border-radius:20px;height:10px;margin:0 10px;overflow:hidden}
+.xp-fill{height:100%;background:var(--y);border-radius:20px;transition:width .6s ease}
+.xp-lbl{font-size:11px;opacity:.75;margin-top:5px}
 
-  /* ── SCREENS ── */
-  .screen { display: none; padding: 0 0 80px 0; min-height: 100vh; }
-  .screen.active { display: block; }
+.sec-title{font-size:12px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.8px;margin:20px 20px 12px}
+.level-card{background:#fff;border-radius:var(--rad);padding:16px;margin:0 16px 12px;box-shadow:var(--sh);cursor:pointer;display:flex;align-items:center;gap:14px;border:2.5px solid transparent;transition:transform .15s,box-shadow .15s}
+.level-card:active{transform:scale(.97)}
+.level-card.locked{opacity:.45;cursor:not-allowed}
+.level-card.done{border-color:var(--g)}
+.level-card.current{border-color:var(--p)}
+.lv-ico{width:50px;height:50px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.lv-info{flex:1;min-width:0}
+.lv-info h3{font-size:15px;font-weight:800;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lv-info .sub{font-size:11px;color:var(--mu);margin-bottom:6px}
+.lv-bar{background:var(--br);border-radius:8px;height:5px;overflow:hidden}
+.lv-fill{height:100%;border-radius:8px;transition:width .5s}
+.lv-pct{font-size:10px;color:var(--mu);margin-top:3px}
+.lv-badge{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
 
-  /* ── HOME SCREEN ── */
-  .home-hero {
-    background: linear-gradient(135deg, var(--primary) 0%, #9B59B6 100%);
-    padding: 28px 20px 36px;
-    color: white; text-align: center;
-    border-radius: 0 0 32px 32px;
-    position: relative; overflow: hidden;
-  }
-  .home-hero::before {
-    content: ''; position: absolute; top: -40px; right: -40px;
-    width: 150px; height: 150px; border-radius: 50%;
-    background: rgba(255,255,255,0.08);
-  }
-  .home-hero::after {
-    content: ''; position: absolute; bottom: -30px; left: -20px;
-    width: 100px; height: 100px; border-radius: 50%;
-    background: rgba(255,255,255,0.06);
-  }
-  .home-hero h1 { font-size: 26px; font-weight: 900; margin-bottom: 6px; }
-  .home-hero p { font-size: 14px; opacity: 0.85; margin-bottom: 20px; }
-  .xp-bar-wrap { background: rgba(255,255,255,0.2); border-radius: 20px; height: 10px; margin: 0 20px; overflow: hidden; }
-  .xp-bar { height: 100%; background: var(--yellow); border-radius: 20px; transition: width 0.6s ease; }
-  .xp-label { font-size: 12px; opacity: 0.8; margin-top: 6px; }
+/* LEVEL DETAIL */
+.lv-hdr{padding:20px;background:#fff;border-bottom:2px solid var(--br)}
+.back{display:inline-flex;align-items:center;gap:5px;font-size:14px;font-weight:600;color:var(--p);cursor:pointer;background:none;border:none;margin-bottom:12px}
+.lv-hdr h2{font-size:20px;font-weight:900;margin-bottom:3px}
+.lv-hdr p{font-size:12px;color:var(--mu)}
+.word-grid{padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.wchip{background:#fff;border-radius:var(--rads);padding:13px 10px;box-shadow:0 2px 10px rgba(0,0,0,.06);cursor:pointer;text-align:center;border:2px solid var(--br);transition:transform .15s;position:relative}
+.wchip:active{transform:scale(.96)}
+.wchip.learned{border-color:var(--g);background:var(--gl)}
+.wchip .wt{font-size:13px;font-weight:800;margin-bottom:3px}
+.wchip .wm{font-size:10px;color:var(--mu)}
+.wchip .ck{position:absolute;top:6px;right:7px;font-size:11px}
+.qbtn-wrap{padding:0 16px 16px}
+.btn{width:100%;padding:15px;border-radius:var(--rads);border:none;font-size:15px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .18s}
+.btn-p{background:var(--p);color:#fff;box-shadow:0 4px 16px rgba(108,99,255,.35)}
+.btn-p:active{transform:translateY(2px);box-shadow:0 2px 8px rgba(108,99,255,.3)}
+.btn-g{background:var(--g);color:#fff;box-shadow:0 4px 16px rgba(107,203,119,.35)}
+.btn-d{background:var(--br);color:var(--mu);cursor:not-allowed}
+.btn-o{background:#fff;color:var(--p);border:2.5px solid var(--p)}
 
-  .levels-section { padding: 24px 20px 0; }
-  .section-title { font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 16px; }
+/* VOCAB CARD */
+.card-nav{padding:14px 18px;display:flex;align-items:center;background:#fff;border-bottom:2px solid var(--br);gap:10px}
+.card-ctr{flex:1;text-align:center;font-size:13px;font-weight:600;color:var(--mu)}
+.vocab-card{margin:14px 16px;border-radius:var(--rad);overflow:hidden;box-shadow:var(--shl);animation:slideIn .3s ease}
+@keyframes slideIn{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:translateX(0)}}
 
-  .level-card {
-    background: white; border-radius: var(--radius); padding: 18px;
-    margin-bottom: 14px; box-shadow: var(--shadow);
-    cursor: pointer; transition: transform 0.18s, box-shadow 0.18s;
-    display: flex; align-items: center; gap: 16px;
-    border: 2px solid transparent; position: relative; overflow: hidden;
-  }
-  .level-card:active { transform: scale(0.97); }
-  .level-card.locked { opacity: 0.5; cursor: not-allowed; }
-  .level-card.completed { border-color: var(--green); }
-  .level-card.current { border-color: var(--primary); }
+.vc-head{padding:22px 20px 18px;text-align:center;position:relative}
+.vc-emoji{font-size:44px;margin-bottom:10px;display:block}
+.vc-term{font-size:28px;font-weight:900;letter-spacing:-.5px;margin-bottom:3px}
+.vc-full{font-size:11px;color:rgba(255,255,255,.75);margin-bottom:10px;line-height:1.4}
+.vc-pron{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.2);border-radius:20px;padding:5px 14px}
+.vc-pron span{font-size:13px;font-weight:600;color:#fff}
+.audio-btn{background:rgba(255,255,255,.25);border:none;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;transition:all .2s;flex-shrink:0}
+.audio-btn:active{transform:scale(.9)}
+.audio-btn.speaking{animation:audioAnim .5s ease infinite alternate}
+@keyframes audioAnim{from{transform:scale(1);background:rgba(255,255,255,.25)}to{transform:scale(1.15);background:rgba(255,255,255,.4)}}
 
-  .level-emoji {
-    width: 52px; height: 52px; border-radius: 16px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 26px; flex-shrink: 0;
-  }
-  .level-info { flex: 1; }
-  .level-info h3 { font-size: 16px; font-weight: 800; margin-bottom: 3px; }
-  .level-info .subtitle { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; }
-  .level-progress-bar { background: var(--border); border-radius: 10px; height: 6px; overflow: hidden; }
-  .level-progress-fill { height: 100%; border-radius: 10px; transition: width 0.5s ease; }
-  .level-progress-text { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+.vc-body{background:#fff}
+.vc-section{padding:16px 20px;border-bottom:1.5px solid var(--br)}
+.vc-section:last-child{border-bottom:none}
+.sec-lbl{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--mu);margin-bottom:8px}
 
-  .level-badge { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
-  .badge-lock { background: var(--border); }
-  .badge-play { background: var(--primary); color: white; }
-  .badge-done { background: var(--green); color: white; }
+/* phonetic section */
+.phonetic-box{background:linear-gradient(135deg,#667eea,#764ba2);border-radius:var(--rads);padding:14px 16px;display:flex;align-items:flex-start;gap:12px}
+.ph-icon{font-size:22px;flex-shrink:0}
+.ph-text .ph-word{font-size:18px;font-weight:900;color:#fff;margin-bottom:3px}
+.ph-text .ph-tip{font-size:12px;color:rgba(255,255,255,.8);line-height:1.5}
 
-  /* ── LEVEL DETAIL SCREEN ── */
-  .level-header {
-    padding: 24px 20px 20px;
-    background: white; border-bottom: 2px solid var(--border);
-  }
-  .back-btn {
-    display: inline-flex; align-items: center; gap: 6px;
-    font-size: 14px; font-weight: 600; color: var(--primary);
-    cursor: pointer; margin-bottom: 14px; background: none; border: none;
-  }
-  .level-header h2 { font-size: 22px; font-weight: 900; margin-bottom: 4px; }
-  .level-header p { font-size: 13px; color: var(--text-muted); }
+/* meaning */
+.vc-zh{font-size:20px;font-weight:900;margin-bottom:4px}
+.vc-def{font-size:13px;color:var(--mu);line-height:1.6}
 
-  .word-grid { padding: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .word-chip {
-    background: white; border-radius: var(--radius-sm); padding: 14px 12px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.06); cursor: pointer;
-    transition: transform 0.15s; text-align: center;
-    border: 2px solid var(--border); position: relative;
-  }
-  .word-chip:active { transform: scale(0.96); }
-  .word-chip.learned { border-color: var(--green); background: var(--green-light); }
-  .word-chip .term { font-size: 14px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
-  .word-chip .meaning { font-size: 11px; color: var(--text-muted); }
-  .word-chip .check { position: absolute; top: 8px; right: 8px; font-size: 12px; }
+/* story */
+.story-box{background:linear-gradient(135deg,#fff9f0,#fff3e0);border-radius:var(--rads);padding:14px 16px;border-left:4px solid var(--o)}
+.story-txt{font-size:13px;line-height:1.75;color:var(--tx)}
 
-  .quiz-btn-wrap { padding: 0 20px 20px; }
-  .btn {
-    width: 100%; padding: 16px; border-radius: var(--radius-sm); border: none;
-    font-size: 16px; font-weight: 800; cursor: pointer; transition: all 0.18s;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-  }
-  .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 16px rgba(108,99,255,0.35); }
-  .btn-primary:active { transform: translateY(2px); box-shadow: 0 2px 8px rgba(108,99,255,0.3); }
-  .btn-success { background: var(--green); color: white; box-shadow: 0 4px 16px rgba(107,203,119,0.35); }
-  .btn-disabled { background: var(--border); color: var(--text-muted); cursor: not-allowed; }
+/* example */
+.example-box{background:var(--yl);border-radius:var(--rads);padding:14px 16px}
+.ex-en{display:flex;align-items:flex-start;gap:10px;margin-bottom:7px}
+.ex-en-txt{font-size:13px;font-weight:600;color:var(--tx);line-height:1.5;flex:1}
+.ex-zh{font-size:12px;color:var(--mu);line-height:1.5}
 
-  /* ── CARD SCREEN ── */
-  .card-nav {
-    padding: 16px 20px; display: flex; align-items: center; gap: 12px;
-    background: white; border-bottom: 2px solid var(--border);
-  }
-  .card-counter { font-size: 13px; color: var(--text-muted); font-weight: 600; flex: 1; text-align: center; }
-  .nav-dot-row { display: flex; gap: 6px; justify-content: center; padding: 12px 20px 0; flex-wrap: wrap; }
-  .nav-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); transition: background 0.3s; }
-  .nav-dot.active { background: var(--primary); transform: scale(1.3); }
-  .nav-dot.done { background: var(--green); }
+/* related */
+.related-chips{display:flex;flex-wrap:wrap;gap:8px}
+.rchip{background:var(--pl);color:var(--p);border-radius:20px;padding:5px 13px;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s}
+.rchip:active{background:var(--p);color:#fff}
 
-  .vocab-card {
-    margin: 16px 20px; background: white; border-radius: var(--radius);
-    box-shadow: var(--shadow-lg); overflow: hidden; animation: slideIn 0.3s ease;
-  }
-  @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+/* card actions */
+.card-actions{padding:14px 16px;display:flex;gap:10px}
+.card-actions .btn{flex:1;padding:13px;font-size:14px}
 
-  .card-top {
-    padding: 24px 24px 20px; text-align: center;
-    background: linear-gradient(135deg, var(--primary-light), white);
-  }
-  .card-emoji { font-size: 48px; margin-bottom: 12px; display: block; }
-  .card-term { font-size: 30px; font-weight: 900; color: var(--primary); margin-bottom: 4px; letter-spacing: -0.5px; }
-  .card-fullname { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; line-height: 1.4; }
-  .card-pronunciation {
-    display: inline-block; background: var(--primary-light); color: var(--primary);
-    border-radius: 20px; padding: 4px 14px; font-size: 13px; font-weight: 600;
-  }
-  .card-body { padding: 20px 24px; }
-  .card-section { margin-bottom: 18px; }
-  .card-label { font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
-  .card-chinese { font-size: 20px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
-  .card-definition { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
-  .card-example-box {
-    background: var(--yellow-light); border-radius: var(--radius-sm);
-    padding: 14px; border-left: 4px solid var(--yellow);
-  }
-  .card-example-en { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; line-height: 1.5; }
-  .card-example-zh { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
-  .card-memory-box {
-    background: var(--accent-light); border-radius: var(--radius-sm);
-    padding: 14px; border-left: 4px solid var(--accent);
-  }
-  .card-memory { font-size: 13px; color: var(--text); line-height: 1.6; }
-  .related-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
-  .related-chip {
-    background: var(--primary-light); color: var(--primary);
-    border-radius: 20px; padding: 5px 12px; font-size: 12px; font-weight: 700;
-    cursor: pointer;
-  }
-  .card-actions { padding: 0 20px 20px; display: flex; gap: 12px; }
-  .card-actions .btn { flex: 1; padding: 14px; font-size: 14px; }
-  .btn-outline { background: white; color: var(--primary); border: 2px solid var(--primary); }
+/* QUIZ */
+.quiz-hdr{padding:14px 18px;background:#fff;border-bottom:2px solid var(--br)}
+.qprog{background:var(--br);border-radius:10px;height:8px;overflow:hidden;margin-bottom:7px}
+.qprog-fill{height:100%;background:linear-gradient(90deg,var(--p),var(--r));border-radius:10px;transition:width .4s ease}
+.qstats{display:flex;justify-content:space-between;font-size:12px;color:var(--mu);font-weight:600}
+.quiz-body{padding:18px}
+.qtype-badge{display:inline-block;padding:4px 13px;border-radius:20px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px}
+.qterm{background:linear-gradient(135deg,var(--p),#9B59B6);color:#fff;border-radius:var(--rads);padding:18px;text-align:center;font-size:24px;font-weight:900;margin-bottom:18px;display:flex;align-items:center;justify-content:center;gap:10px}
+.qterm .audio-btn{background:rgba(255,255,255,.25)}
+.qquestion{font-size:16px;font-weight:800;margin-bottom:6px}
+.qsub{font-size:13px;color:var(--mu);margin-bottom:18px;line-height:1.5}
+.opts{display:grid;gap:10px}
+.opt{background:#fff;border:2.5px solid var(--br);border-radius:var(--rads);padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;font-size:14px;font-weight:600;transition:all .18s}
+.opt:active{transform:scale(.98)}
+.opt.sel{border-color:var(--p);background:var(--pl);color:var(--p)}
+.opt.ok{border-color:var(--g);background:var(--gl);color:#2d7a3a}
+.opt.err{border-color:var(--r);background:var(--rl);color:#c0392b}
+.opt-letter{width:28px;height:28px;border-radius:8px;background:var(--br);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;transition:all .18s}
+.opt.sel .opt-letter{background:var(--p);color:#fff}
+.opt.ok .opt-letter{background:var(--g);color:#fff}
+.opt.err .opt-letter{background:var(--r);color:#fff}
+.fb{margin:0 18px 16px;border-radius:var(--rads);padding:14px 16px;display:none;animation:slideIn .25s ease}
+.fb.show{display:block}
+.fb.ok-fb{background:var(--gl);border-left:4px solid var(--g)}
+.fb.err-fb{background:var(--rl);border-left:4px solid var(--r)}
+.fb-t{font-size:15px;font-weight:800;margin-bottom:4px}
+.fb.ok-fb .fb-t{color:#2d7a3a}
+.fb.err-fb .fb-t{color:#c0392b}
+.fb-b{font-size:12px;line-height:1.6;color:var(--tx)}
+.chk-wrap{padding:0 18px 14px}
 
-  /* ── QUIZ SCREEN ── */
-  .quiz-header { padding: 16px 20px; background: white; border-bottom: 2px solid var(--border); }
-  .quiz-progress { background: var(--border); border-radius: 10px; height: 8px; overflow: hidden; margin-bottom: 8px; }
-  .quiz-progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--accent)); border-radius: 10px; transition: width 0.4s ease; }
-  .quiz-stats-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); font-weight: 600; }
+/* RESULT */
+.result-wrap{padding:36px 22px;text-align:center}
+.r-emoji{font-size:68px;display:block;animation:bounce .6s ease;margin-bottom:14px}
+@keyframes bounce{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
+.r-title{font-size:24px;font-weight:900;margin-bottom:7px}
+.r-sub{font-size:14px;color:var(--mu);margin-bottom:28px;line-height:1.6}
+.r-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px}
+.r-stat{background:#fff;border-radius:var(--rads);padding:18px;box-shadow:var(--sh)}
+.r-stat .num{font-size:26px;font-weight:900;color:var(--p)}
+.r-stat .lbl{font-size:11px;color:var(--mu);margin-top:3px}
+.xp-earned{background:linear-gradient(135deg,var(--y),#FFB300);border-radius:var(--rads);padding:16px 18px;margin-bottom:24px;display:flex;align-items:center;gap:14px;box-shadow:0 4px 20px rgba(255,193,7,.3)}
+.xp-earned .xi{font-size:30px}
+.xp-earned .xn{font-size:20px;font-weight:900;color:#fff}
+.xp-earned .xl{font-size:11px;color:rgba(255,255,255,.8)}
 
-  .quiz-body { padding: 20px; }
-  .quiz-type-badge {
-    display: inline-block; padding: 5px 14px; border-radius: 20px;
-    font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
-    margin-bottom: 16px;
-  }
-  .quiz-question { font-size: 18px; font-weight: 800; line-height: 1.5; margin-bottom: 8px; color: var(--text); }
-  .quiz-question-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.5; }
-  .quiz-term-display {
-    background: linear-gradient(135deg, var(--primary), #9B59B6);
-    color: white; border-radius: var(--radius-sm); padding: 18px;
-    text-align: center; font-size: 26px; font-weight: 900; margin-bottom: 20px;
-    letter-spacing: -0.5px;
-  }
+/* SEARCH */
+.search-wrap{padding:18px}
+.sbox{display:flex;align-items:center;gap:10px;background:#fff;border:2.5px solid var(--br);border-radius:var(--rads);padding:13px 15px;margin-bottom:14px;transition:border-color .2s}
+.sbox:focus-within{border-color:var(--p)}
+.sbox input{flex:1;border:none;outline:none;font-size:16px;color:var(--tx);background:transparent}
+.sbox input::placeholder{color:var(--mu)}
+.hot-tags{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px}
+.htag{background:var(--pl);color:var(--p);border-radius:20px;padding:5px 13px;font-size:12px;font-weight:700;cursor:pointer}
+.htag:active{background:var(--p);color:#fff}
+.sr-card{background:#fff;border-radius:var(--rads);padding:14px;margin-bottom:10px;box-shadow:0 2px 10px rgba(0,0,0,.06);cursor:pointer;border:2px solid transparent;transition:all .15s}
+.sr-card:hover{border-color:var(--pl)}
+.sr-term{font-size:17px;font-weight:900;color:var(--p)}
+.sr-zh{font-size:14px;font-weight:700;margin-top:2px}
+.sr-def{font-size:11px;color:var(--mu);margin-top:3px;line-height:1.5}
+.sr-lv{font-size:10px;color:var(--mu);margin-top:5px}
+.s-empty{text-align:center;padding:50px 20px;color:var(--mu)}
+.s-empty .ei{font-size:44px;margin-bottom:10px}
 
-  .options-grid { display: grid; gap: 12px; }
-  .option-btn {
-    background: white; border: 2px solid var(--border); border-radius: var(--radius-sm);
-    padding: 16px 18px; text-align: left; cursor: pointer;
-    transition: all 0.18s; font-size: 14px; font-weight: 600; color: var(--text);
-    display: flex; align-items: center; gap: 12px;
-  }
-  .option-btn:active { transform: scale(0.98); }
-  .option-btn.selected { border-color: var(--primary); background: var(--primary-light); color: var(--primary); }
-  .option-btn.correct { border-color: var(--green); background: var(--green-light); color: #2d7a3a; }
-  .option-btn.wrong { border-color: var(--accent); background: var(--accent-light); color: #c0392b; }
-  .option-letter {
-    width: 28px; height: 28px; border-radius: 8px; background: var(--border);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 12px; font-weight: 800; flex-shrink: 0;
-    transition: background 0.18s;
-  }
-  .option-btn.selected .option-letter { background: var(--primary); color: white; }
-  .option-btn.correct .option-letter { background: var(--green); color: white; }
-  .option-btn.wrong .option-letter { background: var(--accent); color: white; }
+/* BOTTOM NAV */
+.bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#fff;border-top:2px solid var(--br);display:flex;padding:6px 0;z-index:100}
+.ni{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:5px 0;transition:all .18s}
+.ni .nicon{font-size:21px}
+.ni .nlbl{font-size:10px;font-weight:700;color:var(--mu)}
+.ni.active .nlbl{color:var(--p)}
+.ni.active .nicon{transform:scale(1.1)}
 
-  .check-btn-wrap { padding: 16px 20px 0; }
+/* TOAST */
+.toast{position:fixed;top:72px;left:50%;transform:translateX(-50%) translateY(-16px);background:var(--tx);color:#fff;padding:10px 22px;border-radius:30px;font-size:13px;font-weight:600;opacity:0;transition:all .3s;z-index:9999;white-space:nowrap;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-  .feedback-banner {
-    margin: 0 20px 20px; border-radius: var(--radius-sm); padding: 16px 18px;
-    display: none; animation: slideIn 0.25s ease;
-  }
-  .feedback-banner.show { display: block; }
-  .feedback-banner.correct-fb { background: var(--green-light); border-left: 4px solid var(--green); }
-  .feedback-banner.wrong-fb { background: var(--accent-light); border-left: 4px solid var(--accent); }
-  .fb-title { font-size: 16px; font-weight: 800; margin-bottom: 4px; }
-  .fb-title.correct-fb { color: #2d7a3a; }
-  .fb-title.wrong-fb { color: #c0392b; }
-  .fb-body { font-size: 13px; line-height: 1.6; color: var(--text); }
+/* CONFETTI */
+.conf{position:fixed;top:-10px;border-radius:3px;animation:confFall linear forwards;z-index:9999;pointer-events:none}
+@keyframes confFall{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(105vh) rotate(720deg);opacity:0}}
 
-  /* ── RESULT SCREEN ── */
-  .result-wrap { padding: 40px 24px; text-align: center; }
-  .result-emoji { font-size: 72px; margin-bottom: 16px; display: block; animation: bounce 0.6s ease; }
-  @keyframes bounce { 0%,100%{transform:scale(1)} 50%{transform:scale(1.2)} }
-  .result-title { font-size: 26px; font-weight: 900; margin-bottom: 8px; }
-  .result-sub { font-size: 15px; color: var(--text-muted); margin-bottom: 32px; line-height: 1.6; }
-  .result-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 32px; }
-  .result-stat {
-    background: white; border-radius: var(--radius-sm); padding: 20px;
-    box-shadow: var(--shadow);
-  }
-  .result-stat .num { font-size: 28px; font-weight: 900; color: var(--primary); }
-  .result-stat .label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
-  .xp-earned {
-    background: linear-gradient(135deg, var(--yellow), #FFB300);
-    border-radius: var(--radius-sm); padding: 18px; margin-bottom: 28px;
-    display: flex; align-items: center; gap: 14px; box-shadow: 0 4px 20px rgba(255,193,7,0.3);
-  }
-  .xp-earned .xp-icon { font-size: 32px; }
-  .xp-earned .xp-text { text-align: left; }
-  .xp-earned .xp-num { font-size: 22px; font-weight: 900; color: white; }
-  .xp-earned .xp-label { font-size: 12px; color: rgba(255,255,255,0.8); }
-
-  /* ── SEARCH SCREEN ── */
-  .search-wrap { padding: 20px; }
-  .search-box {
-    display: flex; align-items: center; gap: 12px;
-    background: white; border: 2px solid var(--border); border-radius: var(--radius-sm);
-    padding: 14px 16px; margin-bottom: 16px;
-    transition: border-color 0.2s;
-  }
-  .search-box:focus-within { border-color: var(--primary); }
-  .search-box input {
-    flex: 1; border: none; outline: none; font-size: 16px; color: var(--text);
-    background: transparent;
-  }
-  .search-box input::placeholder { color: var(--text-muted); }
-  .search-icon { font-size: 18px; color: var(--text-muted); }
-
-  .search-results { }
-  .search-result-card {
-    background: white; border-radius: var(--radius-sm); padding: 16px;
-    margin-bottom: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-    cursor: pointer; transition: transform 0.15s;
-    border: 2px solid transparent;
-  }
-  .search-result-card:active { transform: scale(0.98); }
-  .search-result-card:hover { border-color: var(--primary-light); }
-  .sr-term { font-size: 18px; font-weight: 900; color: var(--primary); }
-  .sr-chinese { font-size: 15px; font-weight: 700; margin-top: 2px; }
-  .sr-definition { font-size: 12px; color: var(--text-muted); margin-top: 4px; line-height: 1.5; }
-  .sr-level { font-size: 11px; color: var(--text-muted); margin-top: 6px; }
-  .search-empty { text-align: center; padding: 60px 20px; color: var(--text-muted); }
-  .search-empty .e-icon { font-size: 48px; margin-bottom: 12px; }
-  .search-empty p { font-size: 14px; }
-
-  .hot-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
-  .hot-tag {
-    background: var(--primary-light); color: var(--primary);
-    border-radius: 20px; padding: 6px 14px; font-size: 12px; font-weight: 700;
-    cursor: pointer; transition: background 0.15s;
-  }
-  .hot-tag:active { background: var(--primary); color: white; }
-
-  /* ── BOTTOM NAV ── */
-  .bottom-nav {
-    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-    width: 100%; max-width: 480px;
-    background: white; border-top: 2px solid var(--border);
-    display: flex; padding: 8px 0; z-index: 100;
-  }
-  .nav-item {
-    flex: 1; display: flex; flex-direction: column; align-items: center;
-    gap: 3px; cursor: pointer; padding: 6px 0; transition: all 0.18s;
-  }
-  .nav-item .nav-icon { font-size: 22px; }
-  .nav-item .nav-label { font-size: 10px; font-weight: 700; color: var(--text-muted); }
-  .nav-item.active .nav-label { color: var(--primary); }
-  .nav-item.active .nav-icon { transform: scale(1.1); }
-
-  /* ── TOAST ── */
-  .toast {
-    position: fixed; top: 80px; left: 50%; transform: translateX(-50%) translateY(-20px);
-    background: var(--text); color: white; padding: 12px 24px; border-radius: 30px;
-    font-size: 14px; font-weight: 600; opacity: 0; transition: all 0.3s;
-    z-index: 9999; white-space: nowrap; pointer-events: none;
-  }
-  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-  /* ── STREAK MODAL ── */
-  .modal-overlay {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.5);
-    display: flex; align-items: center; justify-content: center;
-    z-index: 200; padding: 24px; display: none;
-  }
-  .modal-overlay.show { display: flex; }
-  .modal { background: white; border-radius: var(--radius); padding: 32px 24px; text-align: center; width: 100%; max-width: 340px; animation: modalPop 0.3s cubic-bezier(0.34,1.56,0.64,1); }
-  @keyframes modalPop { from{transform:scale(0.8);opacity:0} to{transform:scale(1);opacity:1} }
-  .modal .big-emoji { font-size: 64px; margin-bottom: 12px; display: block; }
-  .modal h3 { font-size: 22px; font-weight: 900; margin-bottom: 8px; }
-  .modal p { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.6; }
-  .modal .btn { max-width: 200px; margin: 0 auto; }
+/* MODAL */
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:200;padding:22px}
+.modal-ov.show{display:flex}
+.modal{background:#fff;border-radius:var(--rad);padding:28px 22px;text-align:center;width:100%;max-width:340px;animation:mpop .3s cubic-bezier(.34,1.56,.64,1)}
+@keyframes mpop{from{transform:scale(.8);opacity:0}to{transform:scale(1);opacity:1}}
+.modal .be{font-size:58px;margin-bottom:10px;display:block}
+.modal h3{font-size:20px;font-weight:900;margin-bottom:7px}
+.modal p{font-size:13px;color:var(--mu);margin-bottom:22px;line-height:1.6}
 </style>
 </head>
 <body>
 
-<!-- TOP BAR -->
 <div class="topbar">
-  <div class="topbar-logo">Tech<span>Words</span></div>
-  <div class="topbar-stats">
-    <div class="stat-chip"><span class="icon">🔥</span><span id="streakCount">0</span></div>
-    <div class="stat-chip"><span class="icon">⚡</span><span id="xpCount">0</span></div>
+  <div class="logo">Tech<span>Words</span></div>
+  <div class="stats">
+    <div class="chip">🔥<span id="sStreak">0</span></div>
+    <div class="chip">⚡<span id="sXP">0</span></div>
   </div>
 </div>
 
-<!-- HOME SCREEN -->
-<div class="screen active" id="screen-home">
-  <div class="home-hero">
+<!-- HOME -->
+<div class="screen active" id="sc-home">
+  <div class="hero">
     <h1>🚀 科技英语闯关</h1>
     <p>掌握 AI 与互联网时代的专业术语</p>
-    <div class="xp-bar-wrap">
-      <div class="xp-bar" id="heroXPBar" style="width:0%"></div>
-    </div>
-    <div class="xp-label" id="heroXPLabel">0 / 100 XP · 继续加油！</div>
+    <div class="xp-wrap"><div class="xp-fill" id="heroBar" style="width:0%"></div></div>
+    <div class="xp-lbl" id="heroLbl">0 XP · 开始你的第一关吧！</div>
   </div>
-  <div class="levels-section">
-    <div class="section-title">📚 学习路径</div>
-    <div id="levelList"></div>
-  </div>
+  <div class="sec-title">📚 学习路径</div>
+  <div id="lvList"></div>
 </div>
 
-<!-- LEVEL DETAIL SCREEN -->
-<div class="screen" id="screen-level">
-  <div class="level-header">
-    <button class="back-btn" onclick="showHome()">← 返回</button>
-    <h2 id="levelDetailTitle"></h2>
-    <p id="levelDetailSub"></p>
+<!-- LEVEL DETAIL -->
+<div class="screen" id="sc-level">
+  <div class="lv-hdr">
+    <button class="back" onclick="goHome()">← 返回</button>
+    <h2 id="lvTitle"></h2>
+    <p id="lvSub"></p>
   </div>
-  <div class="nav-dot-row" id="wordDots"></div>
   <div class="word-grid" id="wordGrid"></div>
-  <div class="quiz-btn-wrap">
-    <button class="btn btn-primary" id="startQuizBtn" onclick="startQuiz()">
-      🎯 开始测验
-    </button>
+  <div class="qbtn-wrap">
+    <button class="btn btn-p" id="quizBtn" onclick="startQuiz()">🎯 开始测验</button>
   </div>
 </div>
 
-<!-- CARD SCREEN -->
-<div class="screen" id="screen-card">
+<!-- CARD -->
+<div class="screen" id="sc-card">
   <div class="card-nav">
-    <button class="back-btn" onclick="backToLevel()" style="margin-bottom:0">← 返回</button>
-    <div class="card-counter" id="cardCounter"></div>
+    <button class="back" onclick="goLevel()" style="margin-bottom:0">← 返回</button>
+    <div class="card-ctr" id="cardCtr"></div>
     <div style="width:60px"></div>
   </div>
-  <div id="vocabCardContent"></div>
+  <div id="cardContent"></div>
   <div class="card-actions">
-    <button class="btn btn-outline" id="prevCardBtn" onclick="prevCard()">← 上一个</button>
-    <button class="btn btn-primary" id="nextCardBtn" onclick="nextCard()">下一个 →</button>
+    <button class="btn btn-o" id="prevBtn" onclick="prevCard()">← 上一个</button>
+    <button class="btn btn-p" id="nextBtn" onclick="nextCard()">下一个 →</button>
   </div>
 </div>
 
-<!-- QUIZ SCREEN -->
-<div class="screen" id="screen-quiz">
-  <div class="quiz-header">
-    <button class="back-btn" onclick="backToLevel()" style="margin-bottom:8px">← 退出测验</button>
-    <div class="quiz-progress">
-      <div class="quiz-progress-fill" id="quizProgressBar" style="width:0%"></div>
-    </div>
-    <div class="quiz-stats-row">
-      <span id="quizQNum">第 1 题</span>
-      <span>✅ <span id="quizCorrect">0</span> · ❌ <span id="quizWrong">0</span></span>
-    </div>
+<!-- QUIZ -->
+<div class="screen" id="sc-quiz">
+  <div class="quiz-hdr">
+    <button class="back" onclick="goLevel()" style="margin-bottom:7px">← 退出</button>
+    <div class="qprog"><div class="qprog-fill" id="qBar" style="width:0%"></div></div>
+    <div class="qstats"><span id="qNum">1/8</span><span>✅<span id="qOk">0</span> ❌<span id="qErr">0</span></span></div>
   </div>
-  <div class="quiz-body" id="quizBody"></div>
-  <div class="feedback-banner" id="feedbackBanner"></div>
-  <div class="check-btn-wrap">
-    <button class="btn btn-primary" id="checkBtn" onclick="checkAnswer()" style="display:none">确认答案</button>
-    <button class="btn btn-primary" id="nextQBtn" onclick="nextQuestion()" style="display:none">继续 →</button>
+  <div class="quiz-body" id="qBody"></div>
+  <div class="fb" id="fb"></div>
+  <div class="chk-wrap">
+    <button class="btn btn-p" id="chkBtn" onclick="checkAns()" style="display:none">确认答案</button>
+    <button class="btn btn-p" id="nxtBtn" onclick="nextQ()" style="display:none">继续 →</button>
   </div>
 </div>
 
-<!-- RESULT SCREEN -->
-<div class="screen" id="screen-result">
-  <div class="result-wrap" id="resultContent"></div>
+<!-- RESULT -->
+<div class="screen" id="sc-result">
+  <div class="result-wrap" id="resultWrap"></div>
 </div>
 
-<!-- SEARCH SCREEN -->
-<div class="screen" id="screen-search">
+<!-- SEARCH -->
+<div class="screen" id="sc-search">
   <div class="search-wrap">
-    <div class="search-box">
-      <span class="search-icon">🔍</span>
-      <input type="text" id="searchInput" placeholder="搜索专业术语… e.g. API, Token" oninput="doSearch(this.value)">
+    <div class="sbox">
+      <span>🔍</span>
+      <input type="text" id="sinput" placeholder="搜索术语… API, Token, Agent" oninput="doSearch(this.value)">
     </div>
-    <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;font-weight:700;">🔥 热门词汇</div>
+    <div style="font-size:11px;font-weight:800;color:var(--mu);margin-bottom:8px">🔥 热门</div>
     <div class="hot-tags" id="hotTags"></div>
-    <div class="search-results" id="searchResults">
-      <div class="search-empty">
-        <div class="e-icon">🔭</div>
-        <p>输入词汇开始搜索<br>或点击上方热门标签</p>
-      </div>
-    </div>
+    <div id="sResults"><div class="s-empty"><div class="ei">🔭</div><p>输入词汇开始搜索</p></div></div>
   </div>
 </div>
 
-<!-- BOTTOM NAV -->
-<div class="bottom-nav">
-  <div class="nav-item active" id="nav-home" onclick="showHome()">
-    <span class="nav-icon">🏠</span>
-    <span class="nav-label">主页</span>
-  </div>
-  <div class="nav-item" id="nav-search" onclick="showSearch()">
-    <span class="nav-icon">🔍</span>
-    <span class="nav-label">查词</span>
-  </div>
-  <div class="nav-item" id="nav-progress" onclick="showProgress()">
-    <span class="nav-icon">📊</span>
-    <span class="nav-label">进度</span>
-  </div>
+<div class="bnav">
+  <div class="ni active" id="n-home" onclick="goHome()"><span class="nicon">🏠</span><span class="nlbl">主页</span></div>
+  <div class="ni" id="n-search" onclick="goSearch()"><span class="nicon">🔍</span><span class="nlbl">查词</span></div>
+  <div class="ni" id="n-prog" onclick="showProg()"><span class="nicon">📊</span><span class="nlbl">进度</span></div>
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
-
-<!-- MODAL -->
-<div class="modal-overlay" id="modal">
-  <div class="modal" id="modalContent"></div>
-</div>
+<div class="modal-ov" id="modal"><div class="modal" id="mContent"></div></div>
 
 <script>
 // ══════════════════════════════════════════════
-// 📚 VOCABULARY DATABASE
+// VOCABULARY — 180 words, 6 levels × 30
 // ══════════════════════════════════════════════
 const LEVELS = [
-  {
-    id: 0,
-    emoji: '🌐',
-    color: '#6C63FF',
-    bg: '#EAE8FF',
-    title: '互联网基础',
-    subtitle: 'Internet Basics',
-    words: [
-      { id:'server', term:'Server', fullName:'服务器', pronunciation:'/ˈsɜːrvər/', chinese:'服务器', chineseDef:'存储和处理数据、向其他设备提供服务的计算机或程序', example:'The website is hosted on a server in Singapore.', exampleZh:'这个网站托管在新加坡的服务器上。', memory:'Server = 服务（serve）+ er（者）→ 提供服务的机器', related:['Client','Cloud','Host','Backend'] },
-      { id:'client', term:'Client', fullName:'客户端', pronunciation:'/ˈklaɪənt/', chinese:'客户端', chineseDef:'向服务器请求服务的设备或程序，比如你的手机、电脑', example:'The mobile app is the client that communicates with the server.', exampleZh:'手机应用就是与服务器通信的客户端。', memory:'Client = 客户 → 找服务器"服务"的那一方', related:['Server','Browser','Frontend','App'] },
-      { id:'api', term:'API', fullName:'Application Programming Interface', pronunciation:'/ˌeɪ piː ˈaɪ/', chinese:'应用程序接口', chineseDef:'让两个不同软件之间能互相通信的一套规则和约定', example:'The app uses a weather API to show real-time forecasts.', exampleZh:'这个应用使用天气 API 展示实时预报。', memory:'把 API 想成餐厅服务员：你（客户端）告诉服务员要什么，服务员去厨房（服务器）取来给你', related:['REST','Endpoint','SDK','Request'] },
-      { id:'database', term:'Database', fullName:'数据库', pronunciation:'/ˈdeɪtəbeɪs/', chinese:'数据库', chineseDef:'有组织地存储大量数据的系统，可以快速查询和更新', example:'User accounts and passwords are stored in a database.', exampleZh:'用户账号和密码存储在数据库中。', memory:'Data（数据）+ Base（基地）→ 数据的"大本营"', related:['SQL','Query','Storage','Backend'] },
-      { id:'frontend', term:'Frontend', fullName:'前端', pronunciation:'/ˈfrɒntɛnd/', chinese:'前端', chineseDef:'用户直接看到和交互的部分，包括网页界面、按钮、颜色等', example:'The frontend developer designed the beautiful homepage.', exampleZh:'前端开发者设计了漂亮的主页。', memory:'Front（前面）+ End（端）→ 在"前面"可见的部分', related:['Backend','UI','HTML','CSS','React'] },
-      { id:'backend', term:'Backend', fullName:'后端', pronunciation:'/ˈbækɛnd/', chinese:'后端', chineseDef:'用户看不到的部分，处理业务逻辑、数据存储和计算', example:'The backend handles user authentication and data processing.', exampleZh:'后端负责用户身份验证和数据处理。', memory:'Back（后面）+ End（端）→ 在"幕后"工作的部分', related:['Frontend','Server','API','Database'] },
-      { id:'cloud', term:'Cloud', fullName:'云 / 云计算', pronunciation:'/klaʊd/', chinese:'云 / 云计算', chineseDef:'通过网络提供的计算资源（服务器、存储、软件），不需要自己买硬件', example:'We store all files in the cloud so anyone can access them.', exampleZh:'我们把所有文件存在云端，这样任何人都能访问。', memory:'想象"云"在天空中，数据存在"云"里，随时随地都能取到', related:['Server','AWS','Storage','SaaS'] },
-      { id:'protocol', term:'Protocol', fullName:'协议', pronunciation:'/ˈprəʊtəkɒl/', chinese:'协议', chineseDef:'两台计算机通信时必须遵守的一套规则和标准', example:'HTTP is the protocol used to transfer web pages.', exampleZh:'HTTP 是传输网页所用的协议。', memory:'Protocol = 规矩 → 电脑之间互相"说话"的规矩', related:['HTTP','HTTPS','TCP/IP','API'] },
-      { id:'cache', term:'Cache', fullName:'缓存', pronunciation:'/kæʃ/', chinese:'缓存', chineseDef:'将常用数据临时保存在快速存储中，加快下次访问速度', example:'Clear your browser cache if the page looks broken.', exampleZh:'如果页面显示异常，试试清除浏览器缓存。', memory:'Cache 读作"cash"（现金）→ 把常用数据"存现"备用，取用更快', related:['Browser','Performance','Memory','CDN'] },
-      { id:'domain', term:'Domain', fullName:'域名', pronunciation:'/dəˈmeɪn/', chinese:'域名', chineseDef:'网站的地址名称，如 google.com，让人容易记住 IP 地址', example:'The company registered the domain name "techwords.com".', exampleZh:'公司注册了域名 techwords.com。', memory:'Domain = 地盘 → 你在互联网上的"地盘"名称', related:['URL','DNS','HTTPS','Host'] },
-      { id:'url', term:'URL', fullName:'Uniform Resource Locator', pronunciation:'/ˌjuː ɑːr ˈɛl/', chinese:'网址 / 统一资源定位符', chineseDef:'互联网上每个资源（网页、图片等）的唯一地址', example:'Copy and paste the URL into your browser to open the page.', exampleZh:'把 URL 复制粘贴到浏览器就能打开页面。', memory:'URL = 互联网上的"门牌号"，每个页面都有独一无二的地址', related:['Domain','HTTP','Link','Browser'] },
-      { id:'cookie', term:'Cookie', fullName:'网络 Cookie', pronunciation:'/ˈkʊki/', chinese:'Cookie（网络小文件）', chineseDef:'网站存在你浏览器里的一小段数据，用来记住你的登录状态或偏好', example:'The website uses cookies to remember your login session.', exampleZh:'网站用 Cookie 记住你的登录状态。', memory:'Cookie 就像商店给你的"会员卡"存在你口袋里，下次进店自动识别你', related:['Session','Browser','Privacy','Storage'] },
-      { id:'bandwidth', term:'Bandwidth', fullName:'带宽', pronunciation:'/ˈbændwɪdθ/', chinese:'带宽', chineseDef:'单位时间内网络能传输的最大数据量，决定网速快慢', example:'Video streaming requires a lot of bandwidth.', exampleZh:'视频流媒体需要大量带宽。', memory:'Band（管道）+ Width（宽度）→ 管道越宽，流量越大，网越快', related:['Network','Speed','Latency','Data'] },
-    ]
-  },
-  {
-    id: 1,
-    emoji: '📱',
-    color: '#FF6B6B',
-    bg: '#FFE8E8',
-    title: '产品与运营',
-    subtitle: 'Product & Growth',
-    words: [
-      { id:'ux', term:'UX', fullName:'User Experience', pronunciation:'/ˌjuː ˈɛks/', chinese:'用户体验', chineseDef:'用户在使用产品过程中的整体感受，包括易用性、情感、效率', example:'Good UX design makes the app feel intuitive and enjoyable.', exampleZh:'好的 UX 设计让应用用起来自然流畅。', memory:'UX = 用户的感受全集：是否好用、好看、好爽', related:['UI','Design','Research','Usability'] },
-      { id:'ui', term:'UI', fullName:'User Interface', pronunciation:'/ˌjuː ˈaɪ/', chinese:'用户界面', chineseDef:'用户能看到和操作的界面元素，如按钮、图标、颜色、布局', example:'The UI was redesigned to be more colorful and modern.', exampleZh:'界面被重新设计得更有活力、更现代。', memory:'UI = 看得见摸得着的"外貌"，UX = 使用后的"感受"', related:['UX','Design','Frontend','Wireframe'] },
-      { id:'mvp', term:'MVP', fullName:'Minimum Viable Product', pronunciation:'/ˌɛm viː ˈpiː/', chinese:'最小可行产品', chineseDef:'用最少功能快速推出的产品版本，用来验证市场需求', example:'We launched the MVP in 2 weeks to test user interest.', exampleZh:'我们在两周内推出了 MVP 来测试用户兴趣。', memory:'Minimum（最少）Viable（可用）Product（产品）→ 够用就行，先上再说', related:['Prototype','Iteration','Lean','Startup'] },
-      { id:'abtest', term:'A/B Test', fullName:'A/B 测试', pronunciation:'/ˌeɪ biː ˈtɛst/', chinese:'A/B 测试', chineseDef:'同时向不同用户展示两个版本，对比数据找出效果更好的那个', example:'We ran an A/B test to see which button color got more clicks.', exampleZh:'我们做了 A/B 测试，看哪种按钮颜色点击率更高。', memory:'A 组看版本 A，B 组看版本 B，用数据说话，不靠拍脑袋', related:['Conversion','Analytics','Experiment','Data'] },
-      { id:'conversion', term:'Conversion', fullName:'转化', pronunciation:'/kənˈvɜːrʒən/', chinese:'转化 / 转化率', chineseDef:'用户完成了你期望的动作（如注册、购买），转化率 = 完成人数 ÷ 总访问人数', example:'The new landing page increased conversions by 30%.', exampleZh:'新的落地页让转化率提升了 30%。', memory:'Convert = 转变 → 把"访客"转变成"用户/买家"的比率', related:['Funnel','CTA','Analytics','Revenue'] },
-      { id:'funnel', term:'Funnel', fullName:'漏斗 / 用户漏斗', pronunciation:'/ˈfʌnəl/', chinese:'用户漏斗', chineseDef:'描述用户从接触产品到最终转化，逐步流失的过程，像漏斗形状', example:'We need to identify where users drop off in the funnel.', exampleZh:'我们需要找到用户在漏斗哪个环节流失的。', memory:'漏斗：上面进来很多人，一层一层过滤，最底部才是真正转化的用户', related:['Conversion','Retention','Acquisition','Analytics'] },
-      { id:'retention', term:'Retention', fullName:'留存率', pronunciation:'/rɪˈtɛnʃən/', chinese:'留存率', chineseDef:'用户在一段时间后仍继续使用产品的比例，衡量产品粘性', example:'Our 7-day retention rate is 40%, which is above industry average.', exampleZh:'我们 7 日留存率是 40%，超过行业平均水平。', memory:'Retain = 留住 → 留住多少用户不流失', related:['Churn','DAU','Engagement','Funnel'] },
-      { id:'dau', term:'DAU / MAU', fullName:'Daily / Monthly Active Users', pronunciation:'/diː eɪ juː/', chinese:'日/月活跃用户数', chineseDef:'DAU = 每天使用产品的独立用户数；MAU = 每月使用的独立用户数', example:'Our DAU grew from 10K to 50K in three months.', exampleZh:'我们的日活从 1 万增长到 5 万，历时三个月。', memory:'Active = 活跃 → 真的在用你产品的人，不是僵尸账号', related:['Retention','Engagement','Analytics','KPI'] },
-      { id:'onboarding', term:'Onboarding', fullName:'新手引导', pronunciation:'/ˈɒnbɔːrdɪŋ/', chinese:'新手引导 / 用户引导', chineseDef:'帮助新用户快速了解产品、完成首次关键操作的引导流程', example:'A smooth onboarding experience is key to user retention.', exampleZh:'流畅的新手引导对提升留存率至关重要。', memory:'On board = 上船 → 帮新乘客顺利登船，不迷路', related:['UX','Retention','Tutorial','Activation'] },
-      { id:'iteration', term:'Iteration', fullName:'迭代', pronunciation:'/ˌɪtəˈreɪʃən/', chinese:'迭代', chineseDef:'在原有基础上持续改进，每次循环推出更好的版本', example:'We release new iterations every two weeks based on user feedback.', exampleZh:'我们每两周根据用户反馈发布新的迭代版本。', memory:'Iteration = 一圈一圈螺旋上升，每圈都比上一圈好', related:['Sprint','MVP','Agile','Release'] },
-      { id:'roadmap', term:'Roadmap', fullName:'产品路线图', pronunciation:'/ˈroʊdmæp/', chinese:'产品路线图', chineseDef:'规划产品未来功能和里程碑的时间线文档', example:'The product roadmap shows what features we plan to build each quarter.', exampleZh:'产品路线图展示了我们每季度计划开发的功能。', memory:'Road（路）+ Map（地图）→ 产品前进方向的"地图"', related:['Sprint','Milestone','Planning','Strategy'] },
-      { id:'kpi', term:'KPI', fullName:'Key Performance Indicator', pronunciation:'/ˌkeɪ piː ˈaɪ/', chinese:'关键绩效指标', chineseDef:'衡量目标达成情况的关键数据指标', example:'Our main KPI this quarter is reaching 100K registered users.', exampleZh:'我们本季度的主要 KPI 是达到 10 万注册用户。', memory:'Key（关键）Performance（表现）Indicator（指标）→ 最重要的那几个衡量数字', related:['OKR','Metric','Analytics','Goal'] },
-    ]
-  },
-  {
-    id: 2,
-    emoji: '⚙️',
-    color: '#3AAFA9',
-    bg: '#E0F7F6',
-    title: '开发与工程',
-    subtitle: 'Dev & Engineering',
-    words: [
-      { id:'repo', term:'Repository', fullName:'代码仓库', pronunciation:'/rɪˈpɒzɪtɔːri/', chinese:'代码仓库（简称 Repo）', chineseDef:'存储项目所有代码和历史记录的地方，常用 GitHub 管理', example:'Push your code to the repository before the deadline.', exampleZh:'在截止日期前把代码推送到仓库。', memory:'Repository = 图书馆 → 把代码"存档"在这里，随时查看历史版本', related:['Git','GitHub','Branch','Commit'] },
-      { id:'deploy', term:'Deploy', fullName:'部署', pronunciation:'/dɪˈplɔɪ/', chinese:'部署', chineseDef:'把开发好的代码发布到服务器上，让用户能够访问使用', example:'We deploy new updates every Friday afternoon.', exampleZh:'我们每周五下午部署新的更新。', memory:'Deploy = 军队"部署"到前线 → 把代码"部署"到服务器，正式上线', related:['Release','CI/CD','Server','Hosting'] },
-      { id:'sdk', term:'SDK', fullName:'Software Development Kit', pronunciation:'/ˌɛs diː ˈkeɪ/', chinese:'软件开发工具包', chineseDef:'开发者用来构建特定平台应用的工具、代码库和文档集合', example:'The iOS SDK lets developers build iPhone apps.', exampleZh:'iOS SDK 让开发者能构建 iPhone 应用。', memory:'Kit = 工具箱 → 给开发者准备好的"工具箱"，拿来就能用', related:['API','Library','Framework','Plugin'] },
-      { id:'framework', term:'Framework', fullName:'框架', pronunciation:'/ˈfreɪmwɜːrk/', chinese:'框架', chineseDef:'提供基础结构和规则的代码骨架，帮开发者更快地构建应用', example:'React is a popular frontend framework for building web apps.', exampleZh:'React 是构建 Web 应用的流行前端框架。', memory:'Framework = 房子的"框架" → 骨架搭好了，只需填充具体内容', related:['Library','SDK','React','Vue','Next.js'] },
-      { id:'git', term:'Git', fullName:'版本控制系统', pronunciation:'/ɡɪt/', chinese:'Git（版本控制工具）', chineseDef:'追踪代码修改历史的工具，支持多人协作，可以回滚到任意版本', example:'Use git commit to save your changes with a message.', exampleZh:'使用 git commit 并附上说明来保存你的修改。', memory:'Git 就像"代码时光机"，记录每一次修改，随时能回到过去', related:['GitHub','Repository','Branch','Commit'] },
-      { id:'debug', term:'Debug', fullName:'调试', pronunciation:'/ˌdiːˈbʌɡ/', chinese:'调试 / 排查 Bug', chineseDef:'找出并修复程序中错误（Bug）的过程', example:'I spent 3 hours debugging why the login button wasn\'t working.', exampleZh:'我花了 3 小时调试登录按钮不工作的问题。', memory:'Bug = 虫子（故事：早期程序员发现虫子卡在电路里导致故障）→ Debug = 除虫', related:['Bug','Testing','Error','Fix'] },
-      { id:'cicd', term:'CI/CD', fullName:'Continuous Integration / Continuous Deployment', pronunciation:'/ˌsiː aɪ siː ˈdiː/', chinese:'持续集成 / 持续部署', chineseDef:'自动化地测试和部署代码的流程，让更新更快更安全地上线', example:'CI/CD pipelines automatically test and deploy code on every push.', exampleZh:'CI/CD 流水线在每次代码推送时自动测试和部署。', memory:'Continuous = 持续不断 → 代码一提交，自动测试、自动上线，不用人工操作', related:['Deploy','Testing','Automation','DevOps'] },
-      { id:'opensource', term:'Open Source', fullName:'开源', pronunciation:'/ˈoʊpən sɔːrs/', chinese:'开源', chineseDef:'源代码对所有人公开，任何人都可以查看、使用和贡献', example:'Linux and Python are famous open source projects.', exampleZh:'Linux 和 Python 是著名的开源项目。', memory:'Open（开放）Source（源码）→ 公开"秘方"，所有人都能看、改、用', related:['GitHub','MIT License','Community','Fork'] },
-      { id:'container', term:'Container', fullName:'容器', pronunciation:'/kənˈteɪnər/', chinese:'容器（技术）', chineseDef:'把应用和它的依赖打包在一起的轻量级虚拟化技术，到哪都能运行', example:'Docker containers make it easy to run apps in any environment.', exampleZh:'Docker 容器让应用在任何环境中都能轻松运行。', memory:'Container = 集装箱 → 把应用打包成集装箱，在哪个码头（服务器）都能卸货运行', related:['Docker','Kubernetes','Deploy','DevOps'] },
-      { id:'refactor', term:'Refactor', fullName:'重构', pronunciation:'/ˌriːˈfæktər/', chinese:'重构', chineseDef:'在不改变程序功能的前提下，改善代码结构和质量', example:'We need to refactor this messy code before adding new features.', exampleZh:'在添加新功能之前，我们需要重构这段混乱的代码。', memory:'Re（重新）+ Factor（因子/结构）→ 重新整理代码结构，功能不变，质量提升', related:['Clean Code','Technical Debt','Review','Optimization'] },
-      { id:'latency', term:'Latency', fullName:'延迟', pronunciation:'/ˈleɪtənsi/', chinese:'延迟', chineseDef:'从发出请求到收到响应所需的时间，越低越好', example:'High latency makes the app feel slow and unresponsive.', exampleZh:'高延迟让应用感觉缓慢、反应迟钝。', memory:'Latent = 潜伏着 → 数据在网络中"潜伏"的时间，越短越好', related:['Performance','Bandwidth','Speed','Response Time'] },
-    ]
-  },
-  {
-    id: 3,
-    emoji: '🤖',
-    color: '#F39C12',
-    bg: '#FEF9E7',
-    title: 'AI 入门',
-    subtitle: 'AI Basics',
-    words: [
-      { id:'ai', term:'AI', fullName:'Artificial Intelligence', pronunciation:'/ˌeɪ ˈaɪ/', chinese:'人工智能', chineseDef:'让机器模拟人类智能行为（学习、推理、理解语言）的技术领域', example:'AI is transforming industries from healthcare to finance.', exampleZh:'AI 正在改变从医疗到金融的各个行业。', memory:'Artificial（人工）Intelligence（智能）→ 人类"造出来"的智能', related:['ML','LLM','Deep Learning','Neural Network'] },
-      { id:'ml', term:'Machine Learning', fullName:'机器学习', pronunciation:'/məˈʃiːn ˈlɜːrnɪŋ/', chinese:'机器学习', chineseDef:'让机器通过分析数据自动"学习"规律，而不是人工编程每条规则', example:'The spam filter uses machine learning to identify junk emails.', exampleZh:'垃圾邮件过滤器使用机器学习识别垃圾邮件。', memory:'Machine（机器）Learning（学习）→ 机器自己"学习"，不用人教每条规则', related:['AI','Deep Learning','Model','Training','Dataset'] },
-      { id:'model', term:'Model', fullName:'AI 模型', pronunciation:'/ˈmɒdəl/', chinese:'模型', chineseDef:'经过训练后能够执行特定任务（如识别图片、生成文字）的 AI 程序', example:'GPT-4 is a powerful language model developed by OpenAI.', exampleZh:'GPT-4 是 OpenAI 开发的强大语言模型。', memory:'Model = 模特 → AI"学习"后形成的"形态"，代表它掌握的知识', related:['Training','LLM','Inference','Parameter'] },
-      { id:'training', term:'Training', fullName:'训练', pronunciation:'/ˈtreɪnɪŋ/', chinese:'训练', chineseDef:'用大量数据让 AI 模型学习规律，调整内部参数的过程', example:'Training a large AI model can take weeks and cost millions of dollars.', exampleZh:'训练一个大型 AI 模型可能需要数周时间和数百万美元。', memory:'Training = 练习 → AI 通过反复"练习"海量数据，学会完成任务', related:['Dataset','Model','Fine-tuning','GPU'] },
-      { id:'dataset', term:'Dataset', fullName:'数据集', pronunciation:'/ˈdeɪtəsɛt/', chinese:'数据集', chineseDef:'用于训练 AI 模型的大量数据集合，质量决定模型好坏', example:'The model was trained on a dataset of 1 billion web pages.', exampleZh:'该模型在包含 10 亿个网页的数据集上进行训练。', memory:'Data（数据）+ Set（集合）→ 给 AI "读"的"教科书"合集', related:['Training','Model','Annotation','Preprocessing'] },
-      { id:'token', term:'Token', fullName:'令牌 / 词元', pronunciation:'/ˈtoʊkən/', chinese:'Token（词元）', chineseDef:'AI 处理文字时的最小单位，大约等于一个词或几个字符', example:'GPT-4 can process up to 128,000 tokens in one conversation.', exampleZh:'GPT-4 单次对话最多能处理 12.8 万个 Token。', memory:'Token 就像乐高积木块 → AI 把句子拆成一个个"积木块"来理解和生成', related:['Prompt','Context Window','LLM','Cost'] },
-      { id:'prompt', term:'Prompt', fullName:'提示词', pronunciation:'/prɒmpt/', chinese:'提示词 / Prompt', chineseDef:'给 AI 的输入指令，决定 AI 如何理解和回应你的请求', example:'A well-crafted prompt can dramatically improve AI output quality.', exampleZh:'精心设计的 Prompt 能大幅提升 AI 输出质量。', memory:'Prompt = 提示 → 给 AI 的"说明书"，写得越清楚，AI 越能理解你想要什么', related:['Token','LLM','Instruction','Chain of Thought'] },
-      { id:'inference', term:'Inference', fullName:'推理 / 推断', pronunciation:'/ˈɪnfərəns/', chinese:'推理（AI 生成过程）', chineseDef:'训练好的 AI 模型接收输入并产生输出的过程，即"使用"模型', example:'Inference takes milliseconds while training can take weeks.', exampleZh:'推理只需几毫秒，而训练可能需要数周。', memory:'Infer = 推断 → 模型根据输入"推断"出答案的过程', related:['Model','Training','Latency','GPU'] },
-      { id:'parameter', term:'Parameter', fullName:'参数', pronunciation:'/pəˈræmɪtər/', chinese:'参数', chineseDef:'AI 模型内部存储知识的数值，参数越多模型通常越强大', example:'GPT-3 has 175 billion parameters.', exampleZh:'GPT-3 拥有 1750 亿个参数。', memory:'Parameter = 记忆单元 → 模型靠数十亿个数字"记住"它学到的一切', related:['Model','Training','LLM','Weights'] },
-      { id:'hallucination', term:'Hallucination', fullName:'幻觉（AI）', pronunciation:'/həˌluːsɪˈneɪʃən/', chinese:'AI 幻觉', chineseDef:'AI 模型自信地生成错误、虚构信息的现象', example:'The AI hallucinated a fake research paper with made-up citations.', exampleZh:'AI 产生幻觉，编造了一篇带有虚假引用的研究论文。', memory:'Hallucination = 幻觉 → AI 在"做梦"，说出来的话听起来真实，实际上是编的', related:['LLM','Accuracy','Grounding','RAG'] },
-      { id:'benchmark', term:'Benchmark', fullName:'基准测试', pronunciation:'/ˈbɛntʃmɑːrk/', chinese:'基准测试', chineseDef:'用标准化测试集评估和比较 AI 模型性能的方法', example:'GPT-4 scored highest on most benchmarks.', exampleZh:'GPT-4 在大多数基准测试中得分最高。', memory:'Benchmark = 基准线 → 跳高的"横杆"，模型需要超过这条线才算好', related:['Evaluation','Performance','Metric','Model'] },
-      { id:'llm', term:'LLM', fullName:'Large Language Model', pronunciation:'/ˌɛl ɛl ˈɛm/', chinese:'大语言模型', chineseDef:'用海量文本训练、能理解和生成人类语言的大型 AI 模型', example:'ChatGPT and Claude are both large language models.', exampleZh:'ChatGPT 和 Claude 都是大语言模型。', memory:'Large（大）Language（语言）Model（模型）→ 读了海量文字、会"说话"的超大 AI', related:['GPT','Claude','Gemini','Token','Prompt'] },
-    ]
-  },
-  {
-    id: 4,
-    emoji: '🧠',
-    color: '#8E44AD',
-    bg: '#F3E8FF',
-    title: 'AI 进阶',
-    subtitle: 'AI Advanced',
-    words: [
-      { id:'agent', term:'Agent', fullName:'AI 智能体', pronunciation:'/ˈeɪdʒənt/', chinese:'AI 智能体 / Agent', chineseDef:'能自主规划、使用工具并完成复杂任务的 AI 程序，不只是问答', example:'The AI agent can browse the web, write code, and send emails automatically.', exampleZh:'AI Agent 能自动浏览网页、编写代码并发送邮件。', memory:'Agent = 特工 → AI"特工"自主行动，完成复杂任务，不需要一直指挥', related:['LLM','Tool Use','Autonomy','MCP','Workflow'] },
-      { id:'rag', term:'RAG', fullName:'Retrieval-Augmented Generation', pronunciation:'/ræɡ/', chinese:'检索增强生成', chineseDef:'AI 在回答问题前先检索外部知识库，结合检索内容生成更准确的回答', example:'RAG helps AI answer questions about your company\'s internal documents.', exampleZh:'RAG 帮助 AI 回答关于公司内部文件的问题。', memory:'先"查资料"，再"作答" → 就像开卷考试，AI 查完参考资料再回答你', related:['Embedding','Vector Database','Grounding','LLM'] },
-      { id:'embedding', term:'Embedding', fullName:'嵌入 / 向量化', pronunciation:'/ɪmˈbɛdɪŋ/', chinese:'嵌入（向量化）', chineseDef:'把文字、图片等信息转化为数字向量，让计算机能计算语义相似度', example:'Embeddings allow the system to find similar documents by meaning, not just keywords.', exampleZh:'Embedding 让系统能通过语义而非关键词找到相似文档。', memory:'Embedding = 把意思"埋进"数字里 → 语义相近的词，数字也相近', related:['Vector','RAG','Semantic Search','Similarity'] },
-      { id:'finetuning', term:'Fine-tuning', fullName:'微调', pronunciation:'/ˈfaɪn tjuːnɪŋ/', chinese:'微调', chineseDef:'在预训练大模型基础上，用特定数据进一步训练使其适应特定任务', example:'We fine-tuned the model on customer service conversations to improve responses.', exampleZh:'我们用客服对话数据微调了模型，改善了回复质量。', memory:'Fine-tune = 精细调音 → 钢琴已经大体调好了，再"微调"几个音符使其完美', related:['Training','Model','Transfer Learning','LoRA'] },
-      { id:'contextwindow', term:'Context Window', fullName:'上下文窗口', pronunciation:'/ˈkɒntɛkst ˈwɪndoʊ/', chinese:'上下文窗口', chineseDef:'AI 模型单次处理能记住的最大文本量，决定能"记住"多长的对话', example:'Claude has a 200K token context window — enough for an entire book.', exampleZh:'Claude 拥有 20 万 Token 的上下文窗口，足够处理整本书。', memory:'Context Window = AI 的"短期记忆"大小 → 窗口越大，记得越多，越不会"忘词"', related:['Token','Memory','LLM','RAG'] },
-      { id:'multimodal', term:'Multimodal', fullName:'多模态', pronunciation:'/ˌmʌltiˈmoʊdəl/', chinese:'多模态', chineseDef:'能同时处理多种类型数据（文字、图片、音频、视频）的 AI 能力', example:'GPT-4o is multimodal — it can understand both text and images.', exampleZh:'GPT-4o 是多模态的——它既能理解文字也能理解图片。', memory:'Multi（多）+ Modal（模式）→ 不只会"读字"，还会"看图""听声音"', related:['Vision','Audio','LLM','AI','Gemini'] },
-      { id:'alignment', term:'Alignment', fullName:'对齐', pronunciation:'/əˈlaɪnmənt/', chinese:'AI 对齐', chineseDef:'确保 AI 系统的行为、价值观与人类意图和价值观一致的研究领域', example:'AI alignment research aims to make powerful AI systems safe and beneficial.', exampleZh:'AI 对齐研究旨在使强大的 AI 系统安全且有益。', memory:'Align = 对准 → 让 AI 的"目标"与人类的"目标"对准，不跑偏', related:['Safety','RLHF','Ethics','Anthropic','Beneficial AI'] },
-      { id:'mcp', term:'MCP', fullName:'Model Context Protocol', pronunciation:'/ˌɛm siː ˈpiː/', chinese:'模型上下文协议', chineseDef:'让 AI 模型安全地连接外部工具和数据源的标准化协议（Anthropic 提出）', example:'With MCP, Claude can connect to your calendar, files, and databases.', exampleZh:'通过 MCP，Claude 可以连接到你的日历、文件和数据库。', memory:'MCP = AI 的"USB 接口" → 让 AI 能插上各种"外设"（工具），获取更多能力', related:['Agent','API','Tool Use','Claude','Integration'] },
-      { id:'rlhf', term:'RLHF', fullName:'Reinforcement Learning from Human Feedback', pronunciation:'/ˌɑːr ɛl eɪtʃ ˈɛf/', chinese:'人类反馈强化学习', chineseDef:'通过人类对 AI 输出进行评分排序来训练模型，使其更符合人类偏好', example:'RLHF is how ChatGPT was trained to give helpful and harmless responses.', exampleZh:'RLHF 是 ChatGPT 被训练成给出有用且无害回复的方式。', memory:'人类"裁判"评分 → AI 学会迎合"好评"，避免"差评"', related:['Alignment','Training','Reward Model','Fine-tuning'] },
-      { id:'zeroshot', term:'Zero-shot', fullName:'零样本学习', pronunciation:'/ˈzɪərəʊ ʃɒt/', chinese:'零样本学习', chineseDef:'AI 无需任何示例就能完成新任务的能力，直接理解指令并执行', example:'A zero-shot prompt asks the model to do something without any examples.', exampleZh:'零样本 Prompt 不提供任何示例就要求模型完成任务。', memory:'Zero（零）Shot（示例）→ 零个例子照样能做，说明 AI 真的"学会了"', related:['Few-shot','Prompt','In-context Learning','LLM'] },
-      { id:'cot', term:'Chain of Thought', fullName:'思维链', pronunciation:'/tʃeɪn əv θɔːt/', chinese:'思维链（CoT）', chineseDef:'让 AI 一步步展示推理过程的技术，能显著提升复杂推理的准确性', example:'Adding "think step by step" to your prompt activates chain of thought reasoning.', exampleZh:'在 Prompt 中加入"逐步思考"可激活思维链推理。', memory:'Chain of Thought = 写出"思考步骤" → 就像数学题要写过程，不只写答案', related:['Prompt','Reasoning','CoT','LLM'] },
-      { id:'vectordb', term:'Vector Database', fullName:'向量数据库', pronunciation:'/ˈvɛktər ˈdeɪtəbeɪs/', chinese:'向量数据库', chineseDef:'专门存储和检索向量（Embedding）的数据库，支持语义相似度搜索', example:'Pinecone and Chroma are popular vector databases for AI applications.', exampleZh:'Pinecone 和 Chroma 是流行的 AI 应用向量数据库。', memory:'普通数据库按"关键词"找，向量数据库按"意思"找，更像人类思维', related:['Embedding','RAG','Semantic Search','Pinecone'] },
-    ]
-  },
-  {
-    id: 5,
-    emoji: '🚀',
-    color: '#2ECC71',
-    bg: '#E8F8EA',
-    title: '前沿科技',
-    subtitle: 'Frontier Tech',
-    words: [
-      { id:'saas', term:'SaaS', fullName:'Software as a Service', pronunciation:'/sæs/', chinese:'软件即服务', chineseDef:'通过互联网订阅使用软件，不需要安装，按月/年付费', example:'Notion, Slack, and Zoom are all SaaS products.', exampleZh:'Notion、Slack 和 Zoom 都是 SaaS 产品。', memory:'Software as a Service = 软件变"水电" → 用多少付多少，不用买硬件', related:['Cloud','Subscription','PaaS','IaaS'] },
-      { id:'microservices', term:'Microservices', fullName:'微服务架构', pronunciation:'/ˈmaɪkrəʊˌsɜːvɪsɪz/', chinese:'微服务', chineseDef:'把一个大应用拆成多个小的独立服务，各自独立部署和扩展', example:'Netflix uses microservices to handle millions of users simultaneously.', exampleZh:'Netflix 用微服务同时处理数百万用户。', memory:'Micro（微小）+ Services（服务）→ 把大厨房拆成多个小档口，互不影响', related:['API','Container','Docker','Architecture'] },
-      { id:'llmops', term:'LLMOps', fullName:'Large Language Model Operations', pronunciation:'/ˌɛl ɛl ɛm ɒps/', chinese:'大语言模型运维', chineseDef:'管理 AI 模型在生产环境中部署、监控、优化的一整套工程实践', example:'LLMOps teams monitor model performance and handle prompt versioning.', exampleZh:'LLMOps 团队监控模型性能并管理 Prompt 版本。', memory:'LLM + Ops（运维）→ 像管理软件一样管理 AI 模型的"上线运营"', related:['MLOps','Deploy','Monitoring','Prompt Management'] },
-      { id:'generativeai', term:'Generative AI', fullName:'生成式 AI', pronunciation:'/ˈdʒɛnərətɪv eɪ aɪ/', chinese:'生成式 AI', chineseDef:'能创造全新内容（文字、图片、音频、视频、代码）的 AI 技术', example:'Generative AI can write essays, generate images, and compose music.', exampleZh:'生成式 AI 能写文章、生成图片、创作音乐。', memory:'Generate = 生成、创造 → 不只分析数据，还能从零创造新内容', related:['LLM','DALL-E','Stable Diffusion','Midjourney'] },
-      { id:'copilot', term:'Copilot', fullName:'AI 副驾驶', pronunciation:'/ˈkoʊpaɪlɒt/', chinese:'AI Copilot（副驾驶）', chineseDef:'辅助人类完成工作的 AI 工具，提供建议、补全、自动化，人类保持主控', example:'GitHub Copilot suggests code as you type, boosting developer productivity.', exampleZh:'GitHub Copilot 在你打字时提供代码建议，提升开发效率。', memory:'Copilot = 副驾驶 → 飞机上正驾驶（你）主飞，副驾驶（AI）协助，不抢控制权', related:['Agent','AI','Automation','Productivity'] },
-      { id:'orchestration', term:'Orchestration', fullName:'编排', pronunciation:'/ˌɔːrkɪˈstreɪʃən/', chinese:'编排（AI / 系统）', chineseDef:'协调多个 AI 模型、工具或服务按照特定流程工作的过程', example:'The orchestration layer coordinates which AI agent handles each task.', exampleZh:'编排层协调哪个 AI Agent 处理哪个任务。', memory:'Orchestra（管弦乐团）→ 指挥让各种乐器/AI 各司其职、协同演奏', related:['Agent','Workflow','Automation','Pipeline'] },
-      { id:'semanticsearch', term:'Semantic Search', fullName:'语义搜索', pronunciation:'/sɪˈmæntɪk sɜːrtʃ/', chinese:'语义搜索', chineseDef:'按照语义和含义搜索，而非关键词匹配，能理解"意思相同但词不同"', example:'Semantic search finds "car accidents" even when you search for "vehicle crashes".', exampleZh:'语义搜索在你搜索"vehicle crashes"时也能找到"car accidents"相关结果。', memory:'Semantic = 语义的 → 懂"意思"的搜索，不像傻乎乎的关键词匹配', related:['Embedding','RAG','Vector Database','Search'] },
-      { id:'edgecomputing', term:'Edge Computing', fullName:'边缘计算', pronunciation:'/ɛdʒ kəmˈpjuːtɪŋ/', chinese:'边缘计算', chineseDef:'在靠近数据产生的地方（设备端）处理数据，而非全部送到云端', example:'Self-driving cars use edge computing to make real-time decisions.', exampleZh:'自动驾驶汽车使用边缘计算来实时做决策。', memory:'Edge = 边缘（设备端）→ 不把数据发到"中心"，在"边缘"就地处理，更快更省', related:['Cloud','IoT','Latency','5G'] },
-      { id:'websocket', term:'WebSocket', fullName:'WebSocket 协议', pronunciation:'/ˈwɛbˌsɒkɪt/', chinese:'WebSocket', chineseDef:'允许服务器和客户端建立持续双向通信连接的协议，实现实时数据推送', example:'Chat apps use WebSocket so messages appear instantly without page refresh.', exampleZh:'聊天应用用 WebSocket 实现消息实时显示，不需要刷新页面。', memory:'WebSocket = 永久热线电话 → HTTP 是打一次挂断，WebSocket 是保持通话不挂', related:['HTTP','Real-time','API','Protocol'] },
-      { id:'nocode', term:'No-code / Low-code', fullName:'无代码 / 低代码', pronunciation:'/nəʊ koʊd/', chinese:'无代码 / 低代码', chineseDef:'不需要写代码（或只写少量代码）就能构建应用的工具和平台', example:'With no-code tools, marketers can build landing pages without developers.', exampleZh:'用无代码工具，市场人员无需开发者就能构建落地页。', memory:'No Code = 不用写代码 → 拖拖拽拽就建好应用，降低技术门槛', related:['SaaS','Automation','Bubble','Webflow'] },
-    ]
-  }
+{id:0,emoji:'🌐',color:'#6C63FF',bg:'#EAE8FF',title:'互联网基础',sub:'Internet Basics',words:[
+{id:'server',term:'Server',full:'服务器',pron:'/ˈsɜːrvər/',emoji:'🖥️',ph:'塞儿-哇',phTip:'像个永远在"塞满活儿"的伙计，随叫随到',zh:'服务器',def:'存储数据并向其他设备提供服务的计算机程序或硬件',story:'🏪 想象你开了一家 24 小时便利店，你就是 Server。顾客（Client）随时推门进来要东西，你永远不能关门说"我先睡会儿"。Server 就是这个永不下班、专门给别人提供服务的机器。',ex:'The website is hosted on a server in Singapore.',exZh:'这个网站托管在新加坡的服务器上。',rel:['Client','Cloud','Database','Host']},
+{id:'client',term:'Client',full:'客户端',pron:'/ˈklaɪənt/',emoji:'📱',ph:'克-莱-恩特',phTip:'像个挑剔的"客人"，只管提需求',zh:'客户端',def:'向服务器发出请求并接收结果的设备或程序，如手机App、浏览器',story:'🍽️ 还是餐厅比喻：Client 是点菜的食客，Server 是厨师。食客只需开口说"我要一份数据"，不需要知道厨房怎么运作。你的手机、浏览器都是 Client，向服务器索要内容。',ex:'The mobile app is the client that talks to the backend server.',exZh:'手机App是与后端服务器通信的客户端。',rel:['Server','Browser','Frontend','App']},
+{id:'api',term:'API',full:'Application Programming Interface',pron:'/ˌeɪ piː ˈaɪ/',emoji:'🔌',ph:'诶-批-爱',phTip:'诶，批量地让两个程序互相爱上对方',zh:'应用程序接口',def:'让不同软件之间能互相通信的一套规则和约定',story:'🍽️ 你去餐厅（网络服务）吃饭，不会跑进厨房自己炒菜。服务员（API）是传话的人——你说"给我天气数据"，服务员转身告诉厨房，再把结果端出来。API 就是这套"如何点餐、如何上菜"的规范。',ex:'The weather app uses an API to get real-time forecast data.',exZh:'天气应用通过 API 获取实时预报数据。',rel:['SDK','Endpoint','REST','Request']},
+{id:'database',term:'Database',full:'数据库',pron:'/ˈdeɪtəbeɪs/',emoji:'🗄️',ph:'得-它-贝斯',phTip:'得到它的"贝斯"（基础），数据的地基',zh:'数据库',def:'有组织地存储大量数据，支持快速查询和更新的系统',story:'📚 想象一个巨大的图书馆，每本书（数据）都有编号，管理员（数据库系统）能在几毫秒内找到任意一本。没有数据库，网站登录时就没法知道"这个密码是否正确"，购物车也没法记住你选了什么。',ex:'All user accounts and passwords are stored in a secure database.',exZh:'所有用户账号和密码存储在安全的数据库中。',rel:['SQL','Query','Backend','Storage']},
+{id:'frontend',term:'Frontend',full:'前端',pron:'/ˈfrɒntɛnd/',emoji:'🎨',ph:'弗朗-特-恩德',phTip:'在"前面"能看到的那一端',zh:'前端',def:'用户直接看到和操作的部分——界面、按钮、颜色、动画',story:'🏠 盖房子时，前端是装修和外立面——用户走进来看到的一切：墙色、家具、灯光。后端是水电管道，埋在墙里看不见。前端开发者负责让产品好看好用，用户感受到的体验都是前端的功劳。',ex:'The frontend developer redesigned the homepage to be more intuitive.',exZh:'前端开发者重新设计了主页，让它更直观易用。',rel:['Backend','UI','HTML','CSS','React']},
+{id:'backend',term:'Backend',full:'后端',pron:'/ˈbækɛnd/',emoji:'⚙️',ph:'拜-克-恩德',phTip:'"背后"那一端，幕后英雄',zh:'后端',def:'用户看不到的部分，负责业务逻辑、数据存储和计算',story:'🎭 剧院舞台上演员光彩夺目（前端），后台的灯光师、音响师、道具组（后端）决定演出能否顺利进行。当你在网站下单，后端悄悄完成了：验证你的身份、检查库存、扣款、通知仓库——全部发生在你看不到的地方。',ex:'The backend handles all the payment processing and order management.',exZh:'后端处理所有支付流程和订单管理。',rel:['Frontend','Server','API','Database']},
+{id:'cloud',term:'Cloud',full:'云计算',pron:'/klaʊd/',emoji:'☁️',ph:'克-劳-德',phTip:'像云一样飘在天上，随时可取',zh:'云计算',def:'通过网络租用计算资源（服务器、存储、软件），不用自己买硬件',story:'💡 过去开公司要自己买服务器放机房，像买发电机自己发电。云计算像接通了电网——你不用买发电机，按用量付费，随时增减。AWS、阿里云就是这样的"电网公司"，你的App跑在它们的机器上。',ex:'We moved all our data storage to the cloud to save costs.',exZh:'我们把所有数据存储迁移到云端以节省成本。',rel:['AWS','SaaS','Server','Storage']},
+{id:'protocol',term:'Protocol',full:'协议',pron:'/ˈprəʊtəkɒl/',emoji:'📋',ph:'扑-柔-托-科',phTip:'扑上去柔和地"托"着数据传输',zh:'协议',def:'计算机之间通信时必须共同遵守的规则和标准',story:'🌍 想象两个不同国家的人通话：如果一个说中文一个说英文，什么都传不了。协议就是双方提前约定"我们用英文，按这个格式说话"。HTTP 是网页协议，TCP/IP 是互联网基础协议——没有它们，数据发出去对方根本听不懂。',ex:'HTTP is the protocol used to transfer web pages between servers and browsers.',exZh:'HTTP 是服务器和浏览器之间传输网页所用的协议。',rel:['HTTP','HTTPS','TCP/IP','API']},
+{id:'cache',term:'Cache',full:'缓存',pron:'/kæʃ/',emoji:'⚡',ph:'凯什',phTip:'读音像"cash"（现金），把常用数据"存现"备用',zh:'缓存',def:'把常用数据临时保存在快速存储中，下次访问不用重新加载',story:'🧠 你每天上班走同一条路，不需要每次都掏出地图重新导航——这条路已经"缓存"在你脑子里了。网页缓存同理：第一次加载图片需要从服务器下载，之后浏览器把它存在本地，下次秒开。',ex:'Clear your browser cache if the website looks broken or outdated.',exZh:'如果网站显示异常或过时，清除浏览器缓存试试。',rel:['Browser','Performance','CDN','Memory']},
+{id:'dns',term:'DNS',full:'Domain Name System',pron:'/ˌdiː ɛn ˈɛs/',emoji:'📖',ph:'迪-恩-艾斯',phTip:'互联网的"电话簿"',zh:'域名系统',def:'把人能记住的域名（google.com）翻译成机器能识别的 IP 地址',story:'📞 手机联系人里你存的是"妈妈"，不是"138xxxxxxxx"。DNS 就是互联网的联系人簿——你输入 google.com，DNS 悄悄把它翻译成 142.250.80.46（真实 IP），浏览器才知道该敲哪扇门。',ex:'A DNS error means your device cannot find the website\'s IP address.',exZh:'DNS 错误意味着你的设备找不到该网站的 IP 地址。',rel:['Domain','IP Address','URL','Server']},
+{id:'ip',term:'IP Address',full:'Internet Protocol Address',pron:'/ˌaɪ ˈpiː ˈædrɛs/',emoji:'📍',ph:'爱-批 地址',phTip:'互联网上每台设备的"门牌号"',zh:'IP 地址',def:'网络中每台设备的唯一数字标识，如 192.168.1.1',story:'🏘️ 城市里每栋楼都有门牌号，快递员才能准确送货。IP 地址就是网络世界的门牌号——服务器有 IP，你的手机有 IP，数据包按照这个"门牌"找到正确的目的地。IPv4 是四段数字，IPv6 是新一代更长的格式。',ex:'Your device gets a new IP address every time you connect to a different Wi-Fi.',exZh:'每次连接不同 Wi-Fi，你的设备会获得一个新的 IP 地址。',rel:['DNS','Protocol','Router','Network']},
+{id:'cdn',term:'CDN',full:'Content Delivery Network',pron:'/ˌsiː diː ˈɛn/',emoji:'🌍',ph:'си-迪-恩',phTip:'内容的"全球快递网络"',zh:'内容分发网络',def:'在全球多地部署服务器节点，让用户从最近的节点获取内容，加快速度',story:'🍕 一家只在北京有厨房的披萨店，送货到广州要3小时。CDN 就是在全国开分店——广州用户从广州节点取数据，北京用户从北京取。YouTube、Netflix 都靠 CDN 让全球用户都能流畅播放视频。',ex:'CDN ensures users around the world get fast loading speeds.',exZh:'CDN 确保全球用户都能获得快速的加载速度。',rel:['Server','Cache','Latency','Cloud']},
+{id:'firewall',term:'Firewall',full:'防火墙',pron:'/ˈfaɪərwɔːl/',emoji:'🛡️',ph:'法-儿-沃',phTip:'像一堵"火墙"，挡住危险流量',zh:'防火墙',def:'监控并过滤网络流量，阻止未授权或有害的连接',story:'🚧 小区门口的保安亭——住户和快递可以进，陌生人要登记，可疑人员直接拦截。防火墙就是网络的"保安"，设置规则决定哪些流量能进，哪些必须滚开。公司防火墙能阻止黑客入侵也能屏蔽员工上某些网站。',ex:'The corporate firewall blocks access to social media during work hours.',exZh:'公司防火墙在工作时间屏蔽对社交媒体的访问。',rel:['Security','Network','Proxy','Encryption']},
+{id:'https',term:'HTTPS',full:'HyperText Transfer Protocol Secure',pron:'/ˌeɪtʃ tiː tiː piː ɛs/',emoji:'🔒',ph:'H-T-T-P-S',phTip:'比 HTTP 多了个"S"——Safe，安全版本',zh:'安全超文本传输协议',def:'HTTP 的加密版本，用 SSL/TLS 加密传输数据，防止被截听',story:'💌 普通 HTTP 像发明信片——邮递员（中间人）能看到内容。HTTPS 像把信装进密封信封——即使被人截走，也看不到里面写什么。浏览器地址栏的🔒小锁就代表用了 HTTPS。网购、登录一定要认准它。',ex:'Always check for HTTPS before entering your password on a website.',exZh:'在网站输入密码前，务必确认地址栏有 HTTPS。',rel:['HTTP','SSL','Encryption','Security']},
+{id:'encryption',term:'Encryption',full:'加密',pron:'/ɪnˈkrɪpʃən/',emoji:'🔐',ph:'英-克-瑞-普-申',phTip:'"把内容扭曲成只有持钥匙的人才能看懂的形态"',zh:'加密',def:'将数据转换为只有授权方才能解读的格式，保护信息安全',story:'🔏 古代间谍用密码本把"明天进攻"写成一串乱码，只有拿到同款密码本的人才能解读。现代加密用数学算法做同样的事——你的微信消息、银行交易都经过加密，即使被截获也是一堆乱码。',ex:'All messages in this app are protected with end-to-end encryption.',exZh:'该应用中所有消息均受端对端加密保护。',rel:['HTTPS','SSL','Security','Privacy']},
+{id:'latency',term:'Latency',full:'延迟',pron:'/ˈleɪtənsi/',emoji:'⏱️',ph:'雷-腾-си',phTip:'"雷声"传到你耳边需要时间，延迟就是这段时间',zh:'延迟',def:'从发出请求到收到响应所用的时间，单位通常是毫秒（ms）',story:'🎮 打网游时你按下攻击键，角色过0.5秒才出手——这0.5秒就是延迟（Latency）。延迟越低，体验越流畅。实时通话、直播、游戏对延迟要求极高；下载大文件则更在乎带宽。',ex:'High latency makes video calls feel laggy and unresponsive.',exZh:'高延迟会让视频通话感觉卡顿、反应迟钝。',rel:['Bandwidth','Performance','CDN','Network']},
+{id:'bandwidth',term:'Bandwidth',full:'带宽',pron:'/ˈbændwɪdθ/',emoji:'🚰',ph:'班-德-威斯',phTip:'"管道的宽度"——越宽，流量越大',zh:'带宽',def:'单位时间内网络能传输的最大数据量，决定网速上限',story:'🚰 带宽像水管的粗细——细管子（低带宽）一次只能流一点水，就算水压够（低延迟）也很慢。粗管子（高带宽）能同时冲满多个水桶。视频会议吃带宽，游戏更在乎延迟——两者不是一回事。',ex:'Streaming 4K video requires significantly more bandwidth than HD.',exZh:'播放 4K 视频所需的带宽远超 HD 视频。',rel:['Latency','Network','Speed','Data']},
+{id:'proxy',term:'Proxy',full:'代理服务器',pron:'/ˈprɒksi/',emoji:'🕵️',ph:'扑-乐-克-西',phTip:'"替我出面"的那个人',zh:'代理',def:'在用户和目标服务器之间中转请求的中间服务器',story:'🕵️ 你不想直接去谈判，派一个代理人替你出面——对方不知道真正的买家是谁。网络代理同理：你的请求先到代理服务器，代理再帮你转发，目标网站只看到代理的地址，不知道你是谁。VPN 本质上也是一种代理。',ex:'The company uses a proxy server to filter employee internet traffic.',exZh:'公司使用代理服务器过滤员工的网络流量。',rel:['VPN','Firewall','Privacy','Network']},
+{id:'port',term:'Port',full:'端口',pron:'/pɔːrt/',emoji:'🚪',ph:'破-特',phTip:'像建筑里的一扇扇"门"，各有专属编号',zh:'端口',def:'网络通信中用于区分不同服务的数字标识（0-65535）',story:'🏢 一栋大楼（服务器）有一个地址（IP），但里面有很多办公室（服务）。端口就是各办公室的房间号——80号是网页服务，443是HTTPS，22是远程登录。敲门时要说清楚找哪个房间，数据才能找到正确的服务。',ex:'Web servers typically listen on port 80 for HTTP and port 443 for HTTPS.',exZh:'Web 服务器通常在 80 端口监听 HTTP，在 443 端口监听 HTTPS。',rel:['Server','Network','Protocol','Firewall']},
+{id:'auth',term:'Authentication',full:'身份验证',pron:'/ɔːˌθɛntɪˈkeɪʃən/',emoji:'🪪',ph:'奥-然-提-凯-申',phTip:'"你是谁"的验证',zh:'身份验证（认证）',def:'验证用户是否是其声称的那个人，常见方式：密码、指纹、验证码',story:'🏦 银行柜台：取款要出示身份证证明你是账户持有人——这就是认证（Authentication）。网站登录时输入密码，就是在向系统证明"我就是这个账号的主人"。',ex:'Two-factor authentication adds an extra layer of security to your account.',exZh:'双因素认证为你的账户增加了额外的安全层。',rel:['Authorization','Password','OAuth','Security']},
+{id:'authz',term:'Authorization',full:'授权',pron:'/ˌɔːθərɪˈzeɪʃən/',emoji:'🔑',ph:'奥-撒-瑞-泽-申',phTip:'"你能干什么"的许可',zh:'授权',def:'确定已验证身份的用户有权执行哪些操作或访问哪些资源',story:'🏦 认证（Authentication）是"你是谁"，授权（Authorization）是"你能干什么"。进公司大门要刷工卡（认证）；进了大门，普通员工能去自己工位，但不能进服务器机房（授权）。两个概念经常混用，其实截然不同。',ex:'Even authenticated users need proper authorization to access admin features.',exZh:'即使通过身份验证的用户，也需要相应授权才能访问管理功能。',rel:['Authentication','Permissions','OAuth','Access Control']},
+{id:'session',term:'Session',full:'会话',pron:'/ˈsɛʃən/',emoji:'⏳',ph:'塞-申',phTip:'"一次完整的来往"',zh:'会话',def:'用户与服务器之间一段时间内的持续交互，用于记住登录状态',story:'☕ 你走进咖啡馆，服务员认出你（登录），整个下午你点了三次咖啡，服务员都记得你（Session 保持）。你离开（退出登录），下次来服务员要重新认你。Session 就是这段"被记住"的时间窗口。',ex:'Your login session expires after 30 minutes of inactivity for security.',exZh:'出于安全考虑，无操作 30 分钟后登录会话将过期。',rel:['Cookie','Authentication','Token','State']},
+{id:'cookie',term:'Cookie',full:'网络 Cookie',pron:'/ˈkʊki/',emoji:'🍪',ph:'曲-奇',phTip:'就是字面意思的"曲奇饼干"——网站留在你这的小纸条',zh:'Cookie（网络小文件）',def:'网站存在你浏览器里的小段数据，用来记住你的状态和偏好',story:'🍪 你去咖啡馆，第二次进门服务员递给你一张小卡片——上面写着"这位客人喜欢无糖拿铁，上次买过会员卡"。Cookie 就是网站放在你浏览器里的这张"小卡片"，记住你的登录状态、购物车、语言偏好等。',ex:'Accepting cookies allows websites to remember your preferences and login.',exZh:'接受 Cookie 允许网站记住你的偏好和登录状态。',rel:['Session','Storage','Browser','Privacy']},
+{id:'request',term:'Request',full:'请求',pron:'/rɪˈkwɛst/',emoji:'📤',ph:'瑞-奎斯特',phTip:'"请求"就是字面意思，向服务器开口要东西',zh:'请求',def:'客户端向服务器发出的数据获取或操作指令',story:'📞 你打电话问"有没有A型血"——这就是一个 Request（请求）。服务器收到请求，处理后把结果发回给你（Response）。每次你刷新网页、提交表单、点击按钮，背后都在发出一个或多个 Request。',ex:'The app sends a request to the server every time you pull to refresh.',exZh:'每次下拉刷新时，应用都向服务器发送一个请求。',rel:['Response','API','HTTP','Client']},
+{id:'response',term:'Response',full:'响应',pron:'/rɪˈspɒns/',emoji:'📥',ph:'瑞-斯-庞斯',phTip:'对请求的"回应"',zh:'响应',def:'服务器收到请求后返回的数据或结果',story:'📞 接上 Request 的例子：医院接到你的问询，告诉你"有，O型也有"——这就是 Response（响应）。Response 里包含状态码（200表示成功，404表示找不到，500表示服务器出错）和实际数据。',ex:'A 404 response means the server could not find the requested page.',exZh:'404 响应意味着服务器找不到请求的页面。',rel:['Request','HTTP','API','Status Code']},
+{id:'url',term:'URL',full:'Uniform Resource Locator',pron:'/ˌjuː ɑːr ˈɛl/',emoji:'🔗',ph:'优-阿-艾',phTip:'互联网上每个页面的"家庭住址"',zh:'统一资源定位符（网址）',def:'互联网上每个资源的唯一地址，告诉浏览器去哪里找内容',story:'🏠 寄快递要写完整地址：省市区街道门牌号。URL 就是网络世界的完整地址：协议（https://）+ 域名（google.com）+ 路径（/search）+ 参数（?q=hello）。少了任何一部分，快递就送不到了。',ex:'Copy and paste the URL into your browser to open the shared page.',exZh:'把 URL 复制粘贴到浏览器即可打开分享的页面。',rel:['Domain','HTTP','Link','DNS']},
+{id:'http',term:'HTTP',full:'HyperText Transfer Protocol',pron:'/ˌeɪtʃ tiː tiː ˈpiː/',emoji:'🌐',ph:'H-T-T-P',phTip:'四个字母，互联网最基础的"语言"',zh:'超文本传输协议',def:'浏览器和服务器之间传输网页内容的标准协议',story:'📬 你写了一封信（请求），按照一定格式投入邮筒，邮政系统（HTTP）负责传输，收件方按同样格式读信（响应）。HTTP 定义了信封格式、邮递规则，让全球数十亿设备能用同一套方式交换网页内容。',ex:'HTTP was created by Tim Berners-Lee to share documents between researchers.',exZh:'HTTP 由蒂姆·伯纳斯-李创建，最初用于研究人员之间共享文档。',rel:['HTTPS','URL','Protocol','Browser']},
+{id:'json',term:'JSON',full:'JavaScript Object Notation',pron:'/ˈdʒeɪsɒn/',emoji:'📄',ph:'杰-森',phTip:'就是人名"Jason"的读法！一种数据格式',zh:'JSON',def:'一种轻量级的数据交换格式，人可读，机器也容易解析',story:'📋 API 返回数据时总要用一种双方都认识的"语言"。JSON 就是最通用的那种——用花括号和键值对组织信息，像这样：{"name":"张三","age":25}。前端后端都懂，几乎所有编程语言都支持。',ex:'The API returns user data in JSON format, which the app then displays.',exZh:'API 以 JSON 格式返回用户数据，应用再将其展示出来。',rel:['API','Data','Format','XML']},
+{id:'loadbalancer',term:'Load Balancer',full:'负载均衡器',pron:'/loʊd ˈbælənsr/',emoji:'⚖️',ph:'楼-德 芭-兰-色',phTip:'像收银台调度员，"这边三号收银台请过来"',zh:'负载均衡器',def:'将大量网络请求分发到多台服务器，防止单台过载',story:'🏪 超市收银台：一个收银员排了100人的长队，旁边3个收银员却闲着。调度员（Load Balancer）出现了："3号、4号、5号也开始收！"大型网站同时面对千万用户，负载均衡器把请求分散给多台服务器，没有一台会被压垮。',ex:'The load balancer distributes traffic across five servers to ensure reliability.',exZh:'负载均衡器将流量分布到五台服务器，确保系统可靠运行。',rel:['Server','Scalability','Cloud','Traffic']},
+{id:'router',term:'Router',full:'路由器',pron:'/ˈruːtər/',emoji:'📡',ph:'如-特',phTip:'像交通警察，指挥数据包走哪条路',zh:'路由器',def:'网络中负责将数据包转发到正确目的地的设备',story:'🚦 数据包在网络里旅行，每到一个岔路口就遇到一个路由器——路由器检查数据包的目的地址，决定"应该走左边这条路还是右边"。你家里的 WiFi 路由器把家庭网络和互联网连接起来，同时充当这个"交通指挥员"。',ex:'Your home router connects all your devices to the internet.',exZh:'你家的路由器将所有设备连接到互联网。',rel:['Network','IP Address','Protocol','Firewall']},
+{id:'domain',term:'Domain',full:'域名',pron:'/dəˈmeɪn/',emoji:'🏷️',ph:'多-梅-因',phTip:'互联网上你的"品牌名"',zh:'域名',def:'人类可读的网站地址名称，如 google.com，背后对应服务器的 IP 地址',story:'🏢 公司名字（域名）和公司地址（IP）是两回事。你说"去腾讯总部"，导航帮你找到具体地址——DNS 帮域名翻译成 IP。好域名就像好店名，易记、易传播；差域名让人根本记不住你在哪里。',ex:'The company paid $5 million to buy the premium domain name.',exZh:'该公司花了500万美元购买这个高价值域名。',rel:['DNS','URL','HTTPS','IP Address']},
+{id:'browser',term:'Browser',full:'浏览器',pron:'/ˈbraʊzər/',emoji:'🌐',ph:'布-劳-泽',phTip:'像在网络世界"浏览"的眼睛',zh:'浏览器',def:'用于访问和显示网页的软件，如 Chrome、Safari、Firefox',story:'🖼️ 浏览器是你探索互联网世界的"窗户"。它懂得把服务器返回的 HTML、CSS、JavaScript 代码解读成你看到的彩色网页。Chrome、Safari、Firefox 本质都是干这件事的，只是各有不同的解读细节和速度优化。',ex:'Chrome is the world\'s most widely used web browser.',exZh:'Chrome 是全球使用最广泛的网络浏览器。',rel:['HTML','HTTP','Cache','Cookie']}
+]},
+
+{id:1,emoji:'📱',color:'#FF6B6B',bg:'#FFE8E8',title:'产品与运营',sub:'Product & Growth',words:[
+{id:'ux',term:'UX',full:'User Experience',pron:'/ˌjuː ˈɛks/',emoji:'✨',ph:'优-艾克斯',phTip:'"用户体验"的英文缩写，X代表体验（Experience）',zh:'用户体验',def:'用户在使用产品过程中的整体感受，包括易用性、情感和效率',story:'🛒 在超市购物的全程感受就是 UX：入口好不好找、货架标识清不清楚、结账是否顺畅、推车顺不顺手。产品的 UX 包括第一次打开App时是否困惑、完成一个任务要点几下、出错时有没有清晰提示。',ex:'Good UX design makes complex features feel simple and intuitive.',exZh:'好的 UX 设计让复杂功能感觉简单直观。',rel:['UI','Design','Research','Usability']},
+{id:'ui',term:'UI',full:'User Interface',pron:'/ˌjuː ˈaɪ/',emoji:'🎨',ph:'优-爱',phTip:'"用户界面"，你眼睛看到的那一层',zh:'用户界面',def:'用户能看到和操作的所有视觉元素：按钮、图标、颜色、字体、布局',story:'🎨 UI 是穿在 UX 身上的衣服——衣服好不好看是 UI，穿着舒不舒适是 UX。同一个功能，用难看的灰色方块实现和用精心设计的彩色卡片实现，UX 可能一样，UI 天差地别。设计师常说"不要只追求好看的 UI，忽略了 UX"。',ex:'The UI was completely redesigned to feel modern and fresh.',exZh:'UI 被彻底重新设计，呈现出现代清新的感觉。',rel:['UX','Design','Frontend','Wireframe']},
+{id:'mvp',term:'MVP',full:'Minimum Viable Product',pron:'/ˌɛm viː ˈpiː/',emoji:'🚀',ph:'M-V-P',phTip:'最小可行产品，不是"最有价值球员"！',zh:'最小可行产品',def:'用最少功能快速推出的产品版本，用来验证市场需求是否存在',story:'🚗 想造一辆车，MVP 不是先造"一个残缺的车轮"，而是先做一辆"能用的滑板车"——它能解决核心问题（代步），拿到真实用户反馈后再逐步升级。Dropbox 最初只是一个演示视频，用来验证"有没有人需要云同步"——这就是 MVP 思维。',ex:'We launched the MVP in three weeks to test if users actually needed this feature.',exZh:'我们在三周内推出了 MVP，测试用户是否真的需要这个功能。',rel:['Prototype','Iteration','Lean','Startup']},
+{id:'abtest',term:'A/B Test',full:'A/B 测试',pron:'/ˌeɪ biː tɛst/',emoji:'🔬',ph:'A-B 测试',phTip:'A 组看版本A，B 组看版本B，数据说话',zh:'A/B 测试',def:'同时向不同用户展示两个版本，通过数据对比找出效果更好的方案',story:'🧪 大家争论按钮应该用蓝色还是红色，产品经理说"不争了，都上！"——50%用户看蓝按钮，50%看红按钮，两周后数据说红色点击率高20%。这就是 A/B 测试：用实验替代猜测，让数据做决策。',ex:'We ran an A/B test and found the shorter headline increased sign-ups by 15%.',exZh:'我们做了 A/B 测试，发现较短的标题让注册量提升了 15%。',rel:['Conversion','Analytics','Experiment','Data']},
+{id:'conversion',term:'Conversion',full:'转化',pron:'/kənˈvɜːrʒən/',emoji:'🎯',ph:'肯-佛-日-恩',phTip:'把"看客"转化成"买家"',zh:'转化（率）',def:'用户完成目标行为（注册/购买/点击）的比例。转化率=完成人数÷总访问人数',story:'🏪 100人走进店里，最终3人掏钱买东西——转化率就是3%。电商对话率哪怕提升1%，年收入可能差百万。"提高转化率"是产品最重要的目标之一：减少步骤、降低门槛、消除顾虑，每一个细节都影响这个数字。',ex:'Simplifying the checkout process increased our conversion rate from 2% to 5%.',exZh:'简化结账流程让我们的转化率从 2% 提升到了 5%。',rel:['Funnel','CTA','Analytics','Revenue']},
+{id:'funnel',term:'Funnel',full:'用户漏斗',pron:'/ˈfʌnəl/',emoji:'📊',ph:'法-奈',phTip:'像漏斗，进口大出口小，每层都在流失人',zh:'用户漏斗',def:'描述用户从接触产品到最终转化，每个环节都会流失一部分人的过程',story:'💧 漏斗最宽处：100万人看到广告；中间层：10万人点进来；再窄：1万人注册；最细处：1000人真正付费。每层都有"漏洞"，运营要做的就是找到哪层漏得最厉害，补上那个洞。',ex:'We identified a major drop-off in the second step of our sign-up funnel.',exZh:'我们发现注册漏斗第二步有大量用户流失。',rel:['Conversion','Retention','Analytics','Acquisition']},
+{id:'retention',term:'Retention',full:'留存率',pron:'/rɪˈtɛnʃən/',emoji:'🧲',ph:'瑞-腾-申',phTip:'"留住"用户不流失的能力',zh:'留存率',def:'在特定时间后（如7天、30天）仍继续使用产品的用户比例',story:'🪣 一个漏底的桶，你不断往里加水（获取新用户），但水也在不断漏出去（用户流失）。留存率就是桶底有多"严"。次日留存40%意味着今天来了100个新用户，明天还剩40个在用。留存率是衡量产品是否有真实价值的核心指标。',ex:'Our 30-day retention rate improved significantly after we redesigned onboarding.',exZh:'重新设计新手引导后，我们的 30 日留存率显著提升。',rel:['Churn','DAU','Engagement','Funnel']},
+{id:'dau',term:'DAU/MAU',full:'Daily/Monthly Active Users',pron:'/diː eɪ juː/',emoji:'👥',ph:'D-A-U',phTip:'日活/月活，衡量"真正在用"的人数',zh:'日/月活跃用户',def:'DAU=每天使用产品的独立用户数；MAU=每月使用的独立用户数',story:'📈 注册用户100万，听起来很多——但如果 DAU 只有1000，说明99.9%的用户注册后就再也没回来。DAU/MAU 的比值（粘性）才是真正的健康指标。微信的 DAU/MAU 接近100%，说明用户每天都在用；有些App的比值不到5%。',ex:'Our DAU grew from 10,000 to 50,000 in three months after the new feature launch.',exZh:'新功能上线后三个月，我们的日活从 1 万增长到 5 万。',rel:['Retention','MAU','Analytics','KPI']},
+{id:'onboarding',term:'Onboarding',full:'新手引导',pron:'/ˈɒnbɔːrdɪŋ/',emoji:'👋',ph:'昂-鲍-丁',phTip:'"上船"——帮新乘客顺利登船不迷路',zh:'新手引导',def:'帮助新用户快速了解产品、完成首次关键操作的引导流程',story:'✈️ 坐飞机，空乘会在起飞前演示安全须知——这就是 Onboarding。好的 App Onboarding 在用户第一次打开时，用最少步骤帮他们完成一件"有价值的事"：发第一条消息、导入第一个联系人、看到第一条内容。让用户立刻感受到产品价值，他才会留下来。',ex:'A well-designed onboarding experience can double your day-one retention.',exZh:'精心设计的新手引导可以让次日留存率翻倍。',rel:['UX','Retention','Tutorial','Activation']},
+{id:'kpi',term:'KPI',full:'Key Performance Indicator',pron:'/ˌkeɪ piː ˈaɪ/',emoji:'🎯',ph:'K-P-I',phTip:'关键绩效指标，团队最重要的那几个数字',zh:'关键绩效指标',def:'衡量目标达成情况的关键数据指标',story:'⚽ 足球教练说"本赛季目标：进球数30+，失球数少于15，联赛排名前三"——这三个就是 KPI。好的 KPI 必须是可量化、有时限、与目标直接相关的。模糊的"提高用户体验"不是 KPI，具体的"次日留存率达到40%"才是。',ex:'Our team\'s KPI this quarter is to reach 100,000 registered users.',exZh:'我们团队本季度的 KPI 是达到 10 万注册用户。',rel:['OKR','Metric','Analytics','Goal']},
+{id:'okr',term:'OKR',full:'Objectives and Key Results',pron:'/ˌoʊ keɪ ˈɑːr/',emoji:'🏔️',ph:'O-K-R',phTip:'目标+关键结果，Google 推广的管理方法',zh:'目标与关键结果',def:'设定雄心勃勃的目标（Objective），并定义可量化的关键结果（Key Results）来衡量是否达成',story:'🧭 OKR 格式：O（目标）= 成为用户最喜爱的笔记应用；KR1 = App Store 评分达到4.8；KR2 = 月活增长50%；KR3 = NPS分数超过60。Google、Intel 都用这套方法对齐团队方向，OKR 不考核绩效，而是帮团队聚焦方向。',ex:'Our Q3 OKRs focus on improving product quality and reducing churn.',exZh:'我们 Q3 的 OKR 聚焦于提升产品质量和降低流失率。',rel:['KPI','Goal','Strategy','Management']},
+{id:'sprint',term:'Sprint',full:'冲刺',pron:'/sprɪnt/',emoji:'🏃',ph:'斯-普-林特',phTip:'短跑冲刺，固定时间段内全力开发',zh:'Sprint（冲刺）',def:'敏捷开发中固定时长（通常1-2周）的迭代开发周期',story:'🏃 马拉松运动员不会从头跑到尾保持全速，但短跑运动员在100米内全力冲刺。软件开发的 Sprint 就是设定一个短期目标（2周内完成登录功能），全力冲刺，结束时展示成果，然后开始下一个 Sprint。',ex:'We completed the payment feature in the last two-week sprint.',exZh:'我们在上一个两周 Sprint 中完成了支付功能。',rel:['Agile','Backlog','Iteration','Scrum']},
+{id:'backlog',term:'Backlog',full:'待办列表',pron:'/ˈbæklɒɡ/',emoji:'📝',ph:'拜-克-劳格',phTip:'"堆在背后的一堆事"',zh:'产品待办列表',def:'所有待开发功能和任务的优先级列表，按重要性排序',story:'📦 仓库里堆着各种待处理的货物——有些紧急（用户一直抱怨的Bug），有些重要但不紧急（新功能），有些可以等等（界面微调）。Backlog 就是这个"仓库清单"，产品经理的工作之一就是不断给清单里的项目重新排序和清理。',ex:'The engineering team has a backlog of 40 features waiting to be built.',exZh:'工程团队有 40 个功能等待开发的待办列表。',rel:['Sprint','Roadmap','Priority','Agile']},
+{id:'wireframe',term:'Wireframe',full:'线框图',pron:'/ˈwaɪərfreɪm/',emoji:'📐',ph:'外-儿-弗-雷姆',phTip:'"线"组成的"框架"，设计草图',zh:'线框图',def:'只用线条和方块展示页面布局和功能结构的低保真原型，不含颜色和图片',story:'🏗️ 建筑师画蓝图时，先用简单的线条标出墙在哪、门在哪、窗在哪——不管颜色材质。Wireframe 就是产品的"建筑蓝图"：这里放标题、这里是按钮、这里显示列表。它快速、易改，用来确认功能逻辑而非视觉设计。',ex:'We showed the wireframe to users for feedback before starting visual design.',exZh:'在开始视觉设计之前，我们向用户展示线框图收集反馈。',rel:['Prototype','UI','UX','Design']},
+{id:'prototype',term:'Prototype',full:'原型',pron:'/ˈprəʊtətaɪp/',emoji:'🔧',ph:'扑-柔-托-太普',phTip:'"原始版本"，可交互的演示',zh:'原型',def:'可交互的产品演示版本，用于测试设计方案和收集反馈，不含真实代码',story:'🎬 电影正式开拍前，导演会先拍"样片"——用低成本验证剧情方向、演员表现、镜头风格。原型就是产品的"样片"：可以点击、跳转、模拟交互，但背后没有真实数据和代码。用原型找问题，比写完代码再改要便宜得多。',ex:'We built a clickable prototype in Figma and tested it with 10 users.',exZh:'我们在 Figma 中制作了可点击的原型，并与 10 名用户进行了测试。',rel:['Wireframe','MVP','UX','Design']},
+{id:'persona',term:'Persona',full:'用户画像',pron:'/pəˈsoʊnə/',emoji:'👤',ph:'坡-索-纳',phTip:'代表典型用户的"角色卡"',zh:'用户画像',def:'基于调研数据创建的典型用户虚构角色，帮助团队理解目标用户',story:'👤 产品团队说"我们为谁做这个产品？"——"小王，28岁，职场新人，每天通勤1小时，想用碎片时间学英语，手机是安卓，不太懂技术……"这就是一个 Persona。它帮团队做决策时保持一致：这个功能小王会用吗？这个流程小王能看懂吗？',ex:'We created three user personas based on interviews with 50 real customers.',exZh:'我们基于对 50 位真实客户的访谈，创建了三个用户画像。',rel:['UX','Research','Target User','Design']},
+{id:'cta',term:'CTA',full:'Call to Action',pron:'/ˌsiː tiː ˈeɪ/',emoji:'👆',ph:'С-T-A',phTip:'"号召行动"，引导用户点击的那个按钮',zh:'行动号召',def:'引导用户执行特定行为的按钮、链接或文案，如"立即注册"、"免费试用"',story:'📣 街上的传单上写"扫码领取免费咖啡"——"扫码"就是 CTA。网页上的"立即注册"、"免费下载"、"开始体验"，App里的"发布"、"购买"、"关注"——每一个引导用户行动的元素都是 CTA。CTA 的措辞和颜色直接影响转化率。',ex:'Changing the CTA from "Submit" to "Get My Free Trial" doubled our sign-ups.',exZh:'将 CTA 从"提交"改成"获取免费试用"让注册量翻了一倍。',rel:['Conversion','UI','Marketing','Button']},
+{id:'seo',term:'SEO',full:'Search Engine Optimization',pron:'/ˌɛs iː ˈoʊ/',emoji:'🔍',ph:'S-E-O',phTip:'让搜索引擎更容易"找到"你',zh:'搜索引擎优化',def:'通过优化网页内容和结构，让网站在搜索结果中排名更靠前',story:'🏆 Google 搜索"学英语"，结果第一页就10个位置。SEO 就是争夺这些黄金位置的艺术——好的标题、关键词、页面速度、外部链接都影响排名。排在第一页和第二页的流量差距可以是10倍。',ex:'Good SEO can bring thousands of visitors to your website every day without paid ads.',exZh:'好的 SEO 每天可以为你的网站带来数千访客，无需付费广告。',rel:['Analytics','Content','Traffic','Keywords']},
+{id:'analytics',term:'Analytics',full:'数据分析',pron:'/ˌænəˈlɪtɪks/',emoji:'📊',ph:'安-纳-利-提-克斯',phTip:'"分析数据"，用数字讲故事',zh:'数据分析',def:'收集、处理和解读用户行为数据，用于指导产品决策',story:'🔍 Analytics 就像给产品装上"摄像头"——记录用户在哪里点了什么、停留多久、从哪个页面离开。有了这些数据，你就能做数据驱动的决策，而不是靠感觉。Google Analytics、Amplitude、Mixpanel 都是常用的分析工具。',ex:'Analytics showed that 80% of users dropped off at the payment step.',exZh:'数据分析显示，80% 的用户在支付步骤流失。',rel:['Data','KPI','Conversion','Funnel']},
+{id:'bouncerate',term:'Bounce Rate',full:'跳出率',pron:'/baʊns reɪt/',emoji:'🏃',ph:'班斯 雷特',phTip:'"弹开"的比率——进来就走',zh:'跳出率',def:'只浏览一个页面就离开网站的用户比例，高跳出率通常说明内容与用户期望不符',story:'🚪 100人推开门走进来，80人扫了一眼立刻转身离开，只有20人继续往里走——跳出率就是80%。电商网站跳出率高意味着广告吸引来的人和实际内容不匹配。不同类型的页面正常跳出率差异很大：博客文章可以接受80%，商品详情页超过60%就要警惕了。',ex:'Our blog has a high bounce rate because readers find the answer and immediately leave.',exZh:'我们博客的跳出率很高，因为读者找到答案后立刻就离开了。',rel:['Retention','Analytics','UX','Traffic']},
+{id:'churn',term:'Churn Rate',full:'流失率',pron:'/tʃɜːrn reɪt/',emoji:'🕳️',ph:'切-恩 雷特',phTip:'"像牛奶分离一样"，用户从产品中"分离"出去',zh:'流失率',def:'在特定时间内停止使用产品的用户比例，留存率的反面',story:'🪣 你有100个付费用户，每月有5个取消订阅——月流失率5%。看起来不多？一年后只剩54个！复利效应让流失率变得非常危险。SaaS 公司通常要把月流失率控制在2%以下才能健康增长。',ex:'We reduced monthly churn from 8% to 3% by improving customer support.',exZh:'通过改善客户支持，我们将月流失率从 8% 降至 3%。',rel:['Retention','DAU','Subscription','LTV']},
+{id:'nps',term:'NPS',full:'Net Promoter Score',pron:'/ˌɛn piː ˈɛs/',emoji:'❤️',ph:'N-P-S',phTip:'"净推荐值"，一道题测出用户有多爱你',zh:'净推荐值',def:'通过"你有多大可能把这个产品推荐给朋友？（0-10）"来量化用户忠诚度的指标',story:'💬 9-10分的人是推荐者（Promoters），7-8分是中立者，0-6分是批评者（Detractors）。NPS = 推荐者% - 批评者%。苹果的 NPS 超过70，是最高的之一；一般产品能达到30就很好了。这一道题浓缩了用户对整个产品体验的态度。',ex:'Our NPS jumped from 20 to 55 after we launched the new customer support system.',exZh:'推出新客户支持系统后，我们的 NPS 从 20 跃升到 55。',rel:['Retention','Satisfaction','Analytics','Customer']},
+{id:'featureflag',term:'Feature Flag',full:'功能开关',pron:'/ˈfiːtʃər flæɡ/',emoji:'🚩',ph:'费-切 弗莱格',phTip:'"旗子"控制功能开关，想开就开想关就关',zh:'功能开关',def:'允许在不重新部署代码的情况下，动态开关特定功能的技术机制',story:'🚦 新功能开发好了，但还不确定效果——先只对10%的用户开启。发现问题？一键关掉，所有用户都退回旧版，不需要紧急发版。Feature Flag 就是这个"灯开关"，让你可以精细控制谁能看到什么功能，是做灰度测试的标配工具。',ex:'We use feature flags to roll out new features gradually to 10% of users first.',exZh:'我们用功能开关先向 10% 的用户逐步推出新功能。',rel:['A/B Test','Deploy','Rollout','Engineering']},
+{id:'beta',term:'Beta',full:'Beta 测试',pron:'/ˈbiːtə/',emoji:'🧪',ph:'贝-塔',phTip:'希腊字母第二位，正式版之前的测试版',zh:'Beta 测试 / 公测',def:'向部分真实用户开放产品测试，在正式发布前发现问题',story:'🎮 游戏公司在正式发售前邀请玩家参与"内测"——这就是 Beta 测试。真实用户在真实环境中使用，能发现内部测试没发现的问题：某种特殊手机卡、某个地区网络慢、某类用户根本不理解某个功能。',ex:'We invited 1,000 users to join the beta program before the official launch.',exZh:'正式发布前，我们邀请了 1000 名用户参加 Beta 测试。',rel:['MVP','Testing','Launch','Feedback']},
+{id:'milestone',term:'Milestone',full:'里程碑',pron:'/ˈmaɪlstəʊn/',emoji:'🏁',ph:'迈-尔-斯-通',phTip:'旅途中的"路边石碑"，标记重要节点',zh:'里程碑',def:'项目中具有重要意义的关键时间节点或阶段完成标志',story:'🛣️ 古代旅途中，每隔一里就立一块石头（里程碑）告诉旅人走了多远、还有多远。项目里的里程碑是"完成注册功能"、"上线Beta版"、"获得第1000个付费用户"——是整个团队对齐进度的锚点。',ex:'Reaching 1 million users was a major milestone for our team.',exZh:'达到 100 万用户是我们团队的一个重要里程碑。',rel:['Roadmap','Sprint','Goal','Planning']},
+{id:'stakeholder',term:'Stakeholder',full:'利益相关者',pron:'/ˈsteɪkhəʊldər/',emoji:'🤝',ph:'斯-泰-克-侯-德',phTip:'"持有利益股份"的人，项目成败影响到的所有人',zh:'利益相关者',def:'对项目结果有利益关系或决策影响力的所有人',story:'🏢 一个产品决策——"把免费功能改成付费"——影响到谁？用户（可能流失）、销售（多一个卖点）、客服（面对更多投诉）、CEO（增加收入）、工程师（要开发付费墙）……这些都是 Stakeholder，重大决策前都要考虑他们的诉求。',ex:'We presented the roadmap to all key stakeholders before getting final approval.',exZh:'在获得最终批准之前，我们向所有关键利益相关者展示了路线图。',rel:['Management','Decision','Communication','Project']},
+{id:'painpoint',term:'Pain Point',full:'痛点',pron:'/peɪn pɔɪnt/',emoji:'😣',ph:'佩因-波因特',phTip:'"痛"的"点"，用户最难受的那个问题',zh:'痛点',def:'用户在使用过程中感到不满、不便或困扰的具体问题',story:'😤 "每次找外卖菜单要翻好久""打车等了20分钟还没来""银行转账要填12个字段"——这些就是痛点。好产品的起点往往是精准击中一个痛点。找痛点最好的方法：直接问用户"你最烦什么"，然后认真听。',ex:'The app was built to solve the pain point of managing too many passwords.',exZh:'这款应用就是为了解决管理太多密码这个痛点而构建的。',rel:['UX','User Research','Problem','Value']}
+]},
+
+{id:2,emoji:'⚙️',color:'#3AAFA9',bg:'#E0F7F6',title:'开发与工程',sub:'Dev & Engineering',words:[
+{id:'repo',term:'Repository',full:'代码仓库',pron:'/rɪˈpɒzɪtɔːri/',emoji:'📦',ph:'瑞-坡-兹-托-瑞',phTip:'"存放东西的地方"，代码的图书馆',zh:'代码仓库（Repo）',def:'存储项目所有代码、历史记录和版本的地方，常用 GitHub 管理',story:'📚 想象一个图书馆不仅存着书，还记录了每本书每次修改的历史——谁在第几页加了什么、删了什么、为什么改。Repository 就是这样的代码图书馆。"帮我看一下这个 repo"是开发者最常说的话之一。',ex:'Please push your code to the repository before submitting the pull request.',exZh:'请在提交 pull request 之前将代码推送到仓库。',rel:['Git','GitHub','Branch','Commit']},
+{id:'deploy',term:'Deploy',full:'部署',pron:'/dɪˈplɔɪ/',emoji:'🚀',ph:'滴-普-洛伊',phTip:'像军队"部署"到前线，代码上线出征',zh:'部署',def:'把开发完成的代码发布到服务器，让真实用户能够访问和使用',story:'🏭 工厂里生产完了产品（代码写好了），装车运到商店上架（部署），顾客才能买（用户才能用）。没有部署，再好的代码也只在开发者电脑里。"我们今天下午部署"就是"今天下午更新上线"。',ex:'We deploy new updates every Friday afternoon after thorough testing.',exZh:'经过充分测试后，我们每周五下午部署新的更新。',rel:['Release','CI/CD','Server','GitHub']},
+{id:'sdk',term:'SDK',full:'Software Development Kit',pron:'/ˌɛs diː ˈkeɪ/',emoji:'🧰',ph:'S-D-K',phTip:'"开发工具箱"，拿来就能用',zh:'软件开发工具包',def:'开发者用来构建特定平台或服务应用的工具、代码库和文档集合',story:'🧰 你要装修家里，不用自己去买锤子、锯子、螺丝刀——租一套工具箱（SDK）就能干活了。集成微信支付 SDK，开发者不用自己写支付协议，调用几个函数就搞定。SDK 是平台送给开发者的"豪华工具箱"。',ex:'We integrated the payment SDK to add Alipay and WeChat Pay in one day.',exZh:'我们集成了支付 SDK，一天内就加上了支付宝和微信支付。',rel:['API','Library','Framework','Plugin']},
+{id:'framework',term:'Framework',full:'框架',pron:'/ˈfreɪmwɜːrk/',emoji:'🏗️',ph:'弗-雷姆-沃克',phTip:'"建筑框架"，房子的骨架搭好了，填充内容就行',zh:'框架',def:'提供基础结构、规则和工具的代码骨架，帮开发者更快构建应用',story:'🏠 造房子时先搭好钢筋框架，再砌砖填充。React、Vue 是前端框架，Django、Spring 是后端框架——它们把通用的问题（路由、状态管理、数据库连接）都解决好了，你只需要专注写自己的业务逻辑。',ex:'React is the most popular frontend framework for building modern web apps.',exZh:'React 是构建现代 Web 应用最流行的前端框架。',rel:['Library','SDK','React','Vue']},
+{id:'git',term:'Git',full:'分布式版本控制系统',pron:'/ɡɪt/',emoji:'🌿',ph:'给特',phTip:'"代码时光机"，任意时刻都能回到过去',zh:'Git（版本控制工具）',def:'追踪代码修改历史的工具，支持多人协作，可回滚到任意历史版本',story:'⏰ 假设你写文章时每隔一小时自动保存一个版本，写坏了可以回到三小时前——这就是 Git 的核心能力。不同的是，Git 还能让多人同时修改同一份文件，自动合并各人的改动。"git commit"是开发者每天说最多的动词之一。',ex:'Use git commit to save your changes with a descriptive message.',exZh:'用 git commit 保存更改，并写上清晰的说明。',rel:['GitHub','Repository','Branch','Commit']},
+{id:'debug',term:'Debug',full:'调试',pron:'/ˌdiːˈbʌɡ/',emoji:'🐛',ph:'迪-巴格',phTip:'"除虫"，找出并修复程序里的Bug',zh:'调试',def:'找出并修复程序中错误（Bug）的过程',story:'🪲 1940年代，一只飞蛾卡进计算机电路导致故障，工程师把它取出来贴在日志本上，写下"发现实际虫子（bug）"——Bug 和 Debug 的词源就在这里。现代调试是在代码里找逻辑错误，"我在 debug"就是"我在找哪行代码写错了"。',ex:'I spent three hours debugging why the login button wasn\'t responding.',exZh:'我花了三小时调试登录按钮为何没有响应。',rel:['Bug','Testing','Error','Fix']},
+{id:'cicd',term:'CI/CD',full:'Continuous Integration / Continuous Deployment',pron:'/ˌsiː aɪ siː ˈdiː/',emoji:'🔄',ph:'СI/CD',phTip:'"持续"自动测试和部署，代码一提交就自动跑',zh:'持续集成/持续部署',def:'自动化地测试和部署代码的流程，让更新更快更安全地上线',story:'🏭 流水线工厂：原材料进来，自动检测质量（CI），合格的自动包装发货（CD）。代码推送后，CI/CD 流水线自动：运行所有测试、检查代码风格、构建产品、部署到服务器——全程无需人工操作，大大减少"手动发版翻车"的概率。',ex:'Our CI/CD pipeline automatically runs 500 tests before every deployment.',exZh:'我们的 CI/CD 流水线在每次部署前自动运行 500 个测试。',rel:['Deploy','Testing','Automation','DevOps']},
+{id:'opensource',term:'Open Source',full:'开源',pron:'/ˈoʊpən sɔːrs/',emoji:'🌍',ph:'欧-彭-索斯',phTip:'"公开源码"，代码对所有人开放',zh:'开源',def:'源代码对所有人公开，任何人都可以查看、使用、修改和贡献',story:'📖 想象一家餐厅不仅卖菜，还把菜谱全都公开——任何人都能学、改、改良后再分享。Linux、Python、Android 都是开源的。开源社区是互联网最神奇的协作形式：全球数百万开发者共同维护，创造出许多最重要的技术基础设施。',ex:'VS Code is a free, open source code editor with millions of contributors.',exZh:'VS Code 是一个免费的开源代码编辑器，拥有数百万贡献者。',rel:['GitHub','License','Community','Fork']},
+{id:'container',term:'Container',full:'容器',pron:'/kənˈteɪnər/',emoji:'📦',ph:'肯-太-纳',phTip:'"集装箱"技术，应用打包带走，到哪都能跑',zh:'容器（技术）',def:'把应用及其所有依赖打包在一起的轻量级虚拟化技术，环境一致、随处可运行',story:'🚢 集装箱发明前，不同形状的货物装卸极麻烦；集装箱统一了标准，换哪条船都能装。Docker 容器做同样的事：把应用和它需要的所有环境打包，在开发者电脑上能跑，在测试服务器上能跑，在生产服务器上也完全一样——解决了"在我机器上明明好用"的永恒难题。',ex:'Docker containers ensure the app runs identically on every developer\'s machine.',exZh:'Docker 容器确保应用在每台开发者机器上运行方式完全相同。',rel:['Docker','Kubernetes','Deploy','Microservices']},
+{id:'refactor',term:'Refactor',full:'重构',pron:'/ˌriːˈfæktər/',emoji:'🔨',ph:'瑞-法-克特',phTip:'"重新整理"，功能不变，质量提升',zh:'重构',def:'在不改变程序功能的前提下，改善代码的内部结构和质量',story:'🏠 房子用了10年，管道开始老化，重新布线——住户感觉不到变化（功能没变），但房子更安全可靠（质量提升）。代码重构同理：函数名更清晰、逻辑更简单、去掉重复代码——用户感受不到，但下次改需求时开发速度快了一倍。',ex:'We spent a full sprint refactoring the payment module to improve reliability.',exZh:'我们花了整整一个 Sprint 重构支付模块，以提升可靠性。',rel:['Technical Debt','Clean Code','Optimization','Review']},
+{id:'rest',term:'REST',full:'Representational State Transfer',pron:'/rɛst/',emoji:'🌐',ph:'雷斯特',phTip:'像"休息"一样简洁，API 设计的主流风格',zh:'REST（API设计风格）',def:'一种设计网络API的架构风格，通过HTTP方法（GET/POST/PUT/DELETE）操作资源',story:'📮 寄信、收信、改信、撕信——对信件的四种操作。REST API 把互联网上所有数据想象成"资源"，用四个动词操作：GET（取）、POST（创建）、PUT（修改）、DELETE（删）。URL 是资源地址，HTTP 方法是动作，组合起来就能表达任何操作。',ex:'Most modern APIs follow REST conventions for predictable and consistent behavior.',exZh:'大多数现代 API 遵循 REST 规范，以实现可预测和一致的行为。',rel:['API','HTTP','JSON','Endpoint']},
+{id:'webhook',term:'Webhook',full:'网络钩子',pron:'/ˈwɛbhʊk/',emoji:'🪝',ph:'维伯-胡克',phTip:'"钩子"挂在那，事件发生时自动触发',zh:'Webhook',def:'当特定事件发生时，服务自动向你指定的URL发送通知的机制',story:'🔔 你不用一直盯着快递进度，而是留下手机号——快递到了自动打电话给你。Webhook 就是这个"到了叫我"机制。GitHub 代码合并时，自动通知 CI/CD 系统开始构建；支付成功时，自动通知你的服务器发货——这些都是 Webhook。',ex:'We set up a webhook to receive notifications whenever a new payment is made.',exZh:'我们设置了一个 Webhook，在每次新支付时自动接收通知。',rel:['API','Event','Integration','Automation']},
+{id:'async',term:'Async',full:'Asynchronous（异步）',pron:'/ˈeɪsɪŋk/',emoji:'⚡',ph:'诶-新克',phTip:'"异步"，不用等上一件事完成就能干下一件',zh:'异步（Async）',def:'不需要等待上一个操作完成就可以继续执行后续代码的编程方式',story:'☕ 你走进咖啡馆点了一杯咖啡，不用站在柜台等5分钟——你先去找位子、打开电脑干活，咖啡好了叫你（回调）。同步是：点完等到拿到才能走。异步让程序不会"卡在等待"上，性能大幅提升。',ex:'The app uses async calls so the UI stays responsive while data is loading.',exZh:'应用使用异步调用，以便在数据加载时界面保持响应。',rel:['Callback','Promise','Thread','Performance']},
+{id:'middleware',term:'Middleware',full:'中间件',pron:'/ˈmɪdəlweər/',emoji:'🔗',ph:'咪-德-尔-维尔',phTip:'"夹在中间"的软件层',zh:'中间件',def:'在请求到达目标处理逻辑前，对请求进行拦截和处理的软件层',story:'🏢 公司大门有保安（验证证件）、前台（登记信息）、电梯管理员（分配楼层）——你到达目的地前经过了三个"中间"环节。服务器的中间件做类似的事：身份验证、日志记录、数据格式转换、权限检查——都在请求真正被处理之前完成。',ex:'Authentication middleware checks every request for a valid token before processing.',exZh:'身份验证中间件在处理每个请求之前检查其是否有有效的 token。',rel:['Backend','API','Authentication','Request']},
+{id:'ratelimiting',term:'Rate Limiting',full:'速率限制',pron:'/reɪt ˈlɪmɪtɪŋ/',emoji:'🚦',ph:'雷特-利-咪-亭',phTip:'"限速"，防止有人疯狂刷接口',zh:'速率限制',def:'限制用户在单位时间内能发出请求次数的机制，防止滥用和过载',story:'📱 某人发现API没有限制，写了个脚本每秒发送1000个请求——服务器直接崩了。Rate Limiting 就是门口的保安："每分钟最多100个请求，超了就等等"。免费用户每分钟60次，付费用户每分钟1000次——这也是商业模式的一部分。',ex:'Our free API tier has a rate limit of 100 requests per minute.',exZh:'我们的免费 API 版本有每分钟 100 次请求的速率限制。',rel:['API','Security','Quota','Performance']},
+{id:'oauth',term:'OAuth',full:'Open Authorization',pron:'/ˈoʊˌɔːθ/',emoji:'🔑',ph:'欧-奥斯',phTip:'"用第三方账号登录"背后的标准协议',zh:'OAuth（开放授权）',def:'允许用户授权第三方应用访问其在另一平台账户信息的标准协议',story:'🔑 你用"微信登录"某个App，不需要把微信密码告诉那个App——微信发给它一张"授权卡"，说"这个用户允许你知道他的昵称和头像"。OAuth 就是这套"发授权卡"的标准流程，安全、通用、不暴露真实密码。',ex:'OAuth allows users to sign in with Google or Apple without creating a new password.',exZh:'OAuth 允许用户用 Google 或 Apple 账号登录，无需创建新密码。',rel:['Authentication','Authorization','API','Security']},
+{id:'pullrequest',term:'Pull Request',full:'拉取请求',pron:'/pʊl rɪˈkwɛst/',emoji:'🔀',ph:'普-尔 瑞-奎斯特',phTip:'"请求把我的代码拉进主分支"',zh:'Pull Request（PR）',def:'开发者完成功能后，请求把代码合并进主分支的流程，通常需要代码审查',story:'📝 你写了一篇文章想加入百科全书，不能直接改——你提交申请（Pull Request），编辑审查（Code Review）：逻辑对不对、格式符不符合规范、有没有错别字。通过后才合并进正文。PR 是团队协作的核心流程，也是代码质量的守门员。',ex:'Please open a pull request and assign it to two reviewers before merging.',exZh:'请在合并之前提交 pull request 并指派两位审阅者。',rel:['Git','Repository','Code Review','Branch']},
+{id:'branch',term:'Branch',full:'分支',pron:'/brɑːntʃ/',emoji:'🌿',ph:'布-兰奇',phTip:'像树枝一样分叉，互不干扰',zh:'分支',def:'从主代码线分叉出来的独立开发线，可以安全地开发新功能不影响主版本',story:'🌳 大树的主干是稳定运行的产品代码，要开发新功能就从主干长出一条新树枝（branch）——在这里随便折腾，不影响主干。功能做好了测试通过，再把这根树枝合并回主干。这是团队多人同时开发不打架的关键。',ex:'Always create a new branch for each feature to keep the main branch clean.',exZh:'每个功能都创建新分支，保持主分支的整洁。',rel:['Git','Merge','Pull Request','Repository']},
+{id:'algorithm',term:'Algorithm',full:'算法',pron:'/ˈælɡərɪðəm/',emoji:'🧮',ph:'艾-哥-瑞-嗦姆',phTip:'"艾哥瑞嗦姆"，解决问题的步骤配方',zh:'算法',def:'解决特定问题的一系列明确步骤和规则',story:'🍳 菜谱就是算法：第一步洗菜，第二步切丝，第三步热锅，第四步下油……每步都明确，按顺序执行就能得到结果。搜索引擎排名算法、推荐算法、导航路径算法——都是"解决问题的配方"，只不过更复杂、更精妙。',ex:'Google\'s search algorithm considers hundreds of factors to rank web pages.',exZh:'谷歌的搜索算法考虑数百个因素来对网页进行排名。',rel:['Data Structure','Complexity','ML','Logic']},
+{id:'scalability',term:'Scalability',full:'可扩展性',pron:'/ˌskeɪləˈbɪlɪti/',emoji:'📈',ph:'斯-凯-拉-比-利-提',phTip:'"能扩展"的能力，用户暴增也不崩',zh:'可扩展性',def:'系统在用户量或数据量增长时，通过增加资源保持性能的能力',story:'🏟️ 一个小饭馆只有10张桌子，某天来了1000人直接挤爆。有"可扩展性"的设计：高峰期能加桌子（横向扩展），或者换更大的厨房（纵向扩展）。Instagram 早期缺乏扩展性设计，用户暴增后服务器天天崩——这是创业公司的经典教训。',ex:'We re-architected the system to handle 100x more users without performance issues.',exZh:'我们重新设计了系统架构，能处理100倍用户量而不影响性能。',rel:['Load Balancer','Microservices','Cloud','Performance']},
+{id:'microservices',term:'Microservices',full:'微服务',pron:'/ˈmaɪkrəʊˌsɜːvɪsɪz/',emoji:'🧩',ph:'迈-克-柔-瑟-维-西兹',phTip:'"微小的"多个服务，各自独立运行',zh:'微服务',def:'把一个大型应用拆分为多个小型独立服务，各自部署、扩展和维护',story:'🍱 大食堂（单体应用）：厨师、收银、配餐都在一个大房间，一个环节出问题全体停工。微服务像美食广场：中餐、日料、奶茶各自独立，一家关门不影响其他家。Netflix、Uber 都拆成了几百个微服务，能独立扩展最忙的那个模块。',ex:'Netflix uses hundreds of microservices that can be updated independently.',exZh:'Netflix 使用数百个微服务，每个都可以独立更新。',rel:['API','Container','Docker','Scalability']},
+{id:'devops',term:'DevOps',full:'Development + Operations',pron:'/ˈdɛvɒps/',emoji:'♾️',ph:'戴-夫-奥普斯',phTip:'"开发"和"运维"合体，消除两者之间的墙',zh:'DevOps',def:'打通开发（Dev）和运维（Ops）的文化、工具和实践体系，实现更快更稳定的软件交付',story:'🤝 过去开发团队和运维团队互相"甩锅"——开发说"我代码没问题"，运维说"你代码在服务器上跑不了"。DevOps 文化消除这堵墙：开发者需要理解部署，运维需要理解代码，工具链打通，CI/CD 自动化——快速交付、快速恢复。',ex:'DevOps practices helped us reduce deployment time from days to minutes.',exZh:'DevOps 实践帮助我们将部署时间从几天缩短到几分钟。',rel:['CI/CD','Deploy','Automation','Culture']},
+{id:'techdebt',term:'Technical Debt',full:'技术债务',pron:'/ˈtɛknɪkəl dɛt/',emoji:'💸',ph:'泰克-尼-课 戴特',phTip:'"借了技术的债"，早晚要还',zh:'技术债务',def:'为了快速完成而采用的不完美解决方案，长期积累后需要花更多时间"还债"',story:'💳 刷信用卡（技术债）解决了当下的资金问题，但利息一直在跑。代码里的临时方案、复制粘贴的重复逻辑、没有写的测试——这些都是技术债。短期能快速上线，但债积多了，加任何新功能都变得极慢，最终必须花大量时间"还债"（重构）。',ex:'Years of technical debt made adding a simple feature take three weeks.',exZh:'多年的技术债务使添加一个简单功能就花了三周时间。',rel:['Refactor','Clean Code','Maintenance','Architecture']},
+{id:'endpoint',term:'Endpoint',full:'API 端点',pron:'/ˈɛndpɔɪnt/',emoji:'📍',ph:'恩德-波因特',phTip:'"终点站"，API 的具体访问地址',zh:'API 端点',def:'API 中一个特定功能对应的URL地址，客户端通过访问端点来调用该功能',story:'🏢 公司有很多部门，每个部门有自己的内线电话。API 就是公司，Endpoint 就是各部门的分机号："/users"是用户部门，"/orders"是订单部门，"/payments"是支付部门。你打不同的分机号，就能联系到对应的功能。',ex:'The endpoint GET /api/users returns a list of all registered users.',exZh:'端点 GET /api/users 返回所有注册用户的列表。',rel:['API','REST','URL','Request']},
+{id:'dependency',term:'Dependency',full:'依赖',pron:'/dɪˈpɛndənsi/',emoji:'🔗',ph:'滴-彭-丹-西',phTip:'"依赖"别人才能运行',zh:'依赖',def:'软件项目需要借助的外部库、框架或服务，没有它就无法正常运行',story:'🍳 你做蛋炒饭，需要鸡蛋、大米、葱。这三样就是你食谱的"依赖"——少了任何一样就做不出来。软件的依赖是代码库（npm包、pip库），项目启动时必须先安装所有依赖。依赖太多有时候是问题：某个小依赖出漏洞，整个项目都要更新。',ex:'This project has over 200 dependencies listed in the package.json file.',exZh:'这个项目在 package.json 文件中列出了超过 200 个依赖。',rel:['npm','Library','Package','Framework']},
+{id:'bug',term:'Bug',full:'程序错误',pron:'/bʌɡ/',emoji:'🐞',ph:'巴格',phTip:'字面意思就是虫子，最古老的技术术语之一',zh:'Bug（程序错误）',def:'导致程序行为与预期不符的错误或缺陷',story:'🪲 1947年，Grace Hopper 的团队在 Harvard Mark II 计算机里真的发现了一只飞蛾——机器故障的原因。他们把飞蛾贴进日志，写上"First actual case of bug being found"。Bug 这个词就这样成了"程序错误"的代名词，沿用至今。',ex:'A critical bug in the payment system caused incorrect charges for 500 users.',exZh:'支付系统中的一个严重 Bug 导致 500 名用户被错误收费。',rel:['Debug','Testing','Fix','QA']},
+{id:'version',term:'Version Control',full:'版本控制',pron:'/ˈvɜːrʒən kənˈtroʊl/',emoji:'📋',ph:'佛-日-恩 肯-柔',phTip:'"给代码拍快照"，随时能回到任意历史版本',zh:'版本控制',def:'追踪文件变化历史、支持多人协作的系统，Git 是最主流的版本控制工具',story:'📸 每次你改了代码，版本控制系统就拍一张"快照"存档，记录谁改了什么、为什么改。三个月后，你突然发现引入了一个Bug——版本控制让你能回到三个月前的快照，找出问题所在。团队协作时，它还能自动合并不同人的修改。',ex:'Version control makes it possible to undo any change and trace who made it.',exZh:'版本控制使得撤销任何更改并追踪是谁做的成为可能。',rel:['Git','Repository','Branch','Commit']}
+]}
 ];
 
 // ══════════════════════════════════════════════
-// 🗂 STATE
+// STATE
 // ══════════════════════════════════════════════
-let state = {
-  xp: 0, streak: 0, lastStudyDate: null,
-  learned: {}, // { wordId: true }
-  levelProgress: {} // { levelId: { wordsLearned: Set } }
-};
-
-let currentLevel = null;
-let currentWordIdx = 0;
-let quizQuestions = [];
-let currentQIdx = 0;
-let quizCorrect = 0;
-let quizWrong = 0;
-let selectedAnswer = null;
-let answered = false;
+const S  = k => localStorage.getItem('tw_'+k);
+const SS = (k,v) => localStorage.setItem('tw_'+k,v);
+let learned = JSON.parse(S('learned')||'{}');
+let xp      = parseInt(S('xp')||'0');
+let streak  = parseInt(S('streak')||'0');
+let curLv   = null;
+let curIdx  = 0;
 
 // ══════════════════════════════════════════════
-// 💾 PERSISTENCE
+// AUDIO
 // ══════════════════════════════════════════════
-function saveState() {
-  const toSave = {
-    xp: state.xp, streak: state.streak,
-    lastStudyDate: state.lastStudyDate,
-    learned: state.learned
-  };
-  localStorage.setItem('techwords_state', JSON.stringify(toSave));
-}
-function loadState() {
-  try {
-    const raw = localStorage.getItem('techwords_state');
-    if (raw) {
-      const saved = JSON.parse(raw);
-      state.xp = saved.xp || 0;
-      state.streak = saved.streak || 0;
-      state.lastStudyDate = saved.lastStudyDate || null;
-      state.learned = saved.learned || {};
-    }
-  } catch(e) {}
-  checkStreak();
-}
-function checkStreak() {
-  const today = new Date().toDateString();
-  if (state.lastStudyDate === today) return;
-  const yesterday = new Date(Date.now() - 86400000).toDateString();
-  if (state.lastStudyDate !== yesterday) {
-    if (state.lastStudyDate && state.lastStudyDate !== today) state.streak = 0;
-  }
-}
-function markStudied() {
-  const today = new Date().toDateString();
-  if (state.lastStudyDate !== today) {
-    const yesterday = new Date(Date.now() - 86400000).toDateString();
-    if (state.lastStudyDate === yesterday) state.streak++;
-    else if (!state.lastStudyDate) state.streak = 1;
-    else state.streak = 1;
-    state.lastStudyDate = today;
-  }
+function speak(txt, rate){
+  if(!window.speechSynthesis) return;
+  rate = rate||0.88;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(txt);
+  u.lang='en-US'; u.rate=rate;
+  speechSynthesis.speak(u);
 }
 
 // ══════════════════════════════════════════════
-// 🏠 HOME
+// TOAST
 // ══════════════════════════════════════════════
-function renderHome() {
-  updateTopBar();
-  const totalWords = LEVELS.reduce((s,l)=>s+l.words.length,0);
-  const learnedCount = Object.keys(state.learned).length;
-  const xpInLevel = state.xp % 100;
-  document.getElementById('heroXPBar').style.width = xpInLevel + '%';
-  document.getElementById('heroXPLabel').textContent = `已学 ${learnedCount}/${totalWords} 个词汇 · ${state.xp} XP 总计`;
-
-  const list = document.getElementById('levelList');
-  list.innerHTML = '';
-  let unlocked = true;
-  LEVELS.forEach((level, i) => {
-    const learnedInLevel = level.words.filter(w => state.learned[w.id]).length;
-    const total = level.words.length;
-    const pct = total > 0 ? (learnedInLevel / total * 100) : 0;
-    const isCompleted = learnedInLevel === total;
-    const isCurrent = unlocked && !isCompleted;
-    const isLocked = !unlocked;
-
-    const card = document.createElement('div');
-    card.className = `level-card ${isCompleted?'completed':''} ${isCurrent?'current':''} ${isLocked?'locked':''}`;
-    card.innerHTML = `
-      <div class="level-emoji" style="background:${level.bg}; font-size:26px">${level.emoji}</div>
-      <div class="level-info">
-        <h3 style="color:${level.color}">${level.title}</h3>
-        <div class="subtitle">${level.subtitle} · ${total} 个词汇</div>
-        <div class="level-progress-bar">
-          <div class="level-progress-fill" style="width:${pct}%;background:${level.color}"></div>
-        </div>
-        <div class="level-progress-text">${learnedInLevel}/${total} 已学${isCompleted?' 🎉':''}</div>
-      </div>
-      <div class="level-badge ${isLocked?'badge-lock':isCompleted?'badge-done':'badge-play'}">
-        ${isLocked?'🔒':isCompleted?'✅':'▶'}
-      </div>`;
-    if (!isLocked) card.onclick = () => openLevel(i);
-    list.appendChild(card);
-
-    if (!isCompleted && isCurrent) unlocked = false;
-    else if (isCompleted) unlocked = true;
-  });
-}
-function updateTopBar() {
-  document.getElementById('streakCount').textContent = state.streak;
-  document.getElementById('xpCount').textContent = state.xp;
-}
-
-// ══════════════════════════════════════════════
-// 📖 LEVEL DETAIL
-// ══════════════════════════════════════════════
-function openLevel(levelIdx) {
-  currentLevel = LEVELS[levelIdx];
-  currentWordIdx = 0;
-  document.getElementById('levelDetailTitle').textContent = currentLevel.emoji + ' ' + currentLevel.title;
-  document.getElementById('levelDetailSub').textContent = currentLevel.subtitle + ' · ' + currentLevel.words.length + ' 个词汇';
-  renderWordGrid();
-  setActiveNav(null);
-  showScreen('screen-level');
-}
-function renderWordGrid() {
-  const grid = document.getElementById('wordGrid');
-  grid.innerHTML = '';
-  currentLevel.words.forEach((w, i) => {
-    const learned = state.learned[w.id];
-    const chip = document.createElement('div');
-    chip.className = `word-chip ${learned ? 'learned' : ''}`;
-    chip.innerHTML = `
-      ${learned ? '<span class="check">✅</span>' : ''}
-      <div class="term">${w.term}</div>
-      <div class="meaning">${w.chinese}</div>`;
-    chip.onclick = () => openCard(i);
-    grid.appendChild(chip);
-  });
-  const learnedCount = currentLevel.words.filter(w => state.learned[w.id]).length;
-  const btn = document.getElementById('startQuizBtn');
-  if (learnedCount < 3) {
-    btn.className = 'btn btn-disabled';
-    btn.textContent = `先学 ${3 - learnedCount} 个词再测验 📚`;
-    btn.onclick = null;
-  } else {
-    btn.className = 'btn btn-primary';
-    btn.textContent = `🎯 开始测验（${learnedCount} 个词）`;
-    btn.onclick = startQuiz;
-  }
-}
-function showHome() {
-  setActiveNav('nav-home');
-  renderHome();
-  showScreen('screen-home');
-}
-function backToLevel() {
-  renderWordGrid();
-  showScreen('screen-level');
-}
-
-// ══════════════════════════════════════════════
-// 🃏 VOCAB CARD
-// ══════════════════════════════════════════════
-function openCard(idx) {
-  currentWordIdx = idx;
-  renderCard();
-  showScreen('screen-card');
-}
-function renderCard() {
-  const w = currentLevel.words[currentWordIdx];
-  const total = currentLevel.words.length;
-  document.getElementById('cardCounter').textContent = `${currentWordIdx + 1} / ${total}`;
-
-  // mark as learned
-  if (!state.learned[w.id]) {
-    state.learned[w.id] = true;
-    state.xp += 5;
-    markStudied();
-    saveState();
-    updateTopBar();
-    showToast('+5 XP · 词汇已掌握！🎉');
-  }
-
-  const content = document.getElementById('vocabCardContent');
-  content.innerHTML = `
-    <div class="vocab-card">
-      <div class="card-top">
-        <span class="card-emoji">${currentLevel.emoji}</span>
-        <div class="card-term">${w.term}</div>
-        <div class="card-fullname">${w.fullName}</div>
-        <div class="card-pronunciation">${w.pronunciation}</div>
-      </div>
-      <div class="card-body">
-        <div class="card-section">
-          <div class="card-label">中文含义</div>
-          <div class="card-chinese">${w.chinese}</div>
-          <div class="card-definition">${w.chineseDef}</div>
-        </div>
-        <div class="card-section">
-          <div class="card-label">💡 例句</div>
-          <div class="card-example-box">
-            <div class="card-example-en">${w.example}</div>
-            <div class="card-example-zh">${w.exampleZh}</div>
-          </div>
-        </div>
-        <div class="card-section">
-          <div class="card-label">🧠 记忆技巧</div>
-          <div class="card-memory-box">
-            <div class="card-memory">${w.memory}</div>
-          </div>
-        </div>
-        <div class="card-section">
-          <div class="card-label">🔗 相关词汇</div>
-          <div class="related-chips">
-            ${w.related.map(r => `<div class="related-chip" onclick="quickSearch('${r}')">${r}</div>`).join('')}
-          </div>
-        </div>
-      </div>
-    </div>`;
-
-  document.getElementById('prevCardBtn').style.opacity = currentWordIdx === 0 ? '0.4' : '1';
-  document.getElementById('nextCardBtn').textContent = currentWordIdx === total - 1 ? '完成！返回 ✅' : '下一个 →';
-}
-function prevCard() {
-  if (currentWordIdx > 0) { currentWordIdx--; renderCard(); }
-}
-function nextCard() {
-  if (currentWordIdx < currentLevel.words.length - 1) {
-    currentWordIdx++;
-    renderCard();
-  } else {
-    backToLevel();
-    showToast('本关词汇已全部学完！可以测验了 🎯');
-  }
-}
-function quickSearch(term) {
-  document.getElementById('searchInput').value = term;
-  doSearch(term);
-  showSearch();
-}
-
-// ══════════════════════════════════════════════
-// 🧩 QUIZ
-// ══════════════════════════════════════════════
-function startQuiz() {
-  const learnedWords = currentLevel.words.filter(w => state.learned[w.id]);
-  if (learnedWords.length < 3) { showToast('请先学习至少 3 个词！📚'); return; }
-  quizQuestions = generateQuestions(learnedWords);
-  currentQIdx = 0; quizCorrect = 0; quizWrong = 0;
-  selectedAnswer = null; answered = false;
-  renderQuestion();
-  showScreen('screen-quiz');
-}
-function generateQuestions(words) {
-  const qs = [];
-  const allWords = LEVELS.flatMap(l => l.words);
-  words.forEach((w, i) => {
-    const type = i % 2 === 0 ? 'meaning' : 'reverse';
-    qs.push(makeQuestion(w, type, allWords));
-  });
-  return shuffle(qs).slice(0, Math.min(words.length, 8));
-}
-function makeQuestion(word, type, allWords) {
-  const others = allWords.filter(w => w.id !== word.id);
-  const wrongs = shuffle(others).slice(0, 3);
-  if (type === 'meaning') {
-    const opts = shuffle([
-      { text: word.chinese, correct: true },
-      ...wrongs.map(w => ({ text: w.chinese, correct: false }))
-    ]);
-    return { type: 'meaning', word, opts, correctIdx: opts.findIndex(o => o.correct) };
-  } else {
-    const opts = shuffle([
-      { text: word.term, correct: true },
-      ...wrongs.map(w => ({ text: w.term, correct: false }))
-    ]);
-    return { type: 'reverse', word, opts, correctIdx: opts.findIndex(o => o.correct) };
-  }
-}
-function renderQuestion() {
-  const q = quizQuestions[currentQIdx];
-  const total = quizQuestions.length;
-  const pct = (currentQIdx / total * 100);
-  document.getElementById('quizProgressBar').style.width = pct + '%';
-  document.getElementById('quizQNum').textContent = `第 ${currentQIdx + 1} / ${total} 题`;
-  document.getElementById('quizCorrect').textContent = quizCorrect;
-  document.getElementById('quizWrong').textContent = quizWrong;
-
-  selectedAnswer = null; answered = false;
-  document.getElementById('feedbackBanner').className = 'feedback-banner';
-  document.getElementById('checkBtn').style.display = 'none';
-  document.getElementById('nextQBtn').style.display = 'none';
-
-  const body = document.getElementById('quizBody');
-  const color = currentLevel.color;
-  const typeLabel = q.type === 'meaning' ? '🔡 选择中文含义' : '🔤 选择英文单词';
-  const typeColor = q.type === 'meaning' ? '#EAE8FF' : '#FFF8DC';
-  const question = q.type === 'meaning' ? '这个术语的中文含义是？' : '哪个是正确的英文术语？';
-  const displayTerm = q.type === 'meaning' ? q.word.term : q.word.chinese;
-
-  body.innerHTML = `
-    <div class="quiz-type-badge" style="background:${typeColor};color:${color}">${typeLabel}</div>
-    <div class="quiz-question">${question}</div>
-    <div class="quiz-term-display" style="background:linear-gradient(135deg,${color},${color}99)">${displayTerm}</div>
-    <div class="options-grid">
-      ${q.opts.map((opt, i) => `
-        <button class="option-btn" onclick="selectOption(${i})" id="opt-${i}">
-          <div class="option-letter">${'ABCD'[i]}</div>
-          <span>${opt.text}</span>
-        </button>`).join('')}
-    </div>`;
-}
-function selectOption(idx) {
-  if (answered) return;
-  selectedAnswer = idx;
-  document.querySelectorAll('.option-btn').forEach((b, i) => {
-    b.classList.toggle('selected', i === idx);
-    b.querySelector('.option-letter').style.background = i === idx ? 'var(--primary)' : '';
-    b.querySelector('.option-letter').style.color = i === idx ? 'white' : '';
-  });
-  document.getElementById('checkBtn').style.display = 'flex';
-}
-function checkAnswer() {
-  if (selectedAnswer === null || answered) return;
-  answered = true;
-  const q = quizQuestions[currentQIdx];
-  const isCorrect = selectedAnswer === q.correctIdx;
-  if (isCorrect) quizCorrect++; else quizWrong++;
-
-  document.querySelectorAll('.option-btn').forEach((b, i) => {
-    if (i === q.correctIdx) b.classList.add('correct');
-    else if (i === selectedAnswer && !isCorrect) b.classList.add('wrong');
-    b.onclick = null;
-  });
-
-  const fb = document.getElementById('feedbackBanner');
-  if (isCorrect) {
-    fb.className = 'feedback-banner correct-fb show';
-    fb.innerHTML = `<div class="fb-title correct-fb">✅ 太棒了！答对了！</div><div class="fb-body">${q.word.term} = ${q.word.chinese}<br><span style="opacity:0.7">${q.word.memory}</span></div>`;
-  } else {
-    fb.className = 'feedback-banner wrong-fb show';
-    fb.innerHTML = `<div class="fb-title wrong-fb">❌ 再想想！</div><div class="fb-body">正确答案是：<strong>${q.opts[q.correctIdx].text}</strong><br>${q.word.memory}</div>`;
-  }
-
-  document.getElementById('checkBtn').style.display = 'none';
-  document.getElementById('nextQBtn').style.display = 'flex';
-  document.getElementById('nextQBtn').textContent = currentQIdx < quizQuestions.length - 1 ? '继续 →' : '查看结果 🏆';
-}
-function nextQuestion() {
-  if (currentQIdx < quizQuestions.length - 1) {
-    currentQIdx++;
-    renderQuestion();
-  } else {
-    showResult();
-  }
-}
-function showResult() {
-  const total = quizQuestions.length;
-  const pct = Math.round(quizCorrect / total * 100);
-  const xpEarned = quizCorrect * 15;
-  state.xp += xpEarned;
-  markStudied();
-  saveState();
-  updateTopBar();
-
-  let emoji, title, sub;
-  if (pct === 100) { emoji='🏆'; title='完美！满分通过！'; sub='你对这些词汇的掌握已经炉火纯青了！继续保持！'; }
-  else if (pct >= 80) { emoji='🎉'; title='非常棒！'; sub='你掌握了大部分词汇，再复习一下错题就能完美了！'; }
-  else if (pct >= 60) { emoji='💪'; title='不错！继续努力！'; sub='已经掌握了大半，多复习几次错题，你一定能全对！'; }
-  else { emoji='📚'; title='需要再复习一下'; sub='没关系！每次错误都是学习机会，再看看词卡，下次一定更好！'; }
-
-  document.getElementById('resultContent').innerHTML = `
-    <span class="result-emoji">${emoji}</span>
-    <div class="result-title">${title}</div>
-    <div class="result-sub">${sub}</div>
-    <div class="result-stats">
-      <div class="result-stat"><div class="num" style="color:var(--green)">${quizCorrect}</div><div class="label">答对题数</div></div>
-      <div class="result-stat"><div class="num" style="color:var(--accent)">${quizWrong}</div><div class="label">答错题数</div></div>
-      <div class="result-stat"><div class="num" style="color:var(--primary)">${pct}%</div><div class="label">正确率</div></div>
-      <div class="result-stat"><div class="num" style="color:var(--yellow)">${state.streak}🔥</div><div class="label">连续天数</div></div>
-    </div>
-    <div class="xp-earned">
-      <div class="xp-icon">⚡</div>
-      <div class="xp-text">
-        <div class="xp-num">+${xpEarned} XP 获得！</div>
-        <div class="xp-label">总计 ${state.xp} XP</div>
-      </div>
-    </div>
-    <button class="btn btn-primary" onclick="backToLevel()" style="margin-bottom:12px">再次挑战 🎯</button>
-    <button class="btn btn-outline" onclick="showHome()">返回主页 🏠</button>`;
-
-  showScreen('screen-result');
-}
-
-// ══════════════════════════════════════════════
-// 🔍 SEARCH
-// ══════════════════════════════════════════════
-function showSearch() {
-  setActiveNav('nav-search');
-  showScreen('screen-search');
-  renderHotTags();
-}
-function renderHotTags() {
-  const hot = ['API','LLM','Token','Agent','RAG','MCP','CI/CD','UX','Prompt','Deploy'];
-  document.getElementById('hotTags').innerHTML = hot.map(t =>
-    `<div class="hot-tag" onclick="quickLookup('${t}')">${t}</div>`).join('');
-}
-function doSearch(q) {
-  const results = document.getElementById('searchResults');
-  if (!q.trim()) {
-    results.innerHTML = `<div class="search-empty"><div class="e-icon">🔭</div><p>输入词汇开始搜索<br>或点击上方热门标签</p></div>`;
-    return;
-  }
-  const all = LEVELS.flatMap((l, li) => l.words.map(w => ({ ...w, levelName: l.title, levelIdx: li })));
-  const matched = all.filter(w =>
-    w.term.toLowerCase().includes(q.toLowerCase()) ||
-    w.chinese.includes(q) ||
-    w.fullName.toLowerCase().includes(q.toLowerCase()) ||
-    (w.chineseDef && w.chineseDef.includes(q))
-  );
-  if (!matched.length) {
-    results.innerHTML = `<div class="search-empty"><div class="e-icon">😅</div><p>没找到"${q}"<br>试试其他关键词？</p></div>`;
-    return;
-  }
-  results.innerHTML = matched.map(w => `
-    <div class="search-result-card" onclick="openSearchCard(${w.levelIdx},'${w.id}')">
-      <div class="sr-term">${w.term}</div>
-      <div class="sr-chinese">${w.chinese}</div>
-      <div class="sr-definition">${w.chineseDef}</div>
-      <div class="sr-level">📚 ${w.levelName}</div>
-    </div>`).join('');
-}
-function quickLookup(term) {
-  document.getElementById('searchInput').value = term;
-  doSearch(term);
-}
-function openSearchCard(levelIdx, wordId) {
-  currentLevel = LEVELS[levelIdx];
-  const idx = currentLevel.words.findIndex(w => w.id === wordId);
-  if (idx >= 0) openCard(idx);
-}
-
-// ══════════════════════════════════════════════
-// 📊 PROGRESS (简版)
-// ══════════════════════════════════════════════
-function showProgress() {
-  setActiveNav('nav-progress');
-  const totalWords = LEVELS.reduce((s,l)=>s+l.words.length,0);
-  const learned = Object.keys(state.learned).length;
-  showModal(`
-    <span class="big-emoji">📊</span>
-    <h3>你的学习进度</h3>
-    <p>
-      📚 已学词汇：<strong>${learned} / ${totalWords}</strong><br>
-      ⚡ 总 XP：<strong>${state.xp}</strong><br>
-      🔥 连续学习：<strong>${state.streak} 天</strong><br>
-      ${learned === 0 ? '快开始你的第一个词汇吧！' : learned < 20 ? '继续加油，你正在起步！🚀' : learned < 60 ? '进步神速！保持这个节奏！💪' : '你是真正的科技词汇达人！🏆'}
-    </p>
-    <button class="btn btn-primary" onclick="hideModal()">继续学习 🚀</button>`);
-}
-
-// ══════════════════════════════════════════════
-// 🔧 UTILS
-// ══════════════════════════════════════════════
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  window.scrollTo(0, 0);
-}
-function setActiveNav(id) {
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  if (id) document.getElementById(id)?.classList.add('active');
-}
-function showToast(msg) {
+function toast(msg, dur){
+  dur = dur||2000;
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
-}
-function showModal(html) {
-  document.getElementById('modalContent').innerHTML = html;
-  document.getElementById('modal').classList.add('show');
-}
-function hideModal() {
-  document.getElementById('modal').classList.remove('show');
-}
-function shuffle(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
+  clearTimeout(t._t);
+  t._t = setTimeout(()=>t.classList.remove('show'), dur);
 }
 
 // ══════════════════════════════════════════════
-// 🚀 INIT
+// CONFETTI  (CSS-based)
 // ══════════════════════════════════════════════
-loadState();
-setActiveNav('nav-home');
+function confetti(){
+  const cols=['#6C63FF','#FF6B6B','#FFD93D','#6BCB77','#FF9F43'];
+  for(let i=0;i<55;i++){
+    const el=document.createElement('div');
+    el.className='conf';
+    const sz=6+Math.random()*7;
+    el.style.cssText=[
+      'left:'+Math.random()*100+'vw',
+      'width:'+sz+'px',
+      'height:'+sz+'px',
+      'background:'+cols[i%5],
+      'animation-duration:'+(1.2+Math.random()*1.6)+'s',
+      'animation-delay:'+Math.random()*0.5+'s'
+    ].join(';');
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(), 3500);
+  }
+}
+
+// ══════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
+  document.getElementById('sc-'+id).classList.add('active');
+}
+function goHome(){
+  showScreen('home');
+  document.getElementById('n-home').classList.add('active');
+  renderHome();
+}
+function goSearch(){
+  showScreen('search');
+  document.getElementById('n-search').classList.add('active');
+  initSearch();
+}
+function showProg(){
+  document.getElementById('n-prog').classList.add('active');
+  renderProgModal();
+}
+function goLevel(){
+  if(curLv) openLevel(curLv.id);
+  else goHome();
+}
+
+// ══════════════════════════════════════════════
+// TOPBAR
+// ══════════════════════════════════════════════
+function updateTopbar(){
+  document.getElementById('sXP').textContent = xp;
+  document.getElementById('sStreak').textContent = streak;
+}
+
+// ══════════════════════════════════════════════
+// HOME
+// ══════════════════════════════════════════════
+function renderHome(){
+  updateTopbar();
+  const total = LEVELS.reduce((a,l)=>a+l.words.length,0);
+  const done  = Object.keys(learned).length;
+  const pct   = Math.round(done/total*100);
+  document.getElementById('heroBar').style.width = pct+'%';
+  document.getElementById('heroLbl').textContent = '已掌握 '+done+' / '+total+' 词 · '+xp+' XP';
+
+  const list = document.getElementById('lvList');
+  list.innerHTML = LEVELS.map((lv,i)=>{
+    const lvDone = lv.words.filter(w=>learned[lv.id+'_'+w.id]).length;
+    const lvPct  = Math.round(lvDone/lv.words.length*100);
+    const prevLv = LEVELS[i-1];
+    const unlocked = i===0||(prevLv&&prevLv.words.filter(w=>learned[prevLv.id+'_'+w.id]).length===prevLv.words.length);
+    const allDone  = lvDone===lv.words.length;
+    const cls   = !unlocked?'locked':allDone?'done':lvDone>0?'current':'';
+    const badge = !unlocked?'🔒':allDone?'✅':'▶';
+    const click = unlocked?'openLevel('+lv.id+')':'';
+    return '<div class="level-card '+cls+'" onclick="'+click+'">'
+      +'<div class="lv-ico" style="background:'+lv.bg+'">'+lv.emoji+'</div>'
+      +'<div class="lv-info">'
+        +'<h3>Lv.'+(i+1)+' · '+lv.title+'</h3>'
+        +'<div class="sub">'+lv.sub+' · '+lv.words.length+'词</div>'
+        +'<div class="lv-bar"><div class="lv-fill" style="width:'+lvPct+'%;background:'+lv.color+'"></div></div>'
+        +'<div class="lv-pct">'+lvDone+'/'+lv.words.length+' 已掌握</div>'
+      +'</div>'
+      +'<div class="lv-badge" style="background:'+lv.bg+';color:'+lv.color+'">'+badge+'</div>'
+    +'</div>';
+  }).join('');
+}
+
+// ══════════════════════════════════════════════
+// LEVEL DETAIL
+// ══════════════════════════════════════════════
+function openLevel(id){
+  curLv = LEVELS.find(l=>l.id===id);
+  showScreen('level');
+  document.getElementById('n-home').classList.add('active');
+  const lv=curLv;
+  document.getElementById('lvTitle').textContent = lv.emoji+' '+lv.title;
+  document.getElementById('lvSub').textContent   = lv.sub+' · '+lv.words.length+' 词';
+
+  const lvDone = lv.words.filter(w=>learned[lv.id+'_'+w.id]).length;
+  document.getElementById('wordGrid').innerHTML = lv.words.map(w=>{
+    const ok = !!learned[lv.id+'_'+w.id];
+    return '<div class="wchip '+(ok?'learned':'')+'" onclick="openCard('+lv.id+',\''+w.id+'\')">'
+      +'<span class="ck">'+(ok?'✅':'')+'</span>'
+      +'<div class="wt">'+w.emoji+' '+w.term+'</div>'
+      +'<div class="wm">'+w.zh+'</div>'
+    +'</div>';
+  }).join('');
+
+  const btn = document.getElementById('quizBtn');
+  if(lvDone>=5){
+    btn.className='btn btn-p'; btn.textContent='🎯 开始测验'; btn.disabled=false;
+  } else {
+    btn.className='btn btn-d'; btn.textContent='先学 '+(5-lvDone)+' 个词再测验'; btn.disabled=true;
+  }
+}
+
+// ══════════════════════════════════════════════
+// VOCAB CARD
+// ══════════════════════════════════════════════
+function openCard(lvId, wId){
+  curLv  = LEVELS.find(l=>l.id===lvId);
+  curIdx = curLv.words.findIndex(w=>w.id===wId);
+  showScreen('card');
+  document.getElementById('n-home').classList.add('active');
+  renderCard();
+}
+
+function _esc(s){ return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
+function _dk(hex,amt){
+  try{
+    const n=parseInt(hex.slice(1),16);
+    return 'rgb('+Math.max(0,((n>>16)&255)-amt)+','+Math.max(0,((n>>8)&255)-amt)+','+Math.max(0,(n&255)-amt)+')';
+  }catch(e){return hex;}
+}
+
+function renderCard(){
+  const lv=curLv, w=lv.words[curIdx];
+  const isLearned=!!learned[lv.id+'_'+w.id];
+  document.getElementById('cardCtr').textContent = (curIdx+1)+' / '+lv.words.length;
+  document.getElementById('prevBtn').style.opacity = curIdx===0?'0.35':'1';
+  document.getElementById('nextBtn').textContent   = curIdx===lv.words.length-1?'完成 ✓':'下一个 →';
+
+  document.getElementById('cardContent').innerHTML =
+    '<div class="vocab-card">'
+    +'<div class="vc-head" style="background:linear-gradient(135deg,'+lv.color+','+_dk(lv.color,45)+')">'
+      +'<span class="vc-emoji">'+w.emoji+'</span>'
+      +'<div class="vc-term">'+w.term+'</div>'
+      +'<div class="vc-full">'+w.full+'</div>'
+      +'<div class="vc-pron"><button class="audio-btn" onclick="speak(\''+_esc(w.term)+'\')">🔊</button><span>'+w.pron+'</span></div>'
+    +'</div>'
+    +'<div class="vc-body">'
+      +'<div class="vc-section"><div class="sec-lbl">🗣 谐音记忆</div>'
+        +'<div class="phonetic-box"><div class="ph-icon">💡</div><div class="ph-text">'
+          +'<div class="ph-word">'+w.ph+'</div><div class="ph-tip">'+w.phTip+'</div>'
+        +'</div></div></div>'
+      +'<div class="vc-section"><div class="sec-lbl">📖 释义</div>'
+        +'<div class="vc-zh">'+w.zh+'</div><div class="vc-def">'+w.def+'</div></div>'
+      +'<div class="vc-section"><div class="sec-lbl">🎭 故事记忆</div>'
+        +'<div class="story-box"><div class="story-txt">'+w.story+'</div></div></div>'
+      +'<div class="vc-section"><div class="sec-lbl">💬 例句</div>'
+        +'<div class="example-box">'
+          +'<div class="ex-en"><div class="ex-en-txt">'+w.ex+'</div>'
+            +'<button class="audio-btn" style="background:rgba(0,0,0,.08);flex-shrink:0" onclick="speak(\''+_esc(w.ex)+'\',0.8)">🔊</button>'
+          +'</div><div class="ex-zh">'+w.exZh+'</div>'
+        +'</div></div>'
+      +'<div class="vc-section"><div class="sec-lbl">🔗 相关词</div>'
+        +'<div class="related-chips">'+w.rel.map(r=>'<span class="rchip" onclick="searchWord(\''+_esc(r)+'\')">'+r+'</span>').join('')+'</div>'
+      +'</div>'
+    +'</div>'
+    +'<div style="padding:0 16px 16px">'
+      +'<button class="btn '+(isLearned?'btn-g':'btn-p')+'" onclick="markLearned()">'+(isLearned?'✅ 已掌握':'👍 标记已掌握')+'</button>'
+    +'</div>'
+  +'</div>';
+
+  setTimeout(()=>speak(w.term), 400);
+}
+
+function prevCard(){
+  if(curIdx>0){curIdx--;renderCard();}
+}
+function nextCard(){
+  if(curIdx<curLv.words.length-1){curIdx++;renderCard();}
+  else{toast('🎉 本关词汇全部浏览完毕！');openLevel(curLv.id);}
+}
+function markLearned(){
+  const w=curLv.words[curIdx], key=curLv.id+'_'+w.id;
+  if(!learned[key]){
+    learned[key]=true; SS('learned',JSON.stringify(learned));
+    xp+=10; SS('xp',xp); updateTopbar();
+    toast('🎉 +10 XP · 已掌握！'); confetti();
+  } else { toast('已经掌握了 ✅'); }
+  renderCard();
+}
+
+// ══════════════════════════════════════════════
+// QUIZ
+// ══════════════════════════════════════════════
+let qWords=[],qIdx=0,qScore=0,qErrN=0,qAnswered=false,qOpts=[];
+
+function startQuiz(){
+  if(!curLv) return;
+  const pool=[...curLv.words].sort(()=>Math.random()-.5);
+  qWords=pool.slice(0,Math.min(10,pool.length));
+  qIdx=0;qScore=0;qErrN=0;qAnswered=false;
+  showScreen('quiz');
+  document.getElementById('n-home').classList.add('active');
+  renderQuiz();
+}
+
+function renderQuiz(){
+  const w=qWords[qIdx], total=qWords.length;
+  document.getElementById('qBar').style.width  = (qIdx/total*100)+'%';
+  document.getElementById('qNum').textContent  = (qIdx+1)+'/'+total;
+  document.getElementById('qOk').textContent   = qScore;
+  document.getElementById('qErr').textContent  = qErrN;
+  document.getElementById('fb').className      = 'fb';
+  document.getElementById('chkBtn').style.display='none';
+  document.getElementById('nxtBtn').style.display='none';
+  qAnswered=false;
+
+  const pool2=curLv.words.filter(x=>x.id!==w.id).sort(()=>Math.random()-.5).slice(0,3);
+  qOpts=[w,...pool2].sort(()=>Math.random()-.5);
+  const letters=['A','B','C','D'];
+
+  document.getElementById('qBody').innerHTML =
+    '<div class="qtype-badge" style="background:var(--pl);color:var(--p)">📖 选择含义</div>'
+    +'<div class="qterm">'+w.emoji+' '+w.term
+      +'<button class="audio-btn" onclick="speak(\''+_esc(w.term)+'\')">🔊</button></div>'
+    +'<div class="qquestion">这个词的中文含义是？</div>'
+    +'<div class="qsub">'+w.pron+'</div>'
+    +'<div class="opts" id="opts">'
+      +qOpts.map((o,i)=>'<div class="opt" id="opt'+i+'" onclick="selectOpt('+i+')">'
+        +'<div class="opt-letter">'+letters[i]+'</div><span>'+o.zh+'</span></div>').join('')
+    +'</div>';
+}
+
+function selectOpt(i){
+  if(qAnswered) return;
+  qAnswered=true;
+  const w=qWords[qIdx], correct=qOpts[i].id===w.id;
+  qOpts.forEach((o,j)=>{
+    const el=document.getElementById('opt'+j);
+    el.style.pointerEvents='none';
+    if(o.id===w.id) el.classList.add('ok');
+    else if(j===i&&!correct) el.classList.add('err');
+  });
+  const fb=document.getElementById('fb');
+  if(correct){
+    qScore++;xp+=5;SS('xp',xp);updateTopbar();
+    fb.className='fb ok-fb show';
+    fb.innerHTML='<div class="fb-t">✅ 正确！+5 XP</div><div class="fb-b">'+w.def+'</div>';
+  } else {
+    qErrN++;
+    fb.className='fb err-fb show';
+    fb.innerHTML='<div class="fb-t">❌ 正确答案：'+w.zh+'</div><div class="fb-b">'+w.def+'</div>';
+  }
+  document.getElementById('qOk').textContent=qScore;
+  document.getElementById('qErr').textContent=qErrN;
+  document.getElementById('nxtBtn').style.display='block';
+}
+
+function nextQ(){
+  qIdx++;
+  if(qIdx>=qWords.length) finishQuiz();
+  else renderQuiz();
+}
+
+function finishQuiz(){
+  showScreen('result');
+  const pct=Math.round(qScore/qWords.length*100);
+  const emoji=pct>=90?'🏆':pct>=70?'🎉':pct>=50?'💪':'📚';
+  const msg=pct>=90?'完美！你是词汇高手！':pct>=70?'太棒了，继续保持！':pct>=50?'不错，再练练更好！':'多练练，加油！';
+  if(pct>=70){
+    qWords.forEach(w=>{const key=curLv.id+'_'+w.id;if(!learned[key]){learned[key]=true;xp+=5;}});
+    SS('learned',JSON.stringify(learned));SS('xp',xp);updateTopbar();
+  }
+  document.getElementById('resultWrap').innerHTML =
+    '<span class="r-emoji">'+emoji+'</span>'
+    +'<div class="r-title">'+msg+'</div>'
+    +'<div class="r-sub">完成「'+curLv.title+'」测验</div>'
+    +'<div class="r-stats">'
+      +'<div class="r-stat"><div class="num">'+qScore+'/'+qWords.length+'</div><div class="lbl">答对题数</div></div>'
+      +'<div class="r-stat"><div class="num" style="color:'+(pct>=70?'var(--g)':'var(--r)')+'">'+pct+'%</div><div class="lbl">正确率</div></div>'
+    +'</div>'
+    +'<div class="xp-earned"><div class="xi">⚡</div><div><div class="xn">'+xp+' XP</div><div class="xl">累计经验值</div></div></div>'
+    +'<button class="btn btn-p" onclick="startQuiz()" style="margin-bottom:12px">🔄 再来一次</button>'
+    +'<button class="btn btn-o" onclick="openLevel('+curLv.id+')">← 返回关卡</button>';
+  if(pct>=80) setTimeout(confetti,200);
+}
+
+// ══════════════════════════════════════════════
+// SEARCH
+// ══════════════════════════════════════════════
+let _sT;
+function initSearch(){
+  document.getElementById('sinput').value='';
+  document.getElementById('sResults').innerHTML='<div class="s-empty"><div class="ei">🔭</div><p>输入词汇开始搜索</p></div>';
+  const hot=['AI','Token','API','Agent','LLM','Prompt','Cache','UX','Bug','OAuth'];
+  document.getElementById('hotTags').innerHTML=hot.map(t=>'<span class="htag" onclick="searchWord(\''+t+'\')">'+t+'</span>').join('');
+}
+
+function doSearch(q){
+  clearTimeout(_sT);
+  _sT=setTimeout(()=>{
+    if(!q.trim()){document.getElementById('sResults').innerHTML='<div class="s-empty"><div class="ei">🔭</div><p>输入词汇开始搜索</p></div>';return;}
+    const ql=q.toLowerCase(),res=[];
+    LEVELS.forEach(lv=>lv.words.forEach(w=>{
+      if(w.term.toLowerCase().includes(ql)||w.zh.includes(q)||w.def.includes(q)||w.ph.includes(q)||w.id.includes(ql))
+        res.push({lv,w});
+    }));
+    document.getElementById('sResults').innerHTML=res.length
+      ? res.map(({lv,w})=>'<div class="sr-card" onclick="openCard('+lv.id+',\''+w.id+'\')">'
+          +'<div class="sr-term">'+w.emoji+' '+w.term+'</div>'
+          +'<div class="sr-zh">'+w.zh+'</div>'
+          +'<div class="sr-def">'+w.def.slice(0,50)+'…</div>'
+          +'<div class="sr-lv" style="color:'+lv.color+'">'+lv.emoji+' '+lv.title+'</div>'
+        +'</div>').join('')
+      : '<div class="s-empty"><div class="ei">😕</div><p>没找到相关词汇</p></div>';
+  },300);
+}
+
+function searchWord(term){
+  goSearch();
+  document.getElementById('sinput').value=term;
+  doSearch(term);
+}
+
+// ══════════════════════════════════════════════
+// PROGRESS  (modal)
+// ══════════════════════════════════════════════
+function renderProgModal(){
+  const total=LEVELS.reduce((a,l)=>a+l.words.length,0);
+  const done=Object.keys(learned).length;
+  document.getElementById('mContent').innerHTML =
+    '<span class="be">📊</span><h3>我的进度</h3>'
+    +'<p style="font-size:15px;font-weight:800;color:var(--p)">'+xp+' XP · '+done+'/'+total+' 词</p>'
+    +LEVELS.map(lv=>{
+      const lvD=lv.words.filter(w=>learned[lv.id+'_'+w.id]).length;
+      const pct=Math.round(lvD/lv.words.length*100);
+      return '<div style="text-align:left;margin-bottom:10px">'
+        +'<div style="display:flex;justify-content:space-between;font-size:13px;font-weight:700;margin-bottom:4px">'
+          +'<span>'+lv.emoji+' '+lv.title+'</span><span style="color:'+lv.color+'">'+pct+'%</span></div>'
+        +'<div style="background:var(--br);border-radius:6px;height:7px;overflow:hidden">'
+          +'<div style="height:100%;width:'+pct+'%;background:'+lv.color+';border-radius:6px;transition:width .5s"></div></div>'
+        +'<div style="font-size:11px;color:var(--mu);margin-top:3px">'+lvD+'/'+lv.words.length+' 词</div>'
+      +'</div>';
+    }).join('')
+    +'<button class="btn btn-p" style="margin-top:8px" onclick="document.getElementById(\'modal\').classList.remove(\'show\')">关闭</button>';
+  document.getElementById('modal').classList.add('show');
+}
+
+// ══════════════════════════════════════════════
+// MODAL CLOSE
+// ══════════════════════════════════════════════
+document.getElementById('modal').addEventListener('click',function(e){
+  if(e.target===this) this.classList.remove('show');
+});
+
+// ══════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════
+updateTopbar();
 renderHome();
-document.getElementById('modal').onclick = e => { if (e.target === document.getElementById('modal')) hideModal(); };
 </script>
 </body>
 </html>
