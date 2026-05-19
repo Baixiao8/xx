@@ -2276,7 +2276,7 @@ function renderHome(){
     rs.innerHTML = '<div class="sec-title">🔄 今日复习 <span style="color:var(--r);font-size:11px;font-weight:700">'+reviewQ.length+' 词到期</span></div>'
       +'<div style="display:flex;gap:10px;overflow-x:auto;padding:0 16px 14px;scrollbar-width:none;-webkit-overflow-scrolling:touch">'
       +reviewQ.map(({lv,w})=>
-        '<div onclick="openCard('+lv.id+',''+w.id+'')" style="flex-shrink:0;background:#fff;border-radius:14px;padding:12px 14px;min-width:90px;text-align:center;border:1.5px solid var(--br);box-shadow:var(--sh);cursor:pointer">'
+        '<div onclick="openCard('+lv.id+',\''+w.id+'\')" style="flex-shrink:0;background:#fff;border-radius:14px;padding:12px 14px;min-width:90px;text-align:center;border:1.5px solid var(--br);box-shadow:var(--sh);cursor:pointer">'
         +'<div style="font-size:22px;margin-bottom:5px">'+w.emoji+'</div>'
         +'<div style="font-size:12px;font-weight:800;color:var(--tx)">'+w.title+'</div>'
         +'<div style="font-size:10px;color:var(--mu);margin-top:2px">'+w.term+'</div>'
@@ -2327,7 +2327,7 @@ function openLevel(id){
   document.getElementById('wordGrid').innerHTML = lv.words.map(w=>{
     const ok = !!learned[lv.id+'_'+w.id];
     const shortMeaning = w.meaning.length>18 ? w.meaning.slice(0,18)+'…' : w.meaning;
-    return '<div class="wchip '+(ok?'learned':'')+'" onclick="openCard('+lv.id+',''+w.id+'')">'
+    return '<div class="wchip '+(ok?'learned':'')+'" onclick="openCard('+lv.id+',\''+w.id+'\')">'
       +'<span class="ck">'+(ok?'✅':'')+'</span>'
       +'<div class="wt">'+w.emoji+' '+w.title+'</div>'
       +'<div class="wm">'+shortMeaning+'</div>'
@@ -2378,9 +2378,9 @@ function renderCard(){
   if(w.img){
     headerHtml =
       '<div class="vc-head-img">'
-        +'<img src="'+w.img+'" alt="'+w.title+'" onerror="this.parentElement.style.background=''+lv.color+''">'
+        +'<img src="'+w.img+'" alt="'+w.title+'" onerror="this.parentElement.style.background=\''+lv.color+'\'">'
         +'<div class="vc-pron-row">'
-          +'<div class="vc-pron"><button class="audio-btn" onclick="speak(''+_esc(w.title)+'')">🔊</button><span>'+w.pron+'</span></div>'
+          +'<div class="vc-pron"><button class="audio-btn" onclick="speak(\''+_esc(w.title)+'\')">🔊</button><span>'+w.pron+'</span></div>'
         +'</div>'
         +'<div class="vc-img-overlay">'
           +'<div>'
@@ -2396,7 +2396,7 @@ function renderCard(){
         +'<span class="vc-emoji">'+w.emoji+'</span>'
         +'<div class="vc-term">'+w.title+'</div>'
         +'<div class="vc-full">'+w.term+'</div>'
-        +'<div class="vc-pron"><button class="audio-btn" onclick="speak(''+_esc(w.title)+'')">🔊</button><span>'+w.pron+'</span></div>'
+        +'<div class="vc-pron"><button class="audio-btn" onclick="speak(\''+_esc(w.title)+'\')">🔊</button><span>'+w.pron+'</span></div>'
       +'</div>';
   }
 
@@ -2445,7 +2445,7 @@ function renderCard(){
     '<div class="vc-section"><div class="sec-lbl">🌏 例句</div>'
       +'<div class="example-box">'
         +'<div class="ex-en"><div class="ex-en-txt">'+w.ex+'</div>'
-          +'<button class="audio-btn" style="background:rgba(0,0,0,.08);flex-shrink:0" onclick="speak(''+_esc(w.ex)+'',0.8)">🔊</button>'
+          +'<button class="audio-btn" style="background:rgba(0,0,0,.08);flex-shrink:0" onclick="speak(\''+_esc(w.ex)+'\',0.8)">🔊</button>'
         +'</div><div class="ex-zh">'+w.exZh+'</div>'
       +'</div></div>';
 
@@ -2474,7 +2474,7 @@ function renderCard(){
   // Related chips
   const relSec = w.rel && w.rel.length ?
     '<div class="vc-section"><div class="sec-lbl">🔗 相关词</div>'
-      +'<div class="related-chips">'+w.rel.map(r=>'<span class="rchip" onclick="searchWord(''+_esc(r)+'')">'+r+'</span>').join('')+'</div>'
+      +'<div class="related-chips">'+w.rel.map(r=>'<span class="rchip" onclick="searchWord(\''+_esc(r)+'\')">'+r+'</span>').join('')+'</div>'
     +'</div>' : '';
 
   document.getElementById('cardContent').innerHTML =
@@ -2554,7 +2554,7 @@ function renderQuiz(){
   document.getElementById('qBody').innerHTML =
     '<div class="qtype-badge" style="background:var(--pl);color:var(--p)">📖 选择含义</div>'
     +'<div class="qterm">'+w.emoji+' '+w.title
-      +'<button class="audio-btn" onclick="speak(''+_esc(w.title)+'')">🔊</button></div>'
+      +'<button class="audio-btn" onclick="speak(\''+_esc(w.title)+'\')">🔊</button></div>'
     +'<div class="qquestion">这个词的中文含义是？</div>'
     +'<div class="qsub">'+w.pron+'</div>'
     +'<div class="opts" id="opts">'
@@ -2625,7 +2625,7 @@ function initSearch(){
   document.getElementById('sinput').value='';
   document.getElementById('sResults').innerHTML='<div class="s-empty"><div class="ei">🔭</div><p>输入词汇开始搜索</p></div>';
   const hot=['AI','Token','API','Agent','LLM','Prompt','UX','MVP','RAG','MCP'];
-  document.getElementById('hotTags').innerHTML=hot.map(t=>'<span class="htag" onclick="searchWord(''+t+'')">'+t+'</span>').join('');
+  document.getElementById('hotTags').innerHTML=hot.map(t=>'<span class="htag" onclick="searchWord(\''+t+'\')">'+t+'</span>').join('');
 }
 
 function doSearch(q){
@@ -2640,7 +2640,7 @@ function doSearch(q){
         res.push({lv,w});
     }));
     document.getElementById('sResults').innerHTML=res.length
-      ? res.map(({lv,w})=>'<div class="sr-card" onclick="openCard('+lv.id+',''+w.id+'')">'
+      ? res.map(({lv,w})=>'<div class="sr-card" onclick="openCard('+lv.id+',\''+w.id+'\')">'
           +'<div class="sr-term">'+w.emoji+' '+w.title+'</div>'
           +'<div class="sr-zh">'+w.term+'</div>'
           +'<div class="sr-def">'+w.meaning.slice(0,50)+'…</div>'
@@ -2676,7 +2676,7 @@ function renderProgModal(){
         +'<div style="font-size:11px;color:var(--mu);margin-top:3px">'+lvD+'/'+lv.words.length+' 词</div>'
       +'</div>';
     }).join('')
-    +'<button class="btn btn-p" style="margin-top:8px" onclick="document.getElementById('modal').classList.remove('show')">关闭</button>';
+    +'<button class="btn btn-p" style="margin-top:8px" onclick="document.getElementById(\'modal\').classList.remove(\'show\')">关闭</button>';
   document.getElementById('modal').classList.add('show');
 }
 
