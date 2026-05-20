@@ -227,6 +227,7 @@ body{font-family:'Nunito','Noto Sans SC',-apple-system,BlinkMacSystemFont,sans-s
 .wrong-hint-mis .wh-lbl{color:var(--yd)}
 .wrong-hint-mem .wh-lbl{color:var(--pd)}
 .wh-txt{font-size:12px;line-height:1.65;font-weight:700;color:var(--tx)}
+.reappear-hint{margin-top:8px;font-size:12px;font-weight:800;color:var(--mu);padding:6px 10px;background:var(--bg);border-radius:var(--rads);border:1.5px dashed var(--brd)}
 .chk-wrap{position:sticky;bottom:56px;z-index:10;background:var(--bg);padding:12px 18px 14px;border-top:2px solid var(--br)}
 
 /* RESULT */
@@ -2257,6 +2258,20 @@ function recordWrong(key){
   wrong[key]=(wrong[key]||0)+1; SS('wrong',JSON.stringify(wrong));
 }
 
+// ── 关卡内错题重现（v2.9.0）──────────────────────────────────
+// 答错时将该词追加到队列末尾（最多重现1次，SINGLE模式跳过）
+// 返回 true 表示实际追加了，false 表示已有重现或 SINGLE 模式
+function requeueItem(item){
+  if(quizMode === QUIZ_MODE.SINGLE) return false;
+  const alreadyQueued = qItems.slice(qIdx+1).some(i => i.key === item.key && i.reappear);
+  if(alreadyQueued) return false;
+  qItems.push({...item, reappear: true});
+  const total = qItems.length;
+  document.getElementById('qNum').textContent = (qIdx+1)+'/'+total;
+  document.getElementById('qBar').style.width = (qIdx/total*100)+'%';
+  return true;
+}
+
 // ── 重置所有测验状态（唯一出口，不会漏掉某个标志）────────────
 function resetQuizState(){
   quizMode=null; qItems=[]; qIdx=0; qScore=0; qErrN=0; qAnswered=false; qOpts=[];
@@ -2971,8 +2986,9 @@ function selectOpt(i){
   } else {
     qErrN++;
     recordWrong(key);
+    const requeued = requeueItem(qItems[qIdx]);
     fb.className='fb err-fb show';
-    fb.innerHTML='<div class="fb-t">❌ 正确答案：'+w.title+'</div><div class="fb-b">'+w.meaning+'</div>'+buildWrongHint(w);
+    fb.innerHTML='<div class="fb-t">❌ 正确答案：'+w.title+'</div><div class="fb-b">'+w.meaning+'</div>'+buildWrongHint(w)+(requeued?'<div class="reappear-hint">📌 稍后会再练一次这个词</div>':'');
   }
   document.getElementById('qOk').textContent=qScore;
   document.getElementById('qErr').textContent=qErrN;
@@ -2998,8 +3014,9 @@ function checkAns(){
   } else {
     qErrN++;
     recordWrong(key);
+    const requeued = requeueItem(qItems[qIdx]);
     fb.className='fb err-fb show';
-    fb.innerHTML='<div class="fb-t">❌ 正确答案：'+w.title+'</div><div class="fb-b">'+w.meaning+'</div>'+buildWrongHint(w);
+    fb.innerHTML='<div class="fb-t">❌ 正确答案：'+w.title+'</div><div class="fb-b">'+w.meaning+'</div>'+buildWrongHint(w)+(requeued?'<div class="reappear-hint">📌 稍后会再练一次这个词</div>':'');
     inp.style.borderColor='var(--r)';inp.style.background='var(--rl)';inp.style.color='#b91c1c';
   }
   document.getElementById('qOk').textContent=qScore;
@@ -3015,7 +3032,8 @@ function nextQ(){
 
 function finishQuiz(){
   const total=qItems.length;
-  const pct=Math.round(qScore/total*100);
+  const origTotal=qItems.filter(i=>!i.reappear).length; // 原始词数（不含重现题）
+  const pct=Math.round(qScore/origTotal*100);
   const passed=pct>=70;
 
   // ── 数据处理（所有模式共用）──
@@ -3042,7 +3060,7 @@ function finishQuiz(){
   }
 
   // ── 普通模式：结果页（先缓存需要用到的值，再 reset）──
-  const _mode=quizMode, _total=total, _curLvId=curLv?curLv.id:0, _curLvTitle=curLv?curLv.title:'';
+  const _mode=quizMode, _total=origTotal, _curLvId=curLv?curLv.id:0, _curLvTitle=curLv?curLv.title:'';
   const _qScore=qScore, _qErrN=qErrN;
   resetQuizState();
 
