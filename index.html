@@ -296,6 +296,7 @@ body{font-family:'Nunito','Noto Sans SC',-apple-system,BlinkMacSystemFont,sans-s
     <div class="xp-lbl" id="heroLbl">0 XP · 开始你的第一关吧！</div>
   </div>
   <div id="dailyProgress"></div>
+  <div id="wrongSection"></div>
   <div id="reviewSection"></div>
   <div class="sec-title">📚 学习路径</div>
   <div id="lvList"></div>
@@ -2184,6 +2185,7 @@ const LEVELS = [
 const S  = k => localStorage.getItem('tw_'+k);
 const SS = (k,v) => localStorage.setItem('tw_'+k,v);
 let learned = JSON.parse(S('learned')||'{}');
+let wrong   = JSON.parse(S('wrong')||'{}'); // {wordKey: wrongCount}
 let xp      = parseInt(S('xp')||'0');
 let streak  = parseInt(S('streak')||'0');
 let curLv   = null;
@@ -2192,6 +2194,7 @@ let curIdx  = 0;
 const DAY = 86400000;
 const DAILY_GOAL = 3; // 每日完成 3 词维持连签
 let isReviewMode = false; // 复习模式标记
+let isWrongMode  = false; // 错题专练模式标记
 let qWordKeys = []; // 配合 qWords 存储每道题的 learned key
 
 // 初始化今日已学词数（每天重置）
@@ -2329,6 +2332,28 @@ function updateTopbar(){
 function renderHome(){
   updateTopbar();
   updateDailyProgress();
+  // 错题本模块
+  const wrongWords = [];
+  LEVELS.forEach(lv => lv.words.forEach(w => {
+    if((wrong[lv.id+'_'+w.id]||0) > 0) wrongWords.push({lv, w});
+  }));
+  const ws = document.getElementById('wrongSection');
+  if(wrongWords.length > 0){
+    ws.innerHTML = '<div class="sec-title">📌 错题专练 <span class="review-badge" style="background:var(--r)">'+wrongWords.length+' 词</span></div>'
+      +'<div style="display:flex;gap:10px;overflow-x:auto;padding:0 16px 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch">'
+      +wrongWords.map(({lv,w})=>{
+        const cnt = wrong[lv.id+'_'+w.id]||0;
+        return '<div onclick="openCard('+lv.id+',\''+w.id+'\')" style="flex-shrink:0;background:#fff;border-radius:14px;padding:12px 14px;min-width:90px;text-align:center;border:1.5px solid var(--r);box-shadow:0 4px 0 0 var(--rd);cursor:pointer">'
+          +'<div style="font-size:22px;margin-bottom:5px">'+w.emoji+'</div>'
+          +'<div style="font-size:12px;font-weight:800;color:var(--tx)">'+w.title+'</div>'
+          +'<div style="font-size:10px;color:var(--r);margin-top:2px;font-weight:800">错 '+cnt+' 次</div>'
+          +'</div>';
+      }).join('')+'</div>'
+      +'<div style="padding:0 16px 16px">'
+        +'<button class="btn-review" onclick="startWrongQuiz()" style="background:var(--r);border-color:var(--rd);box-shadow:0 4px 0 0 var(--rd)">📌 专练错题（'+wrongWords.length+' 词）</button>'
+      +'</div>';
+  } else { ws.innerHTML = ''; }
+
   const reviewQ = getReviewQueue();
   const totalLearned = Object.keys(learned).length;
   const rs = document.getElementById('reviewSection');
@@ -2599,9 +2624,27 @@ function markLearned(){
 // ══════════════════════════════════════════════
 let qWords=[],qIdx=0,qScore=0,qErrN=0,qAnswered=false,qOpts=[];
 
+function startWrongQuiz(){
+  const pool = [];
+  LEVELS.forEach(lv => lv.words.forEach(w => {
+    const key = lv.id+'_'+w.id;
+    if(wrong[key]>0) pool.push({lv, w});
+  }));
+  if(!pool.length){ toast('暂无错题，继续加油！'); return; }
+  isReviewMode = false; isWrongMode = true;
+  curLv = null;
+  const shuffled = [...pool].sort(()=>Math.random()-.5).slice(0,10);
+  qWords = shuffled.map(({w})=>w);
+  qWordKeys = shuffled.map(({lv,w})=>lv.id+'_'+w.id);
+  qIdx=0;qScore=0;qErrN=0;qAnswered=false;
+  showScreen('quiz');
+  document.getElementById('n-home').classList.add('active');
+  renderQuiz();
+}
+
 function startQuiz(){
   if(!curLv) return;
-  isReviewMode = false;
+  isReviewMode = false; isWrongMode = false;
   const pool=[...curLv.words].sort(()=>Math.random()-.5);
   qWords=pool.slice(0,Math.min(10,pool.length));
   qWordKeys=qWords.map(w=>curLv.id+'_'+w.id);
@@ -2619,7 +2662,7 @@ function startReviewQuiz(){
     if(learned[key]) allLearned.push({lv, w});
   }));
   if(!allLearned.length){ toast('还没有已学词汇，先去学几个词吧！'); return; }
-  isReviewMode = true;
+  isReviewMode = true; isWrongMode = false;
   curLv = null;
   const pool = [...allLearned].sort(()=>Math.random()-.5).slice(0,10);
   qWords = pool.map(({w})=>w);
@@ -2695,13 +2738,20 @@ function renderQuiz(){
   const shortM = m => m.length>28 ? m.slice(0,28)+'…' : m;
   const shortT = t => t.length>22 ? t.slice(0,22)+'…' : t;
 
-  // 判断题型：
-  // 复习模式 or 已学词 → 50% 填空 + 50% 主动回忆（随机切换，保持新鲜感）
-  // 新词 → 认知识别 4选1
+  // 判断题型（4种轮转）：
+  // 新词 → 认知识别
+  // 已学/复习词 → 随机: 填空 / 主动回忆 / 辨析(有misconception时)
   const isLearned = !!learned[qWordKeys[qIdx]];
   const isHighLevel = isReviewMode || isLearned;
-  const useCloze = isHighLevel && Math.random() < 0.5;
-  const useActiveRecall = isHighLevel && !useCloze;
+  let qType = 'recognition';
+  if(isHighLevel){
+    const types = ['cloze','recall'];
+    if(w.misconception) types.push('distinction');
+    qType = types[Math.floor(Math.random()*types.length)];
+  }
+  const useCloze = qType==='cloze';
+  const useActiveRecall = qType==='recall';
+  const useDistinction = qType==='distinction';
 
   if(useCloze){
     // ✏️ 填空练习（3种变体随机）
@@ -2717,6 +2767,21 @@ function renderQuiz(){
       const inp=document.getElementById('clozeInput');
       if(inp){ inp.addEventListener('keydown',e=>{if(e.key==='Enter'&&!qAnswered)checkAns();}); inp.focus(); }
     },50);
+  } else if(useDistinction){
+    // 🔍 辨析：展示 misconception 文本，选出对应的词
+    document.getElementById('qBody').innerHTML =
+      '<div class="qtype-badge" style="background:#F0FDF4;color:#166534;border:2px solid #86EFAC">🔍 辨析</div>'
+      +'<div class="qterm" style="font-size:14px;line-height:1.75;background:var(--yl);border-color:var(--y);box-shadow:var(--shy);color:var(--tx);text-align:left">'+w.misconception+'</div>'
+      +'<div class="qquestion">这是哪个词的辨析要点？</div>'
+      +'<div class="qsub">选出对应的英文术语</div>'
+      +'<div class="opts" id="opts">'
+        +qOpts.map((o,i)=>'<div class="opt" id="opt'+i+'" onclick="selectOpt('+i+')">'
+          +'<div class="opt-letter">'+letters[i]+'</div>'
+          +'<div style="display:flex;flex-direction:column;gap:2px;min-width:0">'
+            +'<span style="font-weight:900;font-size:15px">'+o.emoji+' '+o.title+'</span>'
+            +'<span style="font-size:11px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+shortM(o.meaning)+'</span>'
+          +'</div></div>').join('')
+      +'</div>';
   } else if(useActiveRecall){
     // ✍️ 反向测验：展示中文含义，选英文词
     document.getElementById('qBody').innerHTML =
@@ -2758,14 +2823,19 @@ function selectOpt(i){
     else if(j===i&&!correct) el.classList.add('err');
   });
   const fb=document.getElementById('fb');
+  const key = qWordKeys[qIdx];
   if(correct){
     qScore++;xp+=5;SS('xp',xp);updateTopbar();
     fb.className='fb ok-fb show';
     fb.innerHTML='<div class="fb-t">✅ 正确！+5 XP</div><div class="fb-b">'+w.meaning+'</div>';
+    // 答对：错误计数 -1，归零则从错题本移除
+    if(wrong[key]>0){ wrong[key]--; if(!wrong[key]) delete wrong[key]; SS('wrong',JSON.stringify(wrong)); }
   } else {
     qErrN++;
     fb.className='fb err-fb show';
     fb.innerHTML='<div class="fb-t">❌ 正确答案：'+w.title+'</div><div class="fb-b">'+w.meaning+'</div>';
+    // 答错：错误计数 +1，记入错题本
+    wrong[key]=(wrong[key]||0)+1; SS('wrong',JSON.stringify(wrong));
   }
   document.getElementById('qOk').textContent=qScore;
   document.getElementById('qErr').textContent=qErrN;
@@ -2783,16 +2853,19 @@ function checkAns(){
   inp.disabled=true;
   document.getElementById('chkBtn').style.display='none';
   const fb=document.getElementById('fb');
+  const key = qWordKeys[qIdx];
   if(correct){
     qScore++;xp+=5;SS('xp',xp);updateTopbar();
     fb.className='fb ok-fb show';
     fb.innerHTML='<div class="fb-t">✅ 正确！+5 XP</div><div class="fb-b">'+w.meaning+'</div>';
     inp.style.borderColor='var(--g)';inp.style.background='var(--gl)';inp.style.color='#2d6a00';
+    if(wrong[key]>0){ wrong[key]--; if(!wrong[key]) delete wrong[key]; SS('wrong',JSON.stringify(wrong)); }
   } else {
     qErrN++;
     fb.className='fb err-fb show';
     fb.innerHTML='<div class="fb-t">❌ 正确答案：'+w.title+'</div><div class="fb-b">'+w.meaning+'</div>';
     inp.style.borderColor='var(--r)';inp.style.background='var(--rl)';inp.style.color='#b91c1c';
+    wrong[key]=(wrong[key]||0)+1; SS('wrong',JSON.stringify(wrong));
   }
   document.getElementById('qOk').textContent=qScore;
   document.getElementById('qErr').textContent=qErrN;
@@ -2825,7 +2898,11 @@ function finishQuiz(){
     addTodayLearned(qScore); // 答对数计入今日进度
     updateTopbar();
   }
-  const subTitle = isReviewMode ? '🔄 完成今日复习测验' : '完成「'+(curLv?curLv.title:'')+'」测验';
+  const subTitle = isWrongMode ? '📌 完成错题专练' : isReviewMode ? '🔄 完成随机复习练习' : '完成「'+(curLv?curLv.title:'')+'」测验';
+  const wrongCount = Object.keys(wrong).filter(k=>wrong[k]>0).length;
+  const wrongNote = qErrN > 0
+    ? '<div style="background:var(--rl);border:2px solid var(--r);border-radius:var(--rads);padding:12px 16px;margin-bottom:16px;font-size:13px;font-weight:800;color:#b91c1c">📌 本轮答错 '+qErrN+' 题，已记入错题本（共 '+wrongCount+' 词待练）</div>'
+    : (wrongCount > 0 ? '<div style="background:var(--gl);border:2px solid var(--g);border-radius:var(--rads);padding:12px 16px;margin-bottom:16px;font-size:13px;font-weight:800;color:#2d6a00">✅ 本轮全对！错题本还有 '+wrongCount+' 词待清零</div>' : '');
   document.getElementById('resultWrap').innerHTML =
     '<span class="r-emoji">'+emoji+'</span>'
     +'<div class="r-title">'+msg+'</div>'
@@ -2834,11 +2911,16 @@ function finishQuiz(){
       +'<div class="r-stat"><div class="num">'+qScore+'/'+qWords.length+'</div><div class="lbl">答对题数</div></div>'
       +'<div class="r-stat"><div class="num" style="color:'+(pct>=70?'var(--g)':'var(--r)')+'">'+pct+'%</div><div class="lbl">正确率</div></div>'
     +'</div>'
+    +wrongNote
     +'<div class="xp-earned"><div class="xi">⚡</div><div><div class="xn">'+xp+' XP</div><div class="xl">累计经验值</div></div></div>'
-    +(isReviewMode
-      ? '<button class="btn btn-g" onclick="goHome()" style="margin-bottom:12px">🏠 返回主页</button>'
-      : '<button class="btn btn-p" onclick="startQuiz()" style="margin-bottom:12px">🔄 再来一次</button>'
-       +'<button class="btn btn-o" onclick="openLevel('+(curLv?curLv.id:0)+')">← 返回关卡</button>');
+    +(isWrongMode
+      ? '<button class="btn btn-p" onclick="startWrongQuiz()" style="margin-bottom:12px">🔄 再练一遍</button>'
+       +'<button class="btn btn-g" onclick="goHome()">🏠 返回主页</button>'
+      : isReviewMode
+        ? '<button class="btn btn-g" onclick="goHome()" style="margin-bottom:12px">🏠 返回主页</button>'
+        : '<button class="btn btn-p" onclick="startQuiz()" style="margin-bottom:12px">🔄 再来一次</button>'
+         +'<button class="btn btn-o" onclick="openLevel('+(curLv?curLv.id:0)+')">← 返回关卡</button>');
+  isWrongMode = false;
   if(pct>=80) setTimeout(confetti,200);
 }
 
