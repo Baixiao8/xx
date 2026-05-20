@@ -2685,12 +2685,12 @@ function renderQuiz(){
   const shortT = t => t.length>22 ? t.slice(0,22)+'…' : t;
 
   // 判断题型：
-  // 复习模式 → 100% 填空（深化输出）
-  // 已学词（普通测验）→ 50% 填空 + 50% 主动回忆（主路径也有填空）
+  // 复习模式 or 已学词 → 50% 填空 + 50% 主动回忆（随机切换，保持新鲜感）
   // 新词 → 认知识别 4选1
   const isLearned = !!learned[qWordKeys[qIdx]];
-  const useCloze = isReviewMode || (isLearned && Math.random() < 0.5);
-  const useActiveRecall = !useCloze && isLearned;
+  const isHighLevel = isReviewMode || isLearned;
+  const useCloze = isHighLevel && Math.random() < 0.5;
+  const useActiveRecall = isHighLevel && !useCloze;
 
   if(useCloze){
     // ✏️ 填空练习（3种变体随机）
