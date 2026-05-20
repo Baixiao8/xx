@@ -2330,19 +2330,25 @@ function renderHome(){
   updateTopbar();
   updateDailyProgress();
   const reviewQ = getReviewQueue();
+  const totalLearned = Object.keys(learned).length;
   const rs = document.getElementById('reviewSection');
-  if(reviewQ.length > 0){
-    rs.innerHTML = '<div class="sec-title">🔄 今日复习 <span class="review-badge">'+reviewQ.length+' 词到期</span></div>'
-      +'<div style="display:flex;gap:10px;overflow-x:auto;padding:0 16px 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch">'
-      +reviewQ.map(({lv,w})=>
-        '<div onclick="openCard('+lv.id+',\''+w.id+'\')" style="flex-shrink:0;background:#fff;border-radius:14px;padding:12px 14px;min-width:90px;text-align:center;border:1.5px solid var(--br);box-shadow:var(--sh);cursor:pointer">'
-        +'<div style="font-size:22px;margin-bottom:5px">'+w.emoji+'</div>'
-        +'<div style="font-size:12px;font-weight:800;color:var(--tx)">'+w.title+'</div>'
-        +'<div style="font-size:10px;color:var(--mu);margin-top:2px">'+w.term+'</div>'
-        +'</div>'
-      ).join('')+'</div>'
+  if(totalLearned > 0){
+    const showWords = reviewQ.length > 0 ? reviewQ : [];
+    rs.innerHTML = '<div class="sec-title">🔄 今日复习'
+      +(reviewQ.length > 0 ? ' <span class="review-badge">'+reviewQ.length+' 词到期</span>' : '')
+      +'</div>'
+      +(showWords.length > 0
+        ? '<div style="display:flex;gap:10px;overflow-x:auto;padding:0 16px 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch">'
+          +showWords.map(({lv,w})=>
+            '<div onclick="openCard('+lv.id+',\''+w.id+'\')" style="flex-shrink:0;background:#fff;border-radius:14px;padding:12px 14px;min-width:90px;text-align:center;border:1.5px solid var(--br);box-shadow:var(--sh);cursor:pointer">'
+            +'<div style="font-size:22px;margin-bottom:5px">'+w.emoji+'</div>'
+            +'<div style="font-size:12px;font-weight:800;color:var(--tx)">'+w.title+'</div>'
+            +'<div style="font-size:10px;color:var(--mu);margin-top:2px">'+w.term+'</div>'
+            +'</div>'
+          ).join('')+'</div>'
+        : '')
       +'<div style="padding:0 16px 16px">'
-        +'<button class="btn-review" onclick="startReviewQuiz()">🔄 开始复习测验（'+reviewQ.length+' 词）</button>'
+        +'<button class="btn-review" onclick="startReviewQuiz()">🔄 随机复习练习（共 '+totalLearned+' 词）</button>'
       +'</div>';
   } else { rs.innerHTML = ''; }
   const total = LEVELS.reduce((a,l)=>a+l.words.length,0);
@@ -2606,11 +2612,16 @@ function startQuiz(){
 }
 
 function startReviewQuiz(){
-  const queue = getReviewQueue();
-  if(!queue.length){ toast('暂无到期词汇，再学一些词汇吧！'); return; }
+  // 从全部已学词中随机抽题，不限于到期词，保证每次都有新鲜感
+  const allLearned = [];
+  LEVELS.forEach(lv => lv.words.forEach(w => {
+    const key = lv.id+'_'+w.id;
+    if(learned[key]) allLearned.push({lv, w});
+  }));
+  if(!allLearned.length){ toast('还没有已学词汇，先去学几个词吧！'); return; }
   isReviewMode = true;
   curLv = null;
-  const pool = [...queue].sort(()=>Math.random()-.5).slice(0,10);
+  const pool = [...allLearned].sort(()=>Math.random()-.5).slice(0,10);
   qWords = pool.map(({w})=>w);
   qWordKeys = pool.map(({lv,w})=>lv.id+'_'+w.id);
   qIdx=0;qScore=0;qErrN=0;qAnswered=false;
