@@ -77,6 +77,12 @@ body{font-family:'Nunito','Noto Sans SC',-apple-system,BlinkMacSystemFont,sans-s
 .wchip .wt{font-size:13px;font-weight:900;margin-bottom:3px}
 .wchip .wm{font-size:11px;color:var(--mu);font-weight:800}
 .wchip .ck{position:absolute;top:6px;right:7px;font-size:11px}
+.wchip .phase-dots{display:flex;gap:3px;align-items:center;justify-content:center;margin-top:6px}
+.phase-dot{width:6px;height:6px;border-radius:50%;background:var(--br);border:1.5px solid var(--brd);flex-shrink:0}
+.phase-dot.filled{background:var(--p);border-color:var(--p)}
+.phase-lbl{font-size:9px;font-weight:900;color:var(--p);margin-left:3px;letter-spacing:.3px}
+.phase-badge{display:inline-flex;align-items:center;gap:5px;background:var(--pl);border-radius:var(--radp);padding:4px 10px;font-size:11px;font-weight:900;color:var(--p);margin-bottom:8px}
+.phase-badge .phase-dots{display:flex;gap:3px;align-items:center}
 .qbtn-wrap{padding:12px 16px;position:sticky;bottom:58px;background:var(--card);border-top:2px solid var(--br);z-index:10}
 
 /* BUTTONS */
@@ -2193,8 +2199,26 @@ const S  = k => localStorage.getItem('tw_'+k);
 const SS = (k,v) => localStorage.setItem('tw_'+k,v);
 let learned = JSON.parse(S('learned')||'{}');
 let wrong   = JSON.parse(S('wrong')||'{}'); // {wordKey: wrongCount}
+let phase   = JSON.parse(S('tw_phase')||'{}'); // {wordKey: 0-3} 词汇学习阶段
 let xp      = parseInt(S('xp')||'0');
 let streak  = parseInt(S('streak')||'0');
+
+// ── 词汇学习阶段 helpers ──
+// Phase 0=初见(recognition) / 1=识别(recall) / 2=回忆(cloze) / 3=精通(distinction/cloze)
+// Migration: 已标记掌握的词默认从 phase 2 开始
+const PHASE_LABELS = ['初见','识别','回忆','精通'];
+function getPhase(key){
+  if(phase[key] !== undefined) return phase[key];
+  return learned[key] ? 2 : 0; // migration
+}
+function advancePhase(key){
+  const cur = getPhase(key);
+  if(cur < 3){ phase[key] = cur + 1; SS('tw_phase', JSON.stringify(phase)); }
+}
+function phaseDots(p){
+  const dots = [0,1,2,3].map(i=>'<div class="phase-dot'+(i<=p?' filled':'')+'"></div>').join('');
+  return '<div class="phase-dots">'+dots+'<span class="phase-lbl">'+PHASE_LABELS[p]+'</span></div>';
+}
 let curLv   = null;
 let curIdx  = 0;
 
@@ -2428,10 +2452,13 @@ function openLevel(id){
   document.getElementById('wordGrid').innerHTML = lv.words.map(w=>{
     const ok = !!learned[lv.id+'_'+w.id];
     const shortMeaning = w.meaning.length>18 ? w.meaning.slice(0,18)+'…' : w.meaning;
+    const wKey = lv.id+'_'+w.id;
+    const wp = ok ? getPhase(wKey) : -1;
     return '<div class="wchip '+(ok?'learned':'')+'" onclick="openCard('+lv.id+',\''+w.id+'\')">'
       +'<span class="ck">'+(ok?'✅':'')+'</span>'
       +'<div class="wt">'+w.emoji+' '+w.title+'</div>'
       +'<div class="wm">'+shortMeaning+'</div>'
+      +(ok ? phaseDots(wp) : '')
     +'</div>';
   }).join('');
 
@@ -2613,9 +2640,15 @@ function renderCard(){
 
   // 更新底部固定栏的 CTA 按钮
   const ctaRow = document.getElementById('ctaRow');
-  if(ctaRow) ctaRow.innerHTML = isLearned
-    ? '<button class="btn btn-g" onclick="testThisWord()">✅ 已掌握 · 再考一次</button>'
-    : '<button class="btn btn-p" onclick="testThisWord()">🎯 考考我</button>';
+  const cardKey = lv.id+'_'+w.id;
+  const cardPhase = getPhase(cardKey);
+  const phaseBadge = isLearned
+    ? '<div class="phase-badge">词汇学习阶段 '+phaseDots(cardPhase)+'</div>'
+    : '';
+  if(ctaRow) ctaRow.innerHTML = phaseBadge
+    + (isLearned
+      ? '<button class="btn btn-g" onclick="testThisWord()">✅ 已掌握 · 再考一次</button>'
+      : '<button class="btn btn-p" onclick="testThisWord()">🎯 考考我</button>');
 
   setTimeout(()=>speak(w.title), 400);
 }
@@ -2778,16 +2811,23 @@ function renderQuiz(){
   const shortM = m => m.length>28 ? m.slice(0,28)+'…' : m;
   const shortT = t => t.length>22 ? t.slice(0,22)+'…' : t;
 
-  // 判断题型（4种轮转）：
-  // 新词 → 认知识别
-  // 已学/复习词 → 随机: 填空 / 主动回忆 / 辨析(有misconception时)
-  const isLearned = !!learned[qWordKeys[qIdx]];
-  const isHighLevel = isReviewMode || isWrongMode || isLearned;
-  let qType = 'recognition';
-  if(isHighLevel){
-    const types = ['cloze','recall'];
-    if(w.misconception) types.push('distinction');
-    qType = types[Math.floor(Math.random()*types.length)];
+  // 判断题型（词汇学习阶段系统）：
+  // Phase 0=初见 → 认知识别(recognition)
+  // Phase 1=识别 → 反向测验(recall)
+  // Phase 2=回忆 → 填空练习(cloze)
+  // Phase 3=精通 → 辨析(distinction，有misconception) / 填空(cloze)
+  // 错题专练模式：根据阶段选题型
+  const curKey = qWordKeys[qIdx];
+  const curPhase = getPhase(curKey);
+  let qType;
+  if(curPhase >= 3){
+    qType = w.misconception ? 'distinction' : 'cloze';
+  } else if(curPhase === 2){
+    qType = 'cloze';
+  } else if(curPhase === 1){
+    qType = 'recall';
+  } else {
+    qType = 'recognition'; // phase 0
   }
   const useCloze = qType==='cloze';
   const useActiveRecall = qType==='recall';
@@ -2870,8 +2910,11 @@ function selectOpt(i){
   const key = qWordKeys[qIdx];
   if(correct){
     qScore++;xp+=5;SS('xp',xp);updateTopbar();
+    const prevP = getPhase(key); advancePhase(key); // 答对升阶
+    const nextP = getPhase(key);
+    const phaseUp = nextP > prevP ? ' · '+PHASE_LABELS[nextP]+' 🆙' : '';
     fb.className='fb ok-fb show';
-    fb.innerHTML='<div class="fb-t">✅ 正确！+5 XP</div><div class="fb-b">'+w.meaning+'</div>';
+    fb.innerHTML='<div class="fb-t">✅ 正确！+5 XP'+phaseUp+'</div><div class="fb-b">'+w.meaning+'</div>';
     // 答对：错误计数 -1，归零则从错题本移除
     if(wrong[key]>0){ wrong[key]--; if(!wrong[key]) delete wrong[key]; SS('wrong',JSON.stringify(wrong)); }
   } else {
@@ -2900,8 +2943,11 @@ function checkAns(){
   const key = qWordKeys[qIdx];
   if(correct){
     qScore++;xp+=5;SS('xp',xp);updateTopbar();
+    const prevP2 = getPhase(key); advancePhase(key); // 答对升阶
+    const nextP2 = getPhase(key);
+    const phaseUp2 = nextP2 > prevP2 ? ' · '+PHASE_LABELS[nextP2]+' 🆙' : '';
     fb.className='fb ok-fb show';
-    fb.innerHTML='<div class="fb-t">✅ 正确！+5 XP</div><div class="fb-b">'+w.meaning+'</div>';
+    fb.innerHTML='<div class="fb-t">✅ 正确！+5 XP'+phaseUp2+'</div><div class="fb-b">'+w.meaning+'</div>';
     inp.style.borderColor='var(--g)';inp.style.background='var(--gl)';inp.style.color='#2d6a00';
     if(wrong[key]>0){ wrong[key]--; if(!wrong[key]) delete wrong[key]; SS('wrong',JSON.stringify(wrong)); }
   } else {
