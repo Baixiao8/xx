@@ -115,7 +115,7 @@ body{font-family:'Nunito','Noto Sans SC',-apple-system,BlinkMacSystemFont,sans-s
 @keyframes audioAnim{from{transform:scale(1)}to{transform:scale(1.15)}}
 
 /* Card header — image variant */
-.vc-head-img{position:relative;height:180px;overflow:hidden}
+.vc-head-img{position:relative;height:240px;overflow:hidden}
 .vc-head-img img{width:100%;height:100%;object-fit:cover;display:block}
 .vc-head-img::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.7) 0%,transparent 55%)}
 .vc-head-img .vc-img-overlay{position:absolute;bottom:0;left:0;right:0;padding:14px 18px 18px;z-index:1;display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
@@ -154,19 +154,22 @@ body{font-family:'Nunito','Noto Sans SC',-apple-system,BlinkMacSystemFont,sans-s
 .zh-work-chips{display:flex;flex-wrap:wrap;gap:8px}
 .zh-work-chip{background:var(--gl);color:#2d6a00;border:2px solid var(--g);border-radius:var(--radp);padding:7px 16px;font-size:14px;font-weight:900;box-shadow:var(--shg)}
 
-/* Misconception warning */
-.vc-misconception{background:var(--yl);border-radius:var(--rads);padding:14px 16px;border:2px solid var(--y);box-shadow:var(--shy)}
-.vc-misconception-hd{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:900;color:var(--yd);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
-.vc-misconception-txt{font-size:13px;font-weight:700;color:var(--tx);line-height:1.7}
+/* MEMORY SECTION — visual redesign */
+.mem-section{padding:0 16px 6px}
+.mem-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.mem-thumb{width:48px;height:48px;border-radius:10px;object-fit:cover;border:2px solid var(--br);box-shadow:var(--sh);flex-shrink:0}
+.mem-visual-card{background:var(--pl);border-radius:var(--rads);padding:14px 16px;margin-bottom:10px;border:2px solid var(--p);position:relative;overflow:hidden}
+.mem-visual-deco{font-size:56px;color:var(--p);opacity:.12;position:absolute;top:-10px;left:8px;line-height:1;font-family:Georgia,serif;pointer-events:none}
+.mem-visual-txt{font-size:14px;font-weight:800;color:var(--pd);line-height:1.65;position:relative;z-index:1}
+.mem-story-card{background:var(--yl);border-radius:var(--rads);padding:14px 16px;border:2px solid var(--y);box-shadow:var(--shy)}
+.mem-story-lbl{font-size:10px;font-weight:900;color:var(--yd);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;display:flex;align-items:center;gap:4px}
+.mem-story-txt{font-size:13px;font-weight:700;color:var(--tx);line-height:1.8}
 
-/* Collapsible toggles */
-.vc-toggle{border:2px solid var(--br);border-radius:var(--rads);overflow:hidden;margin:0 20px 14px}
-.vc-toggle summary{padding:13px 16px;font-size:13px;font-weight:900;cursor:pointer;display:flex;align-items:center;gap:8px;list-style:none;background:var(--card);border-bottom:2px solid transparent;transition:background .15s}
-.vc-toggle summary::-webkit-details-marker{display:none}
-.vc-toggle[open] summary{border-bottom-color:var(--br);background:var(--bg)}
-.vc-toggle-body{padding:14px 16px}
-.story-box{background:var(--yl);border-radius:var(--rads);padding:14px 16px;border:2px solid #FFC107}
-.story-txt{font-size:13px;line-height:1.8;color:var(--tx);font-weight:700}
+/* MISCONCEPTION — ≠ visual anchor */
+.mc-section{padding:0 16px 16px}
+.mc-card{background:var(--yl);border-radius:var(--rads);padding:16px;border:2px solid var(--y);box-shadow:var(--shy);display:flex;gap:14px;align-items:flex-start}
+.mc-neq{font-size:28px;font-weight:900;color:var(--yd);flex-shrink:0;line-height:1.1;margin-top:1px}
+.mc-txt{font-size:13px;font-weight:700;color:var(--tx);line-height:1.75}
 .example-box{background:var(--gl);border-radius:var(--rads);padding:14px 16px;border:2px solid #8BC34A}
 .ex-en{display:flex;align-items:flex-start;gap:10px;margin-bottom:7px}
 .ex-en-txt{font-size:13px;font-weight:900;color:var(--tx);line-height:1.5;flex:1}
@@ -2551,27 +2554,34 @@ function renderCard(){
         +'</div><div class="ex-zh">'+w.exZh+'</div>'
       +'</div></div>';
 
-  // Memory toggle (visual + story)
+  // Memory section — always visible, visual redesign
   const memoryToggle = (w.visual || w.story) ?
-    '<div class="vc-toggle"><details>'
-      +'<summary>💡 记忆技巧</summary>'
-      +'<div class="vc-toggle-body">'
-        +(w.visual ? '<div style="font-size:13px;font-weight:700;color:var(--mu);margin-bottom:10px;font-style:italic">'+w.visual+'</div>' : '')
-        +(w.story ? '<div class="story-box"><div class="story-txt">'+w.story+'</div></div>' : '')
+    '<div class="mem-section">'
+      +'<div class="mem-header">'
+        +'<div class="sec-lbl" style="margin:0">💡 记忆技巧</div>'
+        +(w.img ? '<img class="mem-thumb" src="'+w.img+'" alt="" onerror="this.style.display=\'none\'">' : '')
       +'</div>'
-    +'</details></div>' : '';
+      +(w.visual ?
+        '<div class="mem-visual-card">'
+          +'<div class="mem-visual-deco">"</div>'
+          +'<div class="mem-visual-txt">'+w.visual+'</div>'
+        +'</div>' : '')
+      +(w.story ?
+        '<div class="mem-story-card">'
+          +'<div class="mem-story-lbl">📖 工作场景</div>'
+          +'<div class="mem-story-txt">'+w.story+'</div>'
+        +'</div>' : '')
+    +'</div>' : '';
 
-  // Misconception toggle
+  // Misconception — always visible, ≠ visual anchor
   const misconceptionToggle = w.misconception ?
-    '<div class="vc-toggle"><details>'
-      +'<summary>⚠️ 别搞混</summary>'
-      +'<div class="vc-toggle-body">'
-        +'<div class="vc-misconception">'
-          +'<div class="vc-misconception-hd">⚠️ 别搞混</div>'
-          +'<div class="vc-misconception-txt">'+w.misconception+'</div>'
-        +'</div>'
+    '<div class="mc-section">'
+      +'<div class="sec-lbl" style="margin:0 0 10px">⚠️ 别搞混</div>'
+      +'<div class="mc-card">'
+        +'<div class="mc-neq">≠</div>'
+        +'<div class="mc-txt">'+w.misconception+'</div>'
       +'</div>'
-    +'</details></div>' : '';
+    +'</div>' : '';
 
   // Related chips
   const relSec = w.rel && w.rel.length ?
