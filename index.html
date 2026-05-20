@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TechWords · 科技英语闯关</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Noto+Sans+SC:wght@400;700;900&display=swap" rel="stylesheet">
@@ -75,9 +75,9 @@ body{font-family:'Nunito','Noto Sans SC',-apple-system,BlinkMacSystemFont,sans-s
 .wchip:active{transform:translateY(4px);box-shadow:none}
 .wchip.learned{border-color:var(--g);box-shadow:0 4px 0 0 var(--gd);background:var(--gl)}
 .wchip .wt{font-size:13px;font-weight:900;margin-bottom:3px}
-.wchip .wm{font-size:10px;color:var(--mu);font-weight:800}
+.wchip .wm{font-size:11px;color:var(--mu);font-weight:800}
 .wchip .ck{position:absolute;top:6px;right:7px;font-size:11px}
-.qbtn-wrap{padding:0 16px 16px}
+.qbtn-wrap{padding:12px 16px;position:sticky;bottom:58px;background:var(--card);border-top:2px solid var(--br);z-index:10}
 
 /* BUTTONS */
 .btn{width:100%;padding:17px;border-radius:var(--rads);border:2px solid transparent;font-size:16px;font-weight:900;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:transform .1s,box-shadow .1s;letter-spacing:.3px;text-transform:uppercase}
@@ -125,7 +125,7 @@ body{font-family:'Nunito','Noto Sans SC',-apple-system,BlinkMacSystemFont,sans-s
 .vc-head-img .vc-pron-row .vc-pron{background:rgba(0,0,0,.5)}
 .vc-head-img .vc-pron-row .audio-btn{background:rgba(0,0,0,.4)}
 .vc-head-img{cursor:zoom-in}
-.vc-img-expand{position:absolute;top:10px;right:12px;z-index:2;background:rgba(0,0,0,.45);border:none;border-radius:6px;padding:4px 8px;font-size:12px;color:#fff;font-weight:800;cursor:pointer;line-height:1.4}
+.vc-img-expand{position:absolute;top:10px;right:12px;z-index:2;background:rgba(0,0,0,.45);border:none;border-radius:6px;padding:8px 14px;font-size:12px;color:#fff;font-weight:800;cursor:pointer;line-height:1.4;min-height:36px}
 
 /* Image fullscreen overlay */
 .img-ov{position:fixed;inset:0;background:rgba(0,0,0,.92);display:none;align-items:center;justify-content:center;z-index:300;padding:16px;flex-direction:column;gap:12px}
@@ -180,7 +180,7 @@ body{font-family:'Nunito','Noto Sans SC',-apple-system,BlinkMacSystemFont,sans-s
 /* 常见搭配 chip — 中性灰，不与主色竞争 */
 .phrases-chips{display:flex;flex-wrap:wrap;gap:8px}
 .phrase-chip{background:var(--card);color:var(--tx);border-radius:var(--radp);padding:6px 14px;font-size:12px;font-weight:800;border:2px solid var(--br);box-shadow:var(--sh);user-select:text}
-.card-actions{padding:14px 16px;display:flex;gap:10px}
+.card-actions{padding:10px 16px 12px;display:flex;flex-direction:column;gap:8px;position:sticky;bottom:58px;background:var(--card);border-top:2px solid var(--br);z-index:10}
 .card-actions .btn{flex:1;padding:14px;font-size:13px}
 
 /* QUIZ */
@@ -256,7 +256,7 @@ body{font-family:'Nunito','Noto Sans SC',-apple-system,BlinkMacSystemFont,sans-s
 .ni.active .nicon{transform:scale(1.15)}
 
 /* TOAST */
-.toast{position:fixed;top:72px;left:50%;transform:translateX(-50%) translateY(-16px);background:var(--tx);color:#fff;padding:10px 22px;border-radius:var(--radp);font-size:13px;font-weight:900;opacity:0;transition:all .3s;z-index:9999;white-space:nowrap;pointer-events:none}
+.toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--tx);color:#fff;padding:10px 22px;border-radius:var(--radp);font-size:13px;font-weight:900;opacity:0;transition:all .3s;z-index:9999;white-space:nowrap;pointer-events:none}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 /* CONFETTI */
@@ -328,8 +328,11 @@ body{font-family:'Nunito','Noto Sans SC',-apple-system,BlinkMacSystemFont,sans-s
   </div>
   <div id="cardContent"></div>
   <div class="card-actions">
-    <button class="btn btn-o" id="prevBtn" onclick="prevCard()">← 上一个</button>
-    <button class="btn btn-p" id="nextBtn" onclick="nextCard()">下一个 →</button>
+    <div id="ctaRow"></div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-o" id="prevBtn" onclick="prevCard()">← 上一个</button>
+      <button class="btn btn-p" id="nextBtn" onclick="nextCard()">下一个 →</button>
+    </div>
   </div>
 </div>
 
@@ -2606,12 +2609,13 @@ function renderCard(){
         +relSec
       +'</div>'
       +misconceptionToggle
-      +'<div style="padding:0 16px 16px">'
-        +(isLearned
-          ? '<button class="btn btn-g" onclick="testThisWord()">✅ 已掌握 · 再考一次</button>'
-          : '<button class="btn btn-p" onclick="testThisWord()">🎯 考考我</button>')
-      +'</div>'
     +'</div>';
+
+  // 更新底部固定栏的 CTA 按钮
+  const ctaRow = document.getElementById('ctaRow');
+  if(ctaRow) ctaRow.innerHTML = isLearned
+    ? '<button class="btn btn-g" onclick="testThisWord()">✅ 已掌握 · 再考一次</button>'
+    : '<button class="btn btn-p" onclick="testThisWord()">🎯 考考我</button>';
 
   setTimeout(()=>speak(w.title), 400);
 }
@@ -2796,7 +2800,11 @@ function renderQuiz(){
     document.getElementById('chkBtn').style.display='block';
     setTimeout(()=>{
       const inp=document.getElementById('clozeInput');
-      if(inp){ inp.onkeydown=e=>{if(e.key==='Enter'&&!qAnswered)checkAns();}; inp.focus(); }
+      if(inp){
+        inp.onkeydown=e=>{if(e.key==='Enter'&&!qAnswered)checkAns();};
+        // 不自动弹键盘，用户手动点击输入框时再滚动到可见区域
+        inp.addEventListener('focus',()=>{ setTimeout(()=>inp.scrollIntoView({behavior:'smooth',block:'center'}),300); },{once:true});
+      }
     },50);
   } else if(useDistinction){
     // 🔍 辨析：展示 misconception 文本，选出对应的词
@@ -3034,6 +3042,25 @@ function renderProgModal(){
 document.getElementById('modal').addEventListener('click',function(e){
   if(e.target===this) this.classList.remove('show');
 });
+
+// ══════════════════════════════════════════════
+// 词卡滑动手势（左滑下一个，右滑上一个）
+// ══════════════════════════════════════════════
+(function(){
+  let _tx=0, _ty=0;
+  const el=document.getElementById('sc-card');
+  el.addEventListener('touchstart',e=>{
+    _tx=e.touches[0].clientX; _ty=e.touches[0].clientY;
+  },{passive:true});
+  el.addEventListener('touchend',e=>{
+    const dx=e.changedTouches[0].clientX-_tx;
+    const dy=e.changedTouches[0].clientY-_ty;
+    // 横向位移 > 60px 且横向幅度明显大于纵向，才触发翻页
+    if(Math.abs(dx)>60 && Math.abs(dx)>Math.abs(dy)*1.5){
+      if(dx<0) nextCard(); else prevCard();
+    }
+  },{passive:true});
+})();
 
 // ══════════════════════════════════════════════
 // INIT
