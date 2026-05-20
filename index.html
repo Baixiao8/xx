@@ -2224,10 +2224,41 @@ let curIdx  = 0;
 
 const DAY = 86400000;
 const DAILY_GOAL = 3; // 每日完成 3 词维持连签
-let isReviewMode = false; // 复习模式标记
-let isWrongMode  = false; // 错题专练模式标记
-let isSingleWordMode = false; // 从词卡「考考我」进入的单词测验模式
-let qWordKeys = []; // 配合 qWords 存储每道题的 learned key
+
+// ── 测验模式枚举（互斥，取代三个布尔标志）──────────────────────
+// 旧：isReviewMode / isWrongMode / isSingleWordMode（3 bool = 8 组合，只有 4 合法）
+// 新：quizMode 只能是下列 4 个值之一，null = 未在测验中
+const QUIZ_MODE = { LEVEL:'level', REVIEW:'review', WRONG:'wrong', SINGLE:'single' };
+let quizMode = null;
+
+// ── 题目列表（合并旧 qWords + qWordKeys 平行数组）──────────────
+// 旧：qWords[i] 和 qWordKeys[i] 必须同步，靠人工保证
+// 新：qItems[i] = { word:{…}, key:'lv1_ux' }，索引不可能漂移
+let qItems = [];
+
+// ── 统一写入入口（不再在各处散写 learned/wrong/xp）────────────
+function recordCorrect(key){
+  xp+=5; SS('xp',xp); updateTopbar();
+  const prevP=getPhase(key); advancePhase(key);
+  const nextP=getPhase(key);
+  if(wrong[key]>0){ wrong[key]--; if(!wrong[key]) delete wrong[key]; SS('wrong',JSON.stringify(wrong)); }
+  return nextP>prevP ? ' · '+PHASE_LABELS[nextP]+' 🆙' : '';
+}
+function recordWrong(key){
+  wrong[key]=(wrong[key]||0)+1; SS('wrong',JSON.stringify(wrong));
+}
+
+// ── 重置所有测验状态（唯一出口，不会漏掉某个标志）────────────
+function resetQuizState(){
+  quizMode=null; qItems=[]; qIdx=0; qScore=0; qErrN=0; qAnswered=false; qOpts=[];
+}
+
+// ── 开发期不变量断言（生产环境自动跳过）──────────────────────
+function assertState(){
+  if(typeof __DEV__==='undefined') return;
+  console.assert(quizMode===null||Object.values(QUIZ_MODE).includes(quizMode),'非法 quizMode:',quizMode);
+  console.assert(qItems.length===0||qIdx<qItems.length,'qIdx 越界:',qIdx,'/',qItems.length);
+}
 
 // 初始化今日已学词数（每天重置）
 let todayLearned = (() => {
@@ -2678,11 +2709,9 @@ function markLearned(){
 function testThisWord(){
   if(!curLv) return;
   const w=curLv.words[curIdx], key=curLv.id+'_'+w.id;
-  isReviewMode = !!learned[key]; // 已学词走复习模式（重置时间戳），新词走标记模式
-  isWrongMode = false;
-  isSingleWordMode = true;
-  qWords=[w]; qWordKeys=[key];
-  qIdx=0; qScore=0; qErrN=0; qAnswered=false;
+  resetQuizState();
+  quizMode=QUIZ_MODE.SINGLE;
+  qItems=[{word:w, key}];
   showScreen('quiz');
   document.getElementById('n-home').classList.add('active');
   renderQuiz();
@@ -2695,21 +2724,18 @@ function backToCard(){
 // ══════════════════════════════════════════════
 // QUIZ
 // ══════════════════════════════════════════════
-let qWords=[],qIdx=0,qScore=0,qErrN=0,qAnswered=false,qOpts=[];
+let qIdx=0,qScore=0,qErrN=0,qAnswered=false,qOpts=[];
 
 function startWrongQuiz(){
-  const pool = [];
-  LEVELS.forEach(lv => lv.words.forEach(w => {
-    const key = lv.id+'_'+w.id;
-    if(wrong[key]>0) pool.push({lv, w});
+  const pool=[];
+  LEVELS.forEach(lv=>lv.words.forEach(w=>{
+    const key=lv.id+'_'+w.id;
+    if(wrong[key]>0) pool.push({word:w, key});
   }));
   if(!pool.length){ toast('暂无错题，继续加油！'); return; }
-  isReviewMode = false; isWrongMode = true;
-  curLv = null;
-  const shuffled = [...pool].sort(()=>Math.random()-.5).slice(0,10);
-  qWords = shuffled.map(({w})=>w);
-  qWordKeys = shuffled.map(({lv,w})=>lv.id+'_'+w.id);
-  qIdx=0;qScore=0;qErrN=0;qAnswered=false;
+  resetQuizState();
+  quizMode=QUIZ_MODE.WRONG; curLv=null;
+  qItems=[...pool].sort(()=>Math.random()-.5).slice(0,10);
   showScreen('quiz');
   document.getElementById('n-home').classList.add('active');
   renderQuiz();
@@ -2717,11 +2743,10 @@ function startWrongQuiz(){
 
 function startQuiz(){
   if(!curLv) return;
-  isReviewMode = false; isWrongMode = false;
-  const pool=[...curLv.words].sort(()=>Math.random()-.5);
-  qWords=pool.slice(0,Math.min(10,pool.length));
-  qWordKeys=qWords.map(w=>curLv.id+'_'+w.id);
-  qIdx=0;qScore=0;qErrN=0;qAnswered=false;
+  resetQuizState();
+  quizMode=QUIZ_MODE.LEVEL;
+  const pool=[...curLv.words].sort(()=>Math.random()-.5).slice(0,10);
+  qItems=pool.map(w=>({word:w, key:curLv.id+'_'+w.id}));
   showScreen('quiz');
   document.getElementById('n-home').classList.add('active');
   renderQuiz();
@@ -2729,18 +2754,15 @@ function startQuiz(){
 
 function startReviewQuiz(){
   // 从全部已学词中随机抽题，不限于到期词，保证每次都有新鲜感
-  const allLearned = [];
-  LEVELS.forEach(lv => lv.words.forEach(w => {
-    const key = lv.id+'_'+w.id;
-    if(learned[key]) allLearned.push({lv, w});
+  const allLearned=[];
+  LEVELS.forEach(lv=>lv.words.forEach(w=>{
+    const key=lv.id+'_'+w.id;
+    if(learned[key]) allLearned.push({word:w, key});
   }));
   if(!allLearned.length){ toast('还没有已学词汇，先去学几个词吧！'); return; }
-  isReviewMode = true; isWrongMode = false;
-  curLv = null;
-  const pool = [...allLearned].sort(()=>Math.random()-.5).slice(0,10);
-  qWords = pool.map(({w})=>w);
-  qWordKeys = pool.map(({lv,w})=>lv.id+'_'+w.id);
-  qIdx=0;qScore=0;qErrN=0;qAnswered=false;
+  resetQuizState();
+  quizMode=QUIZ_MODE.REVIEW; curLv=null;
+  qItems=[...allLearned].sort(()=>Math.random()-.5).slice(0,10);
   showScreen('quiz');
   document.getElementById('n-home').classList.add('active');
   renderQuiz();
@@ -2793,7 +2815,8 @@ function buildClozeContent(w){
 }
 
 function renderQuiz(){
-  const w=qWords[qIdx], total=qWords.length;
+  assertState();
+  const {word:w, key:curKey}=qItems[qIdx], total=qItems.length;
   document.getElementById('qBar').style.width  = (qIdx/total*100)+'%';
   document.getElementById('qNum').textContent  = (qIdx+1)+'/'+total;
   document.getElementById('qOk').textContent   = qScore;
@@ -2816,8 +2839,6 @@ function renderQuiz(){
   // Phase 1=识别 → 反向测验(recall)
   // Phase 2=回忆 → 填空练习(cloze)
   // Phase 3=精通 → 辨析(distinction，有misconception) / 填空(cloze)
-  // 错题专练模式：根据阶段选题型
-  const curKey = qWordKeys[qIdx];
   const curPhase = getPhase(curKey);
   let qType;
   if(curPhase >= 3){
@@ -2899,7 +2920,7 @@ function renderQuiz(){
 function selectOpt(i){
   if(qAnswered) return;
   qAnswered=true;
-  const w=qWords[qIdx], correct=qOpts[i].id===w.id;
+  const {word:w, key}=qItems[qIdx], correct=qOpts[i].id===w.id;
   qOpts.forEach((o,j)=>{
     const el=document.getElementById('opt'+j);
     el.style.pointerEvents='none';
@@ -2907,22 +2928,16 @@ function selectOpt(i){
     else if(j===i&&!correct) el.classList.add('err');
   });
   const fb=document.getElementById('fb');
-  const key = qWordKeys[qIdx];
   if(correct){
-    qScore++;xp+=5;SS('xp',xp);updateTopbar();
-    const prevP = getPhase(key); advancePhase(key); // 答对升阶
-    const nextP = getPhase(key);
-    const phaseUp = nextP > prevP ? ' · '+PHASE_LABELS[nextP]+' 🆙' : '';
+    qScore++;
+    const phaseUp=recordCorrect(key);
     fb.className='fb ok-fb show';
     fb.innerHTML='<div class="fb-t">✅ 正确！+5 XP'+phaseUp+'</div><div class="fb-b">'+w.meaning+'</div>';
-    // 答对：错误计数 -1，归零则从错题本移除
-    if(wrong[key]>0){ wrong[key]--; if(!wrong[key]) delete wrong[key]; SS('wrong',JSON.stringify(wrong)); }
   } else {
     qErrN++;
+    recordWrong(key);
     fb.className='fb err-fb show';
     fb.innerHTML='<div class="fb-t">❌ 正确答案：'+w.title+'</div><div class="fb-b">'+w.meaning+'</div>';
-    // 答错：错误计数 +1，记入错题本
-    wrong[key]=(wrong[key]||0)+1; SS('wrong',JSON.stringify(wrong));
   }
   document.getElementById('qOk').textContent=qScore;
   document.getElementById('qErr').textContent=qErrN;
@@ -2934,28 +2949,23 @@ function checkAns(){
   const inp=document.getElementById('clozeInput');
   if(!inp||!inp.value.trim()) return;
   qAnswered=true;
-  const w=qWords[qIdx];
-  const userAns=inp.value.trim();
-  const correct=userAns.toLowerCase()===w.title.toLowerCase();
+  const {word:w, key}=qItems[qIdx];
+  const correct=inp.value.trim().toLowerCase()===w.title.toLowerCase();
   inp.disabled=true;
   document.getElementById('chkBtn').style.display='none';
   const fb=document.getElementById('fb');
-  const key = qWordKeys[qIdx];
   if(correct){
-    qScore++;xp+=5;SS('xp',xp);updateTopbar();
-    const prevP2 = getPhase(key); advancePhase(key); // 答对升阶
-    const nextP2 = getPhase(key);
-    const phaseUp2 = nextP2 > prevP2 ? ' · '+PHASE_LABELS[nextP2]+' 🆙' : '';
+    qScore++;
+    const phaseUp=recordCorrect(key);
     fb.className='fb ok-fb show';
-    fb.innerHTML='<div class="fb-t">✅ 正确！+5 XP'+phaseUp2+'</div><div class="fb-b">'+w.meaning+'</div>';
+    fb.innerHTML='<div class="fb-t">✅ 正确！+5 XP'+phaseUp+'</div><div class="fb-b">'+w.meaning+'</div>';
     inp.style.borderColor='var(--g)';inp.style.background='var(--gl)';inp.style.color='#2d6a00';
-    if(wrong[key]>0){ wrong[key]--; if(!wrong[key]) delete wrong[key]; SS('wrong',JSON.stringify(wrong)); }
   } else {
     qErrN++;
+    recordWrong(key);
     fb.className='fb err-fb show';
     fb.innerHTML='<div class="fb-t">❌ 正确答案：'+w.title+'</div><div class="fb-b">'+w.meaning+'</div>';
     inp.style.borderColor='var(--r)';inp.style.background='var(--rl)';inp.style.color='#b91c1c';
-    wrong[key]=(wrong[key]||0)+1; SS('wrong',JSON.stringify(wrong));
   }
   document.getElementById('qOk').textContent=qScore;
   document.getElementById('qErr').textContent=qErrN;
@@ -2964,20 +2974,21 @@ function checkAns(){
 
 function nextQ(){
   qIdx++;
-  if(qIdx>=qWords.length) finishQuiz();
+  if(qIdx>=qItems.length) finishQuiz();
   else renderQuiz();
 }
 
 function finishQuiz(){
-  const pct=Math.round(qScore/qWords.length*100);
-  const correct=pct>=70;
+  const total=qItems.length;
+  const pct=Math.round(qScore/total*100);
+  const passed=pct>=70;
 
   // ── 数据处理（所有模式共用）──
-  if(correct){
-    if(isReviewMode||isWrongMode){
-      qWordKeys.forEach(key=>{ if(learned[key]) learned[key]=Date.now(); });
+  if(passed){
+    if(quizMode===QUIZ_MODE.REVIEW||quizMode===QUIZ_MODE.WRONG){
+      qItems.forEach(({key})=>{ if(learned[key]) learned[key]=Date.now(); });
     } else {
-      qWordKeys.forEach(key=>{ if(!learned[key]){ learned[key]=Date.now(); xp+=5; } });
+      qItems.forEach(({key})=>{ if(!learned[key]){ learned[key]=Date.now(); xp+=5; } });
       SS('xp',xp);
     }
     SS('learned',JSON.stringify(learned));
@@ -2985,43 +2996,47 @@ function finishQuiz(){
     updateTopbar();
   }
 
-  // ── 单词模式：modal 反馈，3 秒自动回词卡 ──
-  if(isSingleWordMode){
-    const _wasReview=isReviewMode, _w=qWords[0];
-    isWrongMode=false; isReviewMode=false; isSingleWordMode=false;
-    showSingleWordResult(correct, _wasReview);
-    if(correct) setTimeout(confetti,100);
+  // ── 单词模式：modal 反馈，自动进入下一词 ──
+  if(quizMode===QUIZ_MODE.SINGLE){
+    const wasReview=!!learned[qItems[0].key]; // learned 尚未被本轮覆写，反映测验前状态
+    const _passed=passed;
+    resetQuizState();
+    showSingleWordResult(_passed, wasReview);
+    if(_passed) setTimeout(confetti,100);
     return;
   }
 
-  // ── 普通模式：结果页 ──
+  // ── 普通模式：结果页（先缓存需要用到的值，再 reset）──
+  const _mode=quizMode, _total=total, _curLvId=curLv?curLv.id:0, _curLvTitle=curLv?curLv.title:'';
+  const _qScore=qScore, _qErrN=qErrN;
+  resetQuizState();
+
   showScreen('result');
   const emoji=pct>=90?'🏆':pct>=70?'🎉':pct>=50?'💪':'📚';
   const msg=pct>=90?'完美！你是词汇高手！':pct>=70?'太棒了，继续保持！':pct>=50?'不错，再练练更好！':'多练练，加油！';
-  const subTitle=isWrongMode?'📌 完成错题专练':isReviewMode?'🔄 完成随机复习练习':'完成「'+(curLv?curLv.title:'')+'」测验';
+  const subTitle=_mode===QUIZ_MODE.WRONG?'📌 完成错题专练':_mode===QUIZ_MODE.REVIEW?'🔄 完成随机复习练习':'完成「'+_curLvTitle+'」测验';
   const wrongCount=Object.keys(wrong).filter(k=>wrong[k]>0).length;
-  const wrongNote=qErrN>0
-    ?'<div style="background:var(--rl);border:2px solid var(--r);border-radius:var(--rads);padding:12px 16px;margin-bottom:16px;font-size:13px;font-weight:800;color:#b91c1c">📌 本轮答错 '+qErrN+' 题，已记入错题本（共 '+wrongCount+' 词待练）</div>'
+  const wrongNote=_qErrN>0
+    ?'<div style="background:var(--rl);border:2px solid var(--r);border-radius:var(--rads);padding:12px 16px;margin-bottom:16px;font-size:13px;font-weight:800;color:#b91c1c">📌 本轮答错 '+_qErrN+' 题，已记入错题本（共 '+wrongCount+' 词待练）</div>'
     :(wrongCount>0?'<div style="background:var(--gl);border:2px solid var(--g);border-radius:var(--rads);padding:12px 16px;margin-bottom:16px;font-size:13px;font-weight:800;color:#2d6a00">✅ 本轮全对！错题本还有 '+wrongCount+' 词待清零</div>':'');
   document.getElementById('resultWrap').innerHTML=
     '<span class="r-emoji">'+emoji+'</span>'
     +'<div class="r-title">'+msg+'</div>'
     +'<div class="r-sub">'+subTitle+'</div>'
     +'<div class="r-stats">'
-      +'<div class="r-stat"><div class="num">'+qScore+'/'+qWords.length+'</div><div class="lbl">答对题数</div></div>'
+      +'<div class="r-stat"><div class="num">'+_qScore+'/'+_total+'</div><div class="lbl">答对题数</div></div>'
       +'<div class="r-stat"><div class="num" style="color:'+(pct>=70?'var(--g)':'var(--r)')+'">'+pct+'%</div><div class="lbl">正确率</div></div>'
     +'</div>'
     +wrongNote
     +'<div class="xp-earned"><div class="xi">⚡</div><div><div class="xn">'+xp+' XP</div><div class="xl">累计经验值</div></div></div>'
-    +(isWrongMode
+    +(_mode===QUIZ_MODE.WRONG
       ?'<button class="btn btn-p" onclick="startWrongQuiz()" style="margin-bottom:12px">🔄 再练一遍</button>'
        +'<button class="btn btn-g" onclick="goHome()">🏠 返回主页</button>'
-      :isReviewMode
+      :_mode===QUIZ_MODE.REVIEW
         ?'<button class="btn btn-p" onclick="startReviewQuiz()" style="margin-bottom:12px">🔄 再来一次</button>'
          +'<button class="btn btn-g" onclick="goHome()">🏠 返回主页</button>'
         :'<button class="btn btn-p" onclick="startQuiz()" style="margin-bottom:12px">🔄 再来一次</button>'
-         +'<button class="btn btn-o" onclick="openLevel('+(curLv?curLv.id:0)+')">← 返回关卡</button>');
-  isWrongMode=false; isReviewMode=false; isSingleWordMode=false;
+         +'<button class="btn btn-o" onclick="openLevel('+_curLvId+')">← 返回关卡</button>');
   if(pct>=80) setTimeout(confetti,200);
 }
 
