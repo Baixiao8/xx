@@ -200,7 +200,7 @@ body{font-family:'Nunito','Noto Sans SC',-apple-system,BlinkMacSystemFont,sans-s
 .opt.sel .opt-letter{background:var(--p);color:#fff}
 .opt.ok .opt-letter{background:var(--g);color:#fff}
 .opt.err .opt-letter{background:var(--r);color:#fff}
-.fb{margin:0 18px 16px;border-radius:var(--rads);padding:14px 16px;display:none;animation:slideIn .25s ease;border:2px solid}
+.fb{border-radius:var(--rads);padding:14px 16px;display:none;animation:slideIn .25s ease;border:2px solid;margin-bottom:10px}
 .fb.show{display:block}
 .fb.ok-fb{background:var(--gl);border-color:var(--g)}
 .fb.err-fb{background:var(--rl);border-color:var(--r)}
@@ -208,7 +208,7 @@ body{font-family:'Nunito','Noto Sans SC',-apple-system,BlinkMacSystemFont,sans-s
 .fb.ok-fb .fb-t{color:#2d6a00}
 .fb.err-fb .fb-t{color:#b91c1c}
 .fb-b{font-size:12px;line-height:1.6;color:var(--tx);font-weight:700}
-.chk-wrap{padding:0 18px 14px}
+.chk-wrap{position:sticky;bottom:56px;z-index:10;background:var(--bg);padding:12px 18px 14px;border-top:2px solid var(--br)}
 
 /* RESULT */
 .result-wrap{padding:36px 22px;text-align:center}
@@ -328,8 +328,8 @@ body{font-family:'Nunito','Noto Sans SC',-apple-system,BlinkMacSystemFont,sans-s
     <div class="qstats"><span id="qNum">1/8</span><span>✅<span id="qOk">0</span> ❌<span id="qErr">0</span></span></div>
   </div>
   <div class="quiz-body" id="qBody"></div>
-  <div class="fb" id="fb"></div>
-  <div class="chk-wrap">
+  <div class="chk-wrap" id="chkWrap">
+    <div class="fb" id="fb"></div>
     <button class="btn btn-p" id="chkBtn" onclick="checkAns()" style="display:none">确认答案</button>
     <button class="btn btn-p" id="nxtBtn" onclick="nextQ()" style="display:none">继续 →</button>
   </div>
@@ -2441,7 +2441,7 @@ function renderCard(){
     headerHtml =
       '<div class="vc-head-img" onclick="expandImg(\''+imgJpg+'\',\''+_esc(w.title)+'\')">'
         +'<img src="'+imgJpg+'" alt="'+w.title+'" onerror="this.parentElement.style.background=\''+lv.color+'\'">'
-        +'<button class="vc-img-expand" onclick="event.stopPropagation();expandImg(\''+imgJpg+'\',\''+_esc(w.title)+'\')">⛶ 查看</button>'
+        +'<button class="vc-img-expand" onclick="event.stopPropagation();expandImg(\''+imgJpg+'\',\''+_esc(w.title)+'\')">放大 ↗</button>'
         +'<div class="vc-pron-row">'
           +'<div class="vc-pron"><button class="audio-btn" onclick="speak(\''+_esc(w.title)+'\')">🔊</button><span>'+w.pron+'</span></div>'
         +'</div>'
@@ -2645,7 +2645,7 @@ function renderQuiz(){
           +'<div class="opt-letter">'+letters[i]+'</div>'
           +'<div style="display:flex;flex-direction:column;gap:1px;min-width:0">'
             +'<span style="font-weight:900;font-size:15px;letter-spacing:.3px">'+o.emoji+' '+o.title+'</span>'
-            +'<span style="font-size:11px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+shortT(o.term)+'</span>'
+            +(shortT(o.term)!==o.title?'<span style="font-size:11px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+shortT(o.term)+'</span>':'')
           +'</div></div>').join('')
       +'</div>';
   } else {
@@ -2744,6 +2744,7 @@ function initSearch(){
 
 function doSearch(q){
   clearTimeout(_sT);
+  document.getElementById('hotTags').style.display = q.trim() ? 'none' : 'flex';
   _sT=setTimeout(()=>{
     if(!q.trim()){document.getElementById('sResults').innerHTML='<div class="s-empty"><div class="ei">🔭</div><p>输入词汇开始搜索</p></div>';return;}
     const ql=q.toLowerCase(),res=[];
