@@ -184,7 +184,7 @@ body{font-family:'Nunito','Noto Sans SC',-apple-system,BlinkMacSystemFont,sans-s
 .qprog{background:var(--br);border-radius:var(--radp);height:14px;overflow:hidden;margin-bottom:8px;border:2px solid var(--brd)}
 .qprog-fill{height:100%;background:var(--p);border-radius:var(--radp);transition:width .4s ease}
 .qstats{display:flex;justify-content:space-between;font-size:12px;color:var(--mu);font-weight:900}
-.quiz-body{padding:18px}
+.quiz-body{padding:18px 18px 140px}
 .qtype-badge{display:inline-block;padding:5px 14px;border-radius:var(--radp);font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px;border:2px solid}
 .qterm{background:var(--p);color:#fff;border-radius:var(--rads);padding:20px;text-align:center;font-size:26px;font-weight:900;margin-bottom:18px;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:var(--shp);border:2px solid var(--pd)}
 .qterm .audio-btn{background:rgba(255,255,255,.25)}
@@ -2742,7 +2742,7 @@ function renderQuiz(){
   // 新词 → 认知识别
   // 已学/复习词 → 随机: 填空 / 主动回忆 / 辨析(有misconception时)
   const isLearned = !!learned[qWordKeys[qIdx]];
-  const isHighLevel = isReviewMode || isLearned;
+  const isHighLevel = isReviewMode || isWrongMode || isLearned;
   let qType = 'recognition';
   if(isHighLevel){
     const types = ['cloze','recall'];
@@ -2765,7 +2765,7 @@ function renderQuiz(){
     document.getElementById('chkBtn').style.display='block';
     setTimeout(()=>{
       const inp=document.getElementById('clozeInput');
-      if(inp){ inp.addEventListener('keydown',e=>{if(e.key==='Enter'&&!qAnswered)checkAns();}); inp.focus(); }
+      if(inp){ inp.onkeydown=e=>{if(e.key==='Enter'&&!qAnswered)checkAns();}; inp.focus(); }
     },50);
   } else if(useDistinction){
     // 🔍 辨析：展示 misconception 文本，选出对应的词
@@ -2884,8 +2884,8 @@ function finishQuiz(){
   const emoji=pct>=90?'🏆':pct>=70?'🎉':pct>=50?'💪':'📚';
   const msg=pct>=90?'完美！你是词汇高手！':pct>=70?'太棒了，继续保持！':pct>=50?'不错，再练练更好！':'多练练，加油！';
   if(pct>=70){
-    if(isReviewMode){
-      // 复习完成：重置时间戳，3 天后再次出现
+    if(isReviewMode || isWrongMode){
+      // 复习/错题专练完成：重置时间戳，仅更新已学词
       qWordKeys.forEach(key=>{ if(learned[key]) learned[key]=Date.now(); });
     } else {
       // 普通测验：新词标记为已学
