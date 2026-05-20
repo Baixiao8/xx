@@ -314,6 +314,7 @@ body{font-family:'Nunito','Noto Sans SC',-apple-system,BlinkMacSystemFont,sans-s
   <div class="logo">Tech<span>Words</span></div>
   <div class="stats">
     <div class="chip">🔥<span id="sStreak">0</span></div>
+    <div class="chip" id="freezeChip" style="display:none">❄️<span id="sFreeze">0</span></div>
     <div class="chip">⚡<span id="sXP">0</span></div>
   </div>
 </div>
@@ -3385,10 +3386,27 @@ function addTodayLearned(n){
     const last = S('lastStudied');
     if(last !== today){
       const yesterday = new Date(Date.now()-DAY).toDateString();
-      streak = (last === yesterday) ? streak+1 : 1;
+      if(last === yesterday){
+        streak++;
+        // 每 7 天奖励一个 Freeze（上限 2）
+        if(streak % 7 === 0){
+          const fc = parseInt(S('freezeCount')||'0');
+          if(fc < 2){ SS('freezeCount', fc+1); toast('❄️ 获得 Streak Freeze × 1！连签奖励'); }
+        }
+      } else {
+        // 断签：检查是否有 Freeze 可用
+        const fc = parseInt(S('freezeCount')||'0');
+        if(fc > 0){
+          SS('freezeCount', fc-1);
+          toast('❄️ Streak Freeze 保住了你的连签！（剩余 '+(fc-1)+' 个）');
+          // streak 保持不变
+        } else {
+          streak = 1;
+        }
+      }
       SS('streak', streak); SS('lastStudied', today);
       updateTopbar();
-      if(streak > 1) toast('🔥 连签 '+streak+' 天，继续加油！');
+      if(streak > 1 && last === yesterday) toast('🔥 连签 '+streak+' 天，继续加油！');
     }
   }
   updateDailyProgress();
@@ -3405,11 +3423,20 @@ function updateDailyProgress(){
     +'<div class="daily-lbl">今日目标 '+g+'/'+DAILY_GOAL+' 词 '+(done?'🔥 已完成，Streak 保住了！':'🎯 再学 '+(DAILY_GOAL-g)+' 词维持连签')+'</div>'
     +'</div>';
 }
+// Phase-based SRS intervals: 0-1 → 1d, 2 → 7d, 3 → 16d
+function getReviewInterval(key){
+  const p = getPhase(key);
+  if(p <= 1) return DAY;
+  if(p === 2) return 7 * DAY;
+  return 16 * DAY;
+}
 function getReviewQueue(){
   const now = Date.now(), queue = [];
   LEVELS.forEach(lv => lv.words.forEach(w => {
-    const t = learned[lv.id+'_'+w.id];
-    if(t && typeof t === 'number' && (now - t > 3*DAY)) queue.push({lv, w});
+    const key = lv.id+'_'+w.id;
+    const t = learned[key];
+    if(t && typeof t === 'number' && (now - t > getReviewInterval(key)))
+      queue.push({lv, w});
   }));
   return queue.slice(0, 10);
 }
@@ -3500,6 +3527,11 @@ function goLevel(){
 function updateTopbar(){
   document.getElementById('sXP').textContent = xp;
   document.getElementById('sStreak').textContent = streak;
+  const fc = parseInt(S('freezeCount')||'0');
+  const freezeChip = document.getElementById('freezeChip');
+  if(freezeChip) freezeChip.style.display = fc > 0 ? '' : 'none';
+  const sFreeze = document.getElementById('sFreeze');
+  if(sFreeze) sFreeze.textContent = fc;
 }
 
 // ══════════════════════════════════════════════
