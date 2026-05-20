@@ -104,7 +104,7 @@ body{font-family:'Nunito','Noto Sans SC',-apple-system,BlinkMacSystemFont,sans-s
 
 /* Card header — colored */
 .vc-head{padding:24px 20px 20px;text-align:center;position:relative}
-.vc-emoji{font-size:52px;margin-bottom:12px;display:block}
+.vc-emoji{font-size:64px;margin-bottom:12px;display:block;filter:drop-shadow(0 3px 6px rgba(0,0,0,.25))}
 .vc-term{font-size:38px;font-weight:900;letter-spacing:-.5px;margin-bottom:4px}
 .vc-full{font-size:12px;color:rgba(255,255,255,.8);margin-bottom:12px;line-height:1.4;font-weight:800}
 .vc-pron{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.2);border-radius:var(--radp);padding:6px 16px;border:2px solid rgba(255,255,255,.3)}
@@ -124,6 +124,14 @@ body{font-family:'Nunito','Noto Sans SC',-apple-system,BlinkMacSystemFont,sans-s
 .vc-head-img .vc-pron-row{position:absolute;top:12px;left:16px;display:flex;align-items:center;gap:8px;z-index:1}
 .vc-head-img .vc-pron-row .vc-pron{background:rgba(0,0,0,.5)}
 .vc-head-img .vc-pron-row .audio-btn{background:rgba(0,0,0,.4)}
+.vc-head-img{cursor:zoom-in}
+.vc-img-expand{position:absolute;top:10px;right:12px;z-index:2;background:rgba(0,0,0,.45);border:none;border-radius:6px;padding:4px 8px;font-size:12px;color:#fff;font-weight:800;cursor:pointer;line-height:1.4}
+
+/* Image fullscreen overlay */
+.img-ov{position:fixed;inset:0;background:rgba(0,0,0,.92);display:none;align-items:center;justify-content:center;z-index:300;padding:16px;flex-direction:column;gap:12px}
+.img-ov.show{display:flex}
+.img-ov img{max-width:100%;max-height:calc(100vh - 80px);border-radius:12px;object-fit:contain;animation:mpop .25s cubic-bezier(.34,1.56,.64,1)}
+.img-ov-close{background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.3);border-radius:8px;padding:8px 20px;color:#fff;font-size:13px;font-weight:900;cursor:pointer}
 
 /* Card body */
 .vc-body{background:var(--card)}
@@ -167,8 +175,7 @@ body{font-family:'Nunito','Noto Sans SC',-apple-system,BlinkMacSystemFont,sans-s
 .rchip{background:var(--pl);color:var(--p);border-radius:var(--radp);padding:6px 14px;font-size:12px;font-weight:900;cursor:pointer;border:2px solid var(--p);box-shadow:var(--shp);transition:transform .1s,box-shadow .1s}
 .rchip:active{background:var(--p);color:#fff;transform:translateY(2px);box-shadow:none}
 .phrases-chips{display:flex;flex-wrap:wrap;gap:8px}
-.phrase-chip{background:var(--pl);color:var(--p);border-radius:var(--radp);padding:6px 14px;font-size:12px;font-weight:900;border:2px solid var(--p);box-shadow:var(--shp);cursor:pointer;transition:transform .1s,box-shadow .1s}
-.phrase-chip:active{background:var(--p);color:#fff;transform:translateY(2px);box-shadow:none}
+.phrase-chip{background:var(--pl);color:var(--p);border-radius:var(--radp);padding:6px 14px;font-size:12px;font-weight:900;border:2px solid var(--p);user-select:text}
 .card-actions{padding:14px 16px;display:flex;gap:10px}
 .card-actions .btn{flex:1;padding:14px;font-size:13px}
 
@@ -354,6 +361,7 @@ body{font-family:'Nunito','Noto Sans SC',-apple-system,BlinkMacSystemFont,sans-s
 
 <div class="toast" id="toast"></div>
 <div class="modal-ov" id="modal"><div class="modal" id="mContent"></div></div>
+<div class="img-ov" id="imgOv" onclick="closeImgOv()"><img id="imgOvImg" src="" alt=""><button class="img-ov-close" onclick="closeImgOv()">关闭</button></div>
 
 <script>
 // ══════════════════════════════════════════════
@@ -385,7 +393,7 @@ const LEVELS = [
     phrases:'UX design / improve UX / poor UX / user experience',
     ex:'The UX is confusing because users cannot find the upload button.',
     exZh:'用户体验很混乱，因为用户找不到上传按钮。',
-    img:'assets/images/ux-cn.png',
+    img:'assets/images/ux-cn.jpg',
     rel:[]
   },
   {
@@ -405,7 +413,7 @@ const LEVELS = [
     phrases:'product requirement / product roadmap / product manager / product goal',
     ex:'We need to clarify the product goal before designing the feature.',
     exZh:'设计这个功能前，我们需要先明确产品目标。',
-    img:'assets/images/product-cn.png',
+    img:'assets/images/product-cn.jpg',
     rel:[]
   },
   {
@@ -425,7 +433,7 @@ const LEVELS = [
     phrases:'build an MVP / MVP scope / MVP launch / MVP version',
     ex:'Let\'s reduce the scope and launch an MVP first.',
     exZh:'我们先缩小范围，发布一个 MVP 版本。',
-    img:'assets/images/mvp-cn.png',
+    img:'assets/images/mvp-cn.jpg',
     rel:[]
   },
   {
@@ -445,7 +453,7 @@ const LEVELS = [
     phrases:'hero section / hero image / hero CTA / homepage hero',
     ex:'The hero image feels too decorative and doesn\'t show the product.',
     exZh:'这个首屏图太装饰化了，没有展示产品本身。',
-    img:'assets/images/hero-cn.png',
+    img:'assets/images/hero-cn.jpg',
     rel:[]
   },
   {
@@ -465,7 +473,7 @@ const LEVELS = [
     phrases:'primary CTA / secondary CTA / CTA button / CTA copy',
     ex:'Can we make the primary CTA more prominent?',
     exZh:'我们可以让主行动按钮更突出一点吗？',
-    img:'assets/images/cta-cn.png',
+    img:'assets/images/cta-cn.jpg',
     rel:[]
   },
   {
@@ -485,7 +493,7 @@ const LEVELS = [
     phrases:'page layout / grid layout / layout issue / layout shift',
     ex:'The layout breaks on mobile screens.',
     exZh:'这个布局在手机屏幕上会错位。',
-    img:'assets/images/layout-cn.png',
+    img:'assets/images/layout-cn.jpg',
     rel:[]
   },
   {
@@ -505,7 +513,7 @@ const LEVELS = [
     phrases:'responsive design / responsive layout / mobile responsive',
     ex:'We need to make this page responsive for mobile users.',
     exZh:'我们需要让这个页面适配移动端用户。',
-    img:'assets/images/responsive-cn.png',
+    img:'assets/images/responsive-cn.jpg',
     rel:[]
   },
   {
@@ -525,7 +533,7 @@ const LEVELS = [
     phrases:'UI component / reusable component / component library / component state',
     ex:'Can we reuse the existing card component here?',
     exZh:'这里可以复用已有的卡片组件吗？',
-    img:'assets/images/component-cn.png',
+    img:'assets/images/component-cn.jpg',
     rel:[]
   },
   {
@@ -545,7 +553,7 @@ const LEVELS = [
     phrases:'user interaction / interaction design / interaction pattern / micro-interaction',
     ex:'The interaction feels slow because there is no loading state.',
     exZh:'这个交互感觉很慢，因为没有加载状态。',
-    img:'assets/images/interaction-cn.png',
+    img:'assets/images/interaction-cn.jpg',
     rel:[]
   },
   {
@@ -565,7 +573,7 @@ const LEVELS = [
     phrases:'low-fidelity wireframe / wireframe layout / create a wireframe',
     ex:'Let\'s align on the wireframe before moving to visual design.',
     exZh:'进入视觉设计前，我们先对齐线框图。',
-    img:'assets/images/wireframe-cn.png',
+    img:'assets/images/wireframe-cn.jpg',
     rel:[]
   },
   {
@@ -585,7 +593,7 @@ const LEVELS = [
     phrases:'interactive prototype / prototype testing / clickable prototype',
     ex:'Can you share the clickable prototype for review?',
     exZh:'你可以分享可点击原型给大家评审吗？',
-    img:'assets/images/prototype-cn.png',
+    img:'assets/images/prototype-cn.jpg',
     rel:[]
   },
   {
@@ -605,7 +613,7 @@ const LEVELS = [
     phrases:'product roadmap / roadmap planning / quarterly roadmap / roadmap item',
     ex:'This item is important, but it is not on the current roadmap.',
     exZh:'这个事项很重要，但不在当前路线图里。',
-    img:'assets/images/roadmap-cn.png',
+    img:'assets/images/roadmap-cn.jpg',
     rel:[]
   },
   {
@@ -625,7 +633,7 @@ const LEVELS = [
     phrases:'product backlog / backlog grooming / backlog item / prioritize backlog',
     ex:'Let’s add it to the backlog and review priority next sprint.',
     exZh:'我们先把它放进需求池，下个迭代再评估优先级。',
-    img:'assets/images/backlog-cn.png',
+    img:'assets/images/backlog-cn.jpg',
     rel:[]
   },
   {
@@ -645,7 +653,7 @@ const LEVELS = [
     phrases:'key stakeholder / stakeholder alignment / stakeholder feedback / stakeholder meeting',
     ex:'We need stakeholder alignment before changing the pricing model.',
     exZh:'改定价模型前，我们需要和相关方对齐。',
-    img:'assets/images/stakeholder-cn.png',
+    img:'assets/images/stakeholder-cn.jpg',
     rel:[]
   },
   {
@@ -665,7 +673,7 @@ const LEVELS = [
     phrases:'business requirement / product requirement / requirement document / requirement change',
     ex:'The requirement is unclear because it does not define the expected user outcome.',
     exZh:'这个需求不清楚，因为没有定义预期的用户结果。',
-    img:'assets/images/requirement-cn.png',
+    img:'assets/images/requirement-cn.jpg',
     rel:[]
   },
   {
@@ -685,7 +693,7 @@ const LEVELS = [
     phrases:'project scope / out of scope / scope creep / scope definition',
     ex:'Payment integration is out of scope for this release.',
     exZh:'支付集成不在这次发布范围内。',
-    img:'assets/images/scope-cn.png',
+    img:'assets/images/scope-cn.jpg',
     rel:[]
   }
   ]
@@ -715,7 +723,7 @@ const LEVELS = [
     phrases:'run an A/B test / test variant / control group / experiment result',
     ex:'We should run an A/B test before changing the signup flow.',
     exZh:'修改注册流程前，我们应该先做一次 A/B 测试。',
-    img:'assets/images/ab-test-cn.png',
+    img:'assets/images/ab-test-cn.jpg',
     rel:[]
   },
   {
@@ -735,7 +743,7 @@ const LEVELS = [
     phrases:'conversion rate / improve conversion / conversion goal / conversion event',
     ex:'The new hero section increased the conversion rate by 12%.',
     exZh:'新的首屏主视觉让转化率提升了 12%。',
-    img:'assets/images/conversion-cn.png',
+    img:'assets/images/conversion-cn.jpg',
     rel:[]
   },
   {
@@ -755,7 +763,7 @@ const LEVELS = [
     phrases:'sales funnel / conversion funnel / funnel analysis / drop-off',
     ex:'We need to find where users drop off in the funnel.',
     exZh:'我们需要找到用户在漏斗的哪一步流失。',
-    img:'assets/images/funnel-cn.png',
+    img:'assets/images/funnel-cn.jpg',
     rel:[]
   },
   {
@@ -775,7 +783,7 @@ const LEVELS = [
     phrases:'user retention / retention rate / D1 retention / D7 retention / D30 retention',
     ex:'We need to improve D7 retention before scaling acquisition.',
     exZh:'在扩大获客前，我们需要先提升 7 日留存。',
-    img:'assets/images/retention-cn.png',
+    img:'assets/images/retention-cn.jpg',
     rel:[]
   },
   {
@@ -795,7 +803,7 @@ const LEVELS = [
     phrases:'activation rate / activation event / activation moment / user activation',
     ex:'Our activation event should be creating the first campaign, not signing up.',
     exZh:'我们的激活事件应该是创建第一个活动，而不是注册。',
-    img:'assets/images/activation-cn.png',
+    img:'assets/images/activation-cn.jpg',
     rel:[]
   },
   {
@@ -815,7 +823,7 @@ const LEVELS = [
     phrases:'user onboarding / onboarding flow / onboarding experience / onboarding checklist',
     ex:'The onboarding flow is too long and users drop off before reaching value.',
     exZh:'新手引导流程太长，用户还没感受到价值就流失了。',
-    img:'assets/images/onboarding-cn.png',
+    img:'assets/images/onboarding-cn.jpg',
     rel:[]
   },
   {
@@ -835,7 +843,7 @@ const LEVELS = [
     phrases:'churn rate / user churn / customer churn / reduce churn',
     ex:'Reducing churn may have a bigger impact than increasing new signups.',
     exZh:'降低流失可能比增加新注册更有影响。',
-    img:'assets/images/churn-cn.png',
+    img:'assets/images/churn-cn.jpg',
     rel:[]
   },
   {
@@ -855,7 +863,7 @@ const LEVELS = [
     phrases:'cohort analysis / weekly cohort / acquisition cohort / retention cohort',
     ex:'The January cohort retained better than the February cohort.',
     exZh:'一月这批用户的留存比二月那批更好。',
-    img:'assets/images/cohort-cn.png',
+    img:'assets/images/cohort-cn.jpg',
     rel:[]
   },
   {
@@ -875,7 +883,7 @@ const LEVELS = [
     phrases:'user segment / customer segment / segment by behavior / enterprise segment',
     ex:'This feature performs well for the enterprise segment but not for individual users.',
     exZh:'这个功能在企业用户群表现很好，但对个人用户不明显。',
-    img:'assets/images/segment-cn.png',
+    img:'assets/images/segment-cn.jpg',
     rel:[]
   },
   {
@@ -895,7 +903,7 @@ const LEVELS = [
     phrases:'user persona / buyer persona / target persona / persona profile',
     ex:'This persona cares more about efficiency than advanced customization.',
     exZh:'这个用户画像更关心效率，而不是高级定制能力。',
-    img:'assets/images/persona-cn.png',
+    img:'assets/images/persona-cn.jpg',
     rel:[]
   },
   {
@@ -915,7 +923,7 @@ const LEVELS = [
     phrases:'user journey map / end-to-end journey / customer journey / journey stage',
     ex:'The user journey breaks down between onboarding and the first successful action.',
     exZh:'用户旅程在新手引导和首次成功操作之间断掉了。',
-    img:'assets/images/user-journey-cn.png',
+    img:'assets/images/user-journey-cn.jpg',
     rel:[]
   },
   {
@@ -935,7 +943,7 @@ const LEVELS = [
     phrases:'customer touchpoint / digital touchpoint / key touchpoint / touchpoint optimization',
     ex:'We should optimize every touchpoint before the user reaches checkout.',
     exZh:'在用户到达结账前，我们应该优化每个触点。',
-    img:'assets/images/touchpoint-cn.png',
+    img:'assets/images/touchpoint-cn.jpg',
     rel:[]
   },
   {
@@ -955,7 +963,7 @@ const LEVELS = [
     phrases:'define the North Star Metric / align around NSM / leading metric',
     ex:'We need a North Star Metric that reflects real customer value.',
     exZh:'我们需要一个能反映真实客户价值的北极星指标。',
-    img:'assets/images/north-star-metric-cn.png',
+    img:'assets/images/north-star-metric-cn.jpg',
     rel:[]
   }
   ]
@@ -985,7 +993,7 @@ const LEVELS = [
     phrases:'call an API / API response / API documentation / API endpoint',
     ex:'The frontend needs an API to fetch the user profile.',
     exZh:'前端需要一个 API 来获取用户资料。',
-    img:'assets/images/api-cn.png',
+    img:'assets/images/api-cn.jpg',
     rel:[]
   },
   {
@@ -1005,7 +1013,7 @@ const LEVELS = [
     phrases:'deploy to staging / deploy to production / deployment failed',
     ex:'Can we deploy this change to staging first?',
     exZh:'我们可以先把这个改动部署到测试环境吗？',
-    img:'assets/images/deploy-cn.png',
+    img:'assets/images/deploy-cn.jpg',
     rel:[]
   },
   {
@@ -1025,7 +1033,7 @@ const LEVELS = [
     phrases:'Git repository / clone a repo / private repo / repository link',
     ex:'Please share the repository link with the team.',
     exZh:'请把代码仓库链接分享给团队。',
-    img:'assets/images/repository-cn.png',
+    img:'assets/images/repository-cn.jpg',
     rel:[]
   },
   {
@@ -1045,7 +1053,7 @@ const LEVELS = [
     phrases:'CI pipeline / CD pipeline / build failed / deployment pipeline',
     ex:'The CI pipeline failed because one test did not pass.',
     exZh:'CI 流水线失败了，因为有一个测试没通过。',
-    img:'assets/images/cicd-cn.png',
+    img:'assets/images/cicd-cn.jpg',
     rel:[]
   },
   {
@@ -1065,7 +1073,7 @@ const LEVELS = [
     phrases:'install the SDK / SDK documentation / mobile SDK / SDK integration',
     ex:'We need to integrate the payment SDK into the app.',
     exZh:'我们需要把支付 SDK 接入到 App 里。',
-    img:'assets/images/sdk-cn.png',
+    img:'assets/images/sdk-cn.jpg',
     rel:[]
   },
   {
@@ -1085,7 +1093,7 @@ const LEVELS = [
     phrases:'API endpoint / endpoint URL / endpoint response / expose an endpoint',
     ex:'Which endpoint should the frontend call to get the order detail?',
     exZh:'前端应该调用哪个接口地址来获取订单详情？',
-    img:'assets/images/endpoint-cn.png',
+    img:'assets/images/endpoint-cn.jpg',
     rel:[]
   },
   {
@@ -1105,7 +1113,7 @@ const LEVELS = [
     phrases:'request payload / response payload / payload si',
     ex:'The request payload is missing the userId field.',
     exZh:'这个请求体缺少 userId 字段。',
-    img:'assets/images/payload-cn.png',
+    img:'assets/images/payload-cn.jpg',
     rel:[]
   },
   {
@@ -1125,7 +1133,7 @@ const LEVELS = [
     phrases:'JSON schema / database schema / schema validation / schema change',
     ex:'Can you share the response schema for this API?',
     exZh:'你能分享一下这个接口的响应数据结构吗？',
-    img:'assets/images/schema-cn.png',
+    img:'assets/images/schema-cn.jpg',
     rel:[]
   },
   {
@@ -1145,7 +1153,7 @@ const LEVELS = [
     phrases:'rollback plan / rollback to previous version / emergency rollback',
     ex:'If the error rate increases, we should roll back immediately.',
     exZh:'如果错误率上升，我们应该立即回滚。',
-    img:'assets/images/rollback-cn.png',
+    img:'assets/images/rollback-cn.jpg',
     rel:[]
   },
   {
@@ -1165,7 +1173,7 @@ const LEVELS = [
     phrases:'create a branch / feature branch / main branch / branch name',
     ex:'Please create a separate branch for this feature.',
     exZh:'请为这个功能创建一个单独分支。',
-    img:'assets/images/branch-cn.png',
+    img:'assets/images/branch-cn.jpg',
     rel:[]
   },
   {
@@ -1185,7 +1193,7 @@ const LEVELS = [
     phrases:'make a commit / commit message / commit history / commit hash',
     ex:'Can you include a clearer commit message?',
     exZh:'你可以写一个更清楚的提交信息吗？',
-    img:'assets/images/commit-cn.png',
+    img:'assets/images/commit-cn.jpg',
     rel:[]
   },
   {
@@ -1205,7 +1213,7 @@ const LEVELS = [
     phrases:'merge branch / merge conflict / merge into main / merge request',
     ex:'There is a merge conflict in the login file.',
     exZh:'登录文件里有一个合并冲突。',
-    img:'assets/images/merge-cn.png',
+    img:'assets/images/merge-cn.jpg',
     rel:[]
   },
   {
@@ -1225,7 +1233,7 @@ const LEVELS = [
     phrases:'open a PR / review a PR / PR comments / approve a PR',
     ex:'I opened a pull request for the new onboarding flow.',
     exZh:'我为新的 onboarding 流程开了一个 PR。',
-    img:'assets/images/pull-request-cn.png',
+    img:'assets/images/pull-request-cn.jpg',
     rel:[]
   },
   {
@@ -1245,7 +1253,7 @@ const LEVELS = [
     phrases:'webhook callback / webhook event / webhook payload / webhook endpoint',
     ex:'We need to verify the webhook signature before processing the event.',
     exZh:'处理事件前，我们需要验证 webhook 签名。',
-    img:'assets/images/webhook-cn.png',
+    img:'assets/images/webhook-cn.jpg',
     rel:[]
   },
   {
@@ -1265,7 +1273,7 @@ const LEVELS = [
     phrases:'CSS variables / environment variables / design variables / variable name / variable value',
     ex:'Can we define this color as a variable so it can be reused across components?',
     exZh:'我们可以把这个颜色定义成变量，让它在多个组件里复用吗？',
-    img:'assets/images/variables-cn.png',
+    img:'assets/images/variables-cn.jpg',
     rel:[]
   }
   ]
@@ -1295,7 +1303,7 @@ const LEVELS = [
     phrases:'Docker container / container image / containeri',
     ex:'The service runs inside a Docker container.',
     exZh:'这个服务运行在 Docker 容器里。',
-    img:'assets/images/container-cn.png',
+    img:'assets/images/container-cn.jpg',
     rel:[]
   },
   {
@@ -1315,7 +1323,7 @@ const LEVELS = [
     phrases:'cloud service / cloud storage / cloud provider / cloud infrastructure',
     ex:'We plan to migrate this service to the cloud.',
     exZh:'我们计划把这个服务迁移到云上。',
-    img:'assets/images/cloud-cn.png',
+    img:'assets/images/cloud-cn.jpg',
     rel:[]
   },
   {
@@ -1335,7 +1343,7 @@ const LEVELS = [
     phrases:'serverless function / AWS Lambda / cloud function / event trigger',
     ex:'We can use a serverless function for image processing.',
     exZh:'我们可以用一个 serverless 函数来处理图片。',
-    img:'assets/images/serverless-cn.png',
+    img:'assets/images/serverless-cn.jpg',
     rel:[]
   },
   {
@@ -1355,7 +1363,7 @@ const LEVELS = [
     phrases:'cache hit / cache miss / clear cache / cache invalidation',
     ex:'We can cache the user profile for five minutes to reduce database load.',
     exZh:'我们可以把用户资料缓存五分钟，降低数据库负载。',
-    img:'assets/images/cache-cn.png',
+    img:'assets/images/cache-cn.jpg',
     rel:[]
   },
   {
@@ -1375,7 +1383,7 @@ const LEVELS = [
     phrases:'message queue / job queue / enqueue / dequeue / queue consumer',
     ex:'Let’s put email sending into a queue so the API can respond faster.',
     exZh:'我们把邮件发送放进队列里，这样 API 可以更快返回。',
-    img:'assets/images/queue-cn.png',
+    img:'assets/images/queue-cn.jpg',
     rel:[]
   },
   {
@@ -1395,7 +1403,7 @@ const LEVELS = [
     phrases:'relational database / database table / query database / database index',
     ex:'The database query is slow because this column has no index.',
     exZh:'这个数据库查询很慢，因为这一列没有索引。',
-    img:'assets/images/database-cn.png',
+    img:'assets/images/database-cn.jpg',
     rel:[]
   },
   {
@@ -1415,7 +1423,7 @@ const LEVELS = [
     phrases:'database migration / run migration / migration script / rollback migration',
     ex:'This release includes a migration that adds a new status column.',
     exZh:'这次发布包含一个新增 status 字段的数据库迁移。',
-    img:'assets/images/migration-cn.png',
+    img:'assets/images/migration-cn.jpg',
     rel:[]
   },
   {
@@ -1435,7 +1443,7 @@ const LEVELS = [
     phrases:'user authentication / authentication flow / two-factor authentication / authentication token',
     ex:'Authentication happens before we check what the user is allowed to access.',
     exZh:'在检查用户能访问什么之前，先要确认用户是谁。',
-    img:'assets/images/authentication-cn.png',
+    img:'assets/images/authentication-cn.jpg',
     rel:[]
   },
   {
@@ -1455,7 +1463,7 @@ const LEVELS = [
     phrases:'authorization check / role-based authorization / access control / permission',
     ex:'We need an authorization check before allowing users to export billing data.',
     exZh:'允许用户导出账单数据前，我们需要做权限校验。',
-    img:'assets/images/authorization-cn.png',
+    img:'assets/images/authorization-cn.jpg',
     rel:[]
   },
   {
@@ -1475,7 +1483,7 @@ const LEVELS = [
     phrases:'access token / refresh token / bearer token / token expired',
     ex:'The request failed because the access token has expired.',
     exZh:'请求失败了，因为 access token 已经过期。',
-    img:'assets/images/auth-token-cn.png',
+    img:'assets/images/auth-token-cn.jpg',
     rel:[]
   },
   {
@@ -1495,7 +1503,7 @@ const LEVELS = [
     phrases:'user session / session expired / session cookie / session storage',
     ex:'The user session expires after thirty minutes of inactivity.',
     exZh:'用户 30 分钟无操作后，会话会过期。',
-    img:'assets/images/session-cn.png',
+    img:'assets/images/session-cn.jpg',
     rel:[]
   },
   {
@@ -1515,7 +1523,7 @@ const LEVELS = [
     phrases:'WebSocket connection / real-time updates / socket server / reconnect',
     ex:'The dashboard uses WebSocket to receive real-time order updates.',
     exZh:'这个看板用 WebSocket 接收实时订单更新。',
-    img:'assets/images/websocket-cn.png',
+    img:'assets/images/websocket-cn.jpg',
     rel:[]
   },
   {
@@ -1535,7 +1543,7 @@ const LEVELS = [
     phrases:'HTTP request / request body / request header / send a request',
     ex:'The request body is missing the required userId field.',
     exZh:'这个请求体缺少必填的 userId 字段。',
-    img:'assets/images/request-cn.png',
+    img:'assets/images/request-cn.jpg',
     rel:[]
   },
   {
@@ -1555,7 +1563,7 @@ const LEVELS = [
     phrases:'HTTP response / response body / response status / response time',
     ex:'The response should include both the order ID and payment status.',
     exZh:'返回结果应该同时包含订单 ID 和支付状态。',
-    img:'assets/images/response-cn.png',
+    img:'assets/images/response-cn.jpg',
     rel:[]
   },
   {
@@ -1575,7 +1583,7 @@ const LEVELS = [
     phrases:'request header / response header / Authorization header / Content-Type header',
     ex:'Please set the Content-Type header to application/json.',
     exZh:'请把 Content-Type 请求头设置为 application/json。',
-    img:'assets/images/header-cn.png',
+    img:'assets/images/header-cn.jpg',
     rel:[]
   },
   {
@@ -1595,7 +1603,7 @@ const LEVELS = [
     phrases:'HTTP status code / 200 OK / 401 Unauthorized / 404 Not Found / 500 Internal Server Error',
     ex:'The API should return a 404 status code when the resource does not exist.',
     exZh:'当资源不存在时，API 应该返回 404 状态码。',
-    img:'assets/images/status-code-cn.png',
+    img:'assets/images/status-code-cn.jpg',
     rel:[]
   },
   {
@@ -1615,7 +1623,7 @@ const LEVELS = [
     phrases:'low latency / high latency / network latency / p95 latency',
     ex:'We should monitor p95 latency instead of only looking at the average.',
     exZh:'我们应该监控 p95 延迟，而不是只看平均值。',
-    img:'assets/images/latency-cn.png',
+    img:'assets/images/latency-cn.jpg',
     rel:[]
   }
   ]
@@ -1645,7 +1653,7 @@ const LEVELS = [
     phrases:'AI model / language model / model output / model capability',
     ex:'The model generates a response based on the prompt.',
     exZh:'模型会根据提示词生成回答。',
-    img:'assets/images/model-cn.png',
+    img:'assets/images/model-cn.jpg',
     rel:[]
   },
   {
@@ -1665,7 +1673,7 @@ const LEVELS = [
     phrases:'training data / train a model / training cost / training process',
     ex:'The model needs more high-quality training data.',
     exZh:'这个模型需要更多高质量训练数据。',
-    img:'assets/images/training-cn.png',
+    img:'assets/images/training-cn.jpg',
     rel:[]
   },
   {
@@ -1685,7 +1693,7 @@ const LEVELS = [
     phrases:'inference speed / inference cost / run inference / inference latency',
     ex:'Inference cost increases when the context is long.',
     exZh:'上下文很长时，推理成本会上升。',
-    img:'assets/images/inference-cn.png',
+    img:'assets/images/inference-cn.jpg',
     rel:[]
   },
   {
@@ -1705,7 +1713,7 @@ const LEVELS = [
     phrases:'token limit / context token / input tokens / output tokens',
     ex:'The prompt is too long and exceeds the token limit.',
     exZh:'这个提示词太长，超过了 token 限制。',
-    img:'assets/images/token-ai-cn.png',
+    img:'assets/images/token-ai-cn.jpg',
     rel:[]
   },
   {
@@ -1725,7 +1733,7 @@ const LEVELS = [
     phrases:'write a prompt / prompt engineering / system prompt / prompt template',
     ex:'The prompt should include the target audience and output format.',
     exZh:'提示词应该包含目标用户和输出格式。',
-    img:'assets/images/prompt-cn.png',
+    img:'assets/images/prompt-cn.jpg',
     rel:[]
   },
   {
@@ -1745,7 +1753,7 @@ const LEVELS = [
     phrases:'LLM app / LLM capability / LLM-powered feature / choose an LLM',
     ex:'We need to decide which LLM is best for this customer support use case.',
     exZh:'我们需要决定哪个 LLM 最适合这个客服场景。',
-    img:'assets/images/llm-cn.png',
+    img:'assets/images/llm-cn.jpg',
     rel:[]
   },
   {
@@ -1765,7 +1773,7 @@ const LEVELS = [
     phrases:'multimodal model / multimodal input / multimodal understanding / multimodal AI',
     ex:'We should use a multimodal model because users will upload screenshots.',
     exZh:'因为用户会上传截图，我们应该使用多模态模型。',
-    img:'assets/images/multimodal-cn.png',
+    img:'assets/images/multimodal-cn.jpg',
     rel:[]
   },
   {
@@ -1785,7 +1793,7 @@ const LEVELS = [
     phrases:'reduce hallucination / hallucinated answer / hallucination risk / factuality',
     ex:'The answer sounds fluent, but we need to check whether it is hallucinated.',
     exZh:'这个回答听起来很流畅，但我们需要检查它是不是编造的。',
-    img:'assets/images/hallucination-cn.png',
+    img:'assets/images/hallucination-cn.jpg',
     rel:[]
   },
   {
@@ -1805,7 +1813,7 @@ const LEVELS = [
     phrases:'AI alignment / aligned model / alignment strategy / safety alignment',
     ex:'Alignment is critical when the model interacts directly with end users.',
     exZh:'当模型直接和终端用户互动时，对齐非常关键。',
-    img:'assets/images/alignment-cn.png',
+    img:'assets/images/alignment-cn.jpg',
     rel:[]
   },
   {
@@ -1825,7 +1833,7 @@ const LEVELS = [
     phrases:'training dataset / evaluation dataset / labeled dataset / dataset quality',
     ex:'The dataset should include edge cases, not only easy examples.',
     exZh:'数据集应该包含边界案例，而不只是简单样例。',
-    img:'assets/images/dataset-cn.png',
+    img:'assets/images/dataset-cn.jpg',
     rel:[]
   },
   {
@@ -1845,7 +1853,7 @@ const LEVELS = [
     phrases:'model parameters / parameter count / tune parameters / billion parameters',
     ex:'A larger parameter count may improve capability, but it also increases cost.',
     exZh:'更大的参数规模可能提升能力，但也会增加成本。',
-    img:'assets/images/parameter-cn.png',
+    img:'assets/images/parameter-cn.jpg',
     rel:[]
   },
   {
@@ -1865,7 +1873,7 @@ const LEVELS = [
     phrases:'large context window / fit into context / context length / context limit',
     ex:'We need to shorten the input so it fits within the context window.',
     exZh:'我们需要缩短输入，让它能放进上下文窗口。',
-    img:'assets/images/context-window-cn.png',
+    img:'assets/images/context-window-cn.jpg',
     rel:[]
   }
   ]
@@ -1895,7 +1903,7 @@ const LEVELS = [
     phrases:'RAG pipeline / retrieval step / knowledge base / grounding documents',
     ex:'We use RAG to answer questions from internal documents.',
     exZh:'我们用 RAG 来回答内部文档相关问题。',
-    img:'assets/images/rag-cn.png',
+    img:'assets/images/rag-cn.jpg',
     rel:[]
   },
   {
@@ -1915,7 +1923,7 @@ const LEVELS = [
     phrases:'AI agent / autonomous agent / agent workflow / tool-using agent',
     ex:'The agent can call external tools to complete the task.',
     exZh:'这个智能体可以调用外部工具完成任务。',
-    img:'assets/images/agent-cn.png',
+    img:'assets/images/agent-cn.jpg',
     rel:[]
   },
   {
@@ -1935,7 +1943,7 @@ const LEVELS = [
     phrases:'text embedding / embedding model / vector embedding / semantic search',
     ex:'We use embeddings to find semantically similar documents.',
     exZh:'我们用 embedding 来查找语义相似的文档。',
-    img:'assets/images/embedding-cn.png',
+    img:'assets/images/embedding-cn.jpg',
     rel:[]
   },
   {
@@ -1955,7 +1963,7 @@ const LEVELS = [
     phrases:'fine-tune a model / fine-tuning dataset / supervised fine-tuning',
     ex:'Fine-tuning may help the model follow our support style.',
     exZh:'微调可能帮助模型更符合我们的客服风格。',
-    img:'assets/images/fine-tuning-cn.png',
+    img:'assets/images/fine-tuning-cn.jpg',
     rel:[]
   },
   {
@@ -1975,7 +1983,7 @@ const LEVELS = [
     phrases:'MCP server / MCP client / Model Context Protocol / MCP tools',
     ex:'We can expose this internal service through an MCP server.',
     exZh:'我们可以通过一个 MCP server 把这个内部服务暴露给 AI 使用。',
-    img:'assets/images/mcp-cn.png',
+    img:'assets/images/mcp-cn.jpg',
     rel:[]
   },
   {
@@ -1995,7 +2003,7 @@ const LEVELS = [
     phrases:'AI copilot / coding copilot / workflow copilot / design copilot',
     ex:'This should behave like a copilot, not an autonomous agent.',
     exZh:'这个功能应该像副驾驶，而不是完全自主的智能体。',
-    img:'assets/images/copilot-cn.png',
+    img:'assets/images/copilot-cn.jpg',
     rel:[]
   },
   {
@@ -2015,7 +2023,7 @@ const LEVELS = [
     phrases:'safety guardrail / content guardrail / add guardrails / policy guardrail',
     ex:'We need stronger guardrails before launching this feature publicly.',
     exZh:'公开上线这个功能前，我们需要更强的安全护栏。',
-    img:'assets/images/guardrail-cn.png',
+    img:'assets/images/guardrail-cn.jpg',
     rel:[]
   },
   {
@@ -2035,7 +2043,7 @@ const LEVELS = [
     phrases:'reasoning model / reasoning task / improve reasoning / multi-step reasoning',
     ex:'This use case requires reasoning across multiple documents.',
     exZh:'这个场景需要跨多个文档进行推理。',
-    img:'assets/images/reasoning-cn.png',
+    img:'assets/images/reasoning-cn.jpg',
     rel:[]
   },
   {
@@ -2055,7 +2063,7 @@ const LEVELS = [
     phrases:'model evaluation / eval set / evaluation metrics / evaluation framework',
     ex:'We need an evaluation framework before comparing these models.',
     exZh:'比较这些模型前，我们需要一个评估框架。',
-    img:'assets/images/evaluation-cn.png',
+    img:'assets/images/evaluation-cn.jpg',
     rel:[]
   },
   {
@@ -2075,7 +2083,7 @@ const LEVELS = [
     phrases:'benchmark score / industry benchmark / benchmark result / benchmark dataset',
     ex:'The benchmark result is useful, but we should validate it on our own data.',
     exZh:'基准测试结果有参考价值，但我们还要用自己的数据验证。',
-    img:'assets/images/benchmark-cn.png',
+    img:'assets/images/benchmark-cn.jpg',
     rel:[]
   },
   {
@@ -2095,7 +2103,7 @@ const LEVELS = [
     phrases:'enable tool calling / tool call result / external tools / tool use',
     ex:'Tool calling allows the assistant to fetch real-time data from our system.',
     exZh:'Tool calling 让助手可以从我们的系统获取实时数据。',
-    img:'assets/images/tool-calling-cn.png',
+    img:'assets/images/tool-calling-cn.jpg',
     rel:[]
   },
   {
@@ -2115,7 +2123,7 @@ const LEVELS = [
     phrases:'vector DB / semantic search / vector index / similarity search',
     ex:'The vector database helps us retrieve relevant passages for the user query.',
     exZh:'向量数据库帮助我们为用户问题检索相关段落。',
-    img:'assets/images/vector-database-cn.png',
+    img:'assets/images/vector-database-cn.jpg',
     rel:[]
   },
   {
@@ -2135,7 +2143,7 @@ const LEVELS = [
     phrases:'system instruction / system message / prompt hierarchy / assistant role',
     ex:'The system prompt should clearly define the assistant’s role and constraints.',
     exZh:'系统提示词应该清楚定义助手的角色和限制。',
-    img:'assets/images/system-prompt-cn.png',
+    img:'assets/images/system-prompt-cn.jpg',
     rel:[]
   },
   {
@@ -2155,7 +2163,7 @@ const LEVELS = [
     phrases:'semantic search / semantic meaning / semantic similarity / semantic HTML / semantic layer',
     ex:'Semantic search can return relevant results even when the exact keyword is missing.',
     exZh:'即使没有完全匹配的关键词，语义搜索也能返回相关结果。',
-    img:'assets/images/semantic-cn.png',
+    img:'assets/images/semantic-cn.jpg',
     rel:[]
   }
   ]
@@ -2407,9 +2415,16 @@ function _dk(hex,amt){
   }catch(e){return hex;}
 }
 
-function copyPhrase(el){
-  if(navigator.clipboard) navigator.clipboard.writeText(el.textContent);
-  toast('已复制：'+el.textContent);
+
+function expandImg(src, alt){
+  const ov = document.getElementById('imgOv');
+  const img = document.getElementById('imgOvImg');
+  img.src = src;
+  img.alt = alt || '';
+  ov.classList.add('show');
+}
+function closeImgOv(){
+  document.getElementById('imgOv').classList.remove('show');
 }
 
 function renderCard(){
@@ -2422,9 +2437,11 @@ function renderCard(){
   // Build header — image or colored
   let headerHtml;
   if(w.img){
+    const imgJpg = w.img;
     headerHtml =
-      '<div class="vc-head-img">'
-        +'<img src="'+w.img+'" alt="'+w.title+'" onerror="this.parentElement.style.background=\''+lv.color+'\'">'
+      '<div class="vc-head-img" onclick="expandImg(\''+imgJpg+'\',\''+_esc(w.title)+'\')">'
+        +'<img src="'+imgJpg+'" alt="'+w.title+'" onerror="this.parentElement.style.background=\''+lv.color+'\'">'
+        +'<button class="vc-img-expand" onclick="event.stopPropagation();expandImg(\''+imgJpg+'\',\''+_esc(w.title)+'\')">⛶ 查看</button>'
         +'<div class="vc-pron-row">'
           +'<div class="vc-pron"><button class="audio-btn" onclick="speak(\''+_esc(w.title)+'\')">🔊</button><span>'+w.pron+'</span></div>'
         +'</div>'
@@ -2479,10 +2496,10 @@ function renderCard(){
 
   // Common phrases
   const phraseChips = w.phrases ? w.phrases.split(' / ').map(p=>
-    '<span class="phrase-chip" onclick="copyPhrase(this)">'+p+'</span>'
+    '<span class="phrase-chip">'+p+'</span>'
   ).join('') : '';
   const phrasesSec = phraseChips ?
-    '<div class="vc-section"><div class="sec-lbl">💬 常见搭配 <span style="font-size:9px;color:var(--mu);font-weight:700;text-transform:none">点击复制</span></div>'
+    '<div class="vc-section"><div class="sec-lbl">💬 常见搭配</div>'
       +'<div class="phrases-chips">'+phraseChips+'</div>'
     +'</div>' : '';
 
