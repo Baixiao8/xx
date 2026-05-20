@@ -121,17 +121,19 @@ body{font-family:'Nunito','Noto Sans SC',-apple-system,BlinkMacSystemFont,sans-s
 @keyframes audioAnim{from{transform:scale(1)}to{transform:scale(1.15)}}
 
 /* Card header — image variant */
-.vc-head-img{position:relative;height:240px;overflow:hidden}
+.vc-head-img{position:relative;height:240px;overflow:hidden;cursor:zoom-in}
 .vc-head-img img{width:100%;height:100%;object-fit:cover;display:block}
-.vc-head-img::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.7) 0%,transparent 55%)}
-.vc-head-img .vc-img-overlay{position:absolute;bottom:0;left:0;right:0;padding:14px 18px 18px;z-index:1;display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
-.vc-head-img .vc-img-overlay .vc-term{color:#fff;font-size:32px;margin-bottom:0}
-.vc-head-img .vc-img-overlay .vc-full{color:rgba(255,255,255,.85);font-size:12px;margin-bottom:0;text-align:left}
-.vc-head-img .vc-pron-row{position:absolute;top:12px;left:16px;display:flex;align-items:center;gap:8px;z-index:1}
-.vc-head-img .vc-pron-row .vc-pron{background:rgba(0,0,0,.5)}
-.vc-head-img .vc-pron-row .audio-btn{background:rgba(0,0,0,.4)}
-.vc-head-img{cursor:zoom-in}
-.vc-img-expand{position:absolute;top:10px;right:12px;z-index:2;background:rgba(0,0,0,.45);border:none;border-radius:6px;padding:8px 14px;font-size:12px;color:#fff;font-weight:800;cursor:pointer;line-height:1.4;min-height:36px}
+.vc-head-img::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.15) 0%,transparent 40%)}
+.vc-img-expand{position:absolute;top:10px;right:12px;z-index:2;background:rgba(0,0,0,.35);border:none;border-radius:6px;padding:6px 12px;font-size:11px;color:rgba(255,255,255,.9);font-weight:800;cursor:pointer;line-height:1.4;min-height:32px;backdrop-filter:blur(4px)}
+
+/* 词头信息条（图片下方，替代原图片内遮罩文字） */
+.vc-word-bar{display:flex;align-items:center;gap:12px;padding:14px 18px 12px;border-bottom:2px solid var(--br);background:var(--card)}
+.vc-word-bar .audio-btn-lg{width:40px;height:40px;border-radius:50%;background:var(--pl);border:2px solid var(--p);font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all .15s}
+.vc-word-bar .audio-btn-lg:active{transform:scale(.9);background:var(--p)}
+.vc-word-bar-info{flex:1;min-width:0}
+.vc-word-bar-title{font-size:26px;font-weight:900;color:var(--tx);letter-spacing:-.3px;line-height:1.1}
+.vc-word-bar-full{font-size:11px;color:var(--mu);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.vc-word-bar-pron{font-size:12px;font-weight:800;color:var(--p);background:var(--pl);border-radius:var(--radp);padding:4px 10px;flex-shrink:0;white-space:nowrap}
 
 /* Image fullscreen overlay */
 .img-ov{position:fixed;inset:0;background:rgba(0,0,0,.92);display:none;align-items:center;justify-content:center;z-index:300;padding:16px;flex-direction:column;gap:12px}
@@ -218,6 +220,13 @@ body{font-family:'Nunito','Noto Sans SC',-apple-system,BlinkMacSystemFont,sans-s
 .fb.ok-fb .fb-t{color:#2d6a00}
 .fb.err-fb .fb-t{color:#b91c1c}
 .fb-b{font-size:12px;line-height:1.6;color:var(--tx);font-weight:700}
+.wrong-hint{margin-top:10px;border-radius:var(--rads);padding:10px 14px;border:2px solid}
+.wrong-hint-mis{background:var(--yl);border-color:var(--y)}
+.wrong-hint-mem{background:var(--pl);border-color:var(--p)}
+.wh-lbl{font-size:11px;font-weight:900;margin-bottom:4px;opacity:.8}
+.wrong-hint-mis .wh-lbl{color:var(--yd)}
+.wrong-hint-mem .wh-lbl{color:var(--pd)}
+.wh-txt{font-size:12px;line-height:1.65;font-weight:700;color:var(--tx)}
 .chk-wrap{position:sticky;bottom:56px;z-index:10;background:var(--bg);padding:12px 18px 14px;border-top:2px solid var(--br)}
 
 /* RESULT */
@@ -2542,6 +2551,17 @@ function renderCard(){
   document.getElementById('nextBtn').textContent   = curIdx===lv.words.length-1?'完成 ✓':'下一个 →';
 
   // Build header — image or colored
+  // 词头信息条（图片词和非图片词共用）
+  const wordBarHtml =
+    '<div class="vc-word-bar">'
+      +'<button class="audio-btn-lg" onclick="speak(\''+_esc(w.title)+'\')">🔊</button>'
+      +'<div class="vc-word-bar-info">'
+        +'<div class="vc-word-bar-title">'+w.emoji+' '+w.title+'</div>'
+        +'<div class="vc-word-bar-full">'+w.term+'</div>'
+      +'</div>'
+      +'<div class="vc-word-bar-pron">'+w.pron+'</div>'
+    +'</div>';
+
   let headerHtml;
   if(w.img){
     const imgJpg = w.img;
@@ -2549,17 +2569,8 @@ function renderCard(){
       '<div class="vc-head-img" onclick="expandImg(\''+imgJpg+'\',\''+_esc(w.title)+'\')">'
         +'<img src="'+imgJpg+'" alt="'+w.title+'" onerror="this.parentElement.style.background=\''+lv.color+'\'">'
         +'<button class="vc-img-expand" onclick="event.stopPropagation();expandImg(\''+imgJpg+'\',\''+_esc(w.title)+'\')">放大 ↗</button>'
-        +'<div class="vc-pron-row">'
-          +'<div class="vc-pron"><button class="audio-btn" onclick="speak(\''+_esc(w.title)+'\')">🔊</button><span>'+w.pron+'</span></div>'
-        +'</div>'
-        +'<div class="vc-img-overlay">'
-          +'<div>'
-            +'<div class="vc-term">'+w.title+'</div>'
-            +'<div class="vc-full">'+w.term+'</div>'
-          +'</div>'
-          +(w.ph?'<div style="background:rgba(0,0,0,.5);border-radius:8px;padding:6px 10px;font-size:11px;font-weight:800;color:rgba(255,255,255,.9);flex-shrink:0">'+w.ph+'</div>':'')
-        +'</div>'
-      +'</div>';
+      +'</div>'
+      +wordBarHtml;
   } else {
     headerHtml =
       '<div class="vc-head" style="background:linear-gradient(135deg,'+lv.color+','+_dk(lv.color,45)+')">'
@@ -2657,9 +2668,9 @@ function renderCard(){
     '<div class="vocab-card">'
       +headerHtml
       +'<div class="vc-body">'
-        +memoryToggle
         +phoneticSec
-        +meaningSec
+        +meaningSec      // 核心含义前置
+        +memoryToggle    // 记忆技巧紧跟含义（先懂意思，再建记忆锚点）
         +originSec
         +zhExprSec
         +phrasesSec
@@ -2917,6 +2928,30 @@ function renderQuiz(){
   }
 }
 
+// 答错强化提示：利用纠错强化窗口，在答错后展示记忆钩子
+// 优先级：misconception > visual > story
+function buildWrongHint(w){
+  if(w.misconception){
+    return '<div class="wrong-hint wrong-hint-mis">'
+      +'<div class="wh-lbl">⚠️ 记住这个区别</div>'
+      +'<div class="wh-txt">'+w.misconception+'</div>'
+      +'</div>';
+  }
+  if(w.visual){
+    return '<div class="wrong-hint wrong-hint-mem">'
+      +'<div class="wh-lbl">💡 这样联想</div>'
+      +'<div class="wh-txt">'+w.visual+'</div>'
+      +'</div>';
+  }
+  if(w.story){
+    return '<div class="wrong-hint wrong-hint-mem">'
+      +'<div class="wh-lbl">📖 工作场景</div>'
+      +'<div class="wh-txt">'+w.story+'</div>'
+      +'</div>';
+  }
+  return '';
+}
+
 function selectOpt(i){
   if(qAnswered) return;
   qAnswered=true;
@@ -2937,7 +2972,7 @@ function selectOpt(i){
     qErrN++;
     recordWrong(key);
     fb.className='fb err-fb show';
-    fb.innerHTML='<div class="fb-t">❌ 正确答案：'+w.title+'</div><div class="fb-b">'+w.meaning+'</div>';
+    fb.innerHTML='<div class="fb-t">❌ 正确答案：'+w.title+'</div><div class="fb-b">'+w.meaning+'</div>'+buildWrongHint(w);
   }
   document.getElementById('qOk').textContent=qScore;
   document.getElementById('qErr').textContent=qErrN;
@@ -2964,7 +2999,7 @@ function checkAns(){
     qErrN++;
     recordWrong(key);
     fb.className='fb err-fb show';
-    fb.innerHTML='<div class="fb-t">❌ 正确答案：'+w.title+'</div><div class="fb-b">'+w.meaning+'</div>';
+    fb.innerHTML='<div class="fb-t">❌ 正确答案：'+w.title+'</div><div class="fb-b">'+w.meaning+'</div>'+buildWrongHint(w);
     inp.style.borderColor='var(--r)';inp.style.background='var(--rl)';inp.style.color='#b91c1c';
   }
   document.getElementById('qOk').textContent=qScore;
