@@ -88,6 +88,13 @@ body{font-family:'Nunito','Noto Sans SC',-apple-system,BlinkMacSystemFont,sans-s
 .btn-d{background:var(--br);color:var(--mu);cursor:not-allowed;border-color:var(--brd)}
 .btn-o{background:var(--card);color:var(--p);border-color:var(--p);box-shadow:var(--shp)}
 .btn-o:active{transform:translateY(4px);box-shadow:none}
+.btn-review{background:var(--y);color:#fff;border:2px solid var(--yd);box-shadow:var(--shy);width:100%;font-size:15px;font-weight:900;font-family:inherit;border-radius:var(--rads);padding:13px;cursor:pointer;letter-spacing:.3px}
+.btn-review:active{transform:translateY(4px);box-shadow:none}
+.review-badge{background:var(--y);color:#fff;border-radius:8px;padding:1px 7px;font-size:11px;font-weight:800;margin-left:6px}
+.daily-wrap{padding:4px 16px 14px}
+.daily-bar-bg{background:var(--br);border-radius:6px;height:8px;margin:6px 0 4px;overflow:hidden}
+.daily-bar-fill{background:linear-gradient(90deg,var(--g),var(--gd));border-radius:6px;height:100%;transition:width .4s ease}
+.daily-lbl{font-size:12px;font-weight:700;color:var(--mu)}
 
 /* VOCAB CARD */
 .card-nav{padding:14px 18px;display:flex;align-items:center;background:var(--card);border-bottom:2px solid var(--br);gap:10px}
@@ -273,6 +280,7 @@ body{font-family:'Nunito','Noto Sans SC',-apple-system,BlinkMacSystemFont,sans-s
     <div class="xp-wrap"><div class="xp-fill" id="heroBar" style="width:0%"></div></div>
     <div class="xp-lbl" id="heroLbl">0 XP · 开始你的第一关吧！</div>
   </div>
+  <div id="dailyProgress"></div>
   <div id="reviewSection"></div>
   <div class="sec-title">📚 学习路径</div>
   <div id="lvList"></div>
@@ -2166,14 +2174,48 @@ let curLv   = null;
 let curIdx  = 0;
 
 const DAY = 86400000;
+const DAILY_GOAL = 3; // 每日完成 3 词维持连签
+let isReviewMode = false; // 复习模式标记
+let qWordKeys = []; // 配合 qWords 存储每道题的 learned key
+
+// 初始化今日已学词数（每天重置）
+let todayLearned = (() => {
+  const today = new Date().toDateString();
+  if(S('tw_todayDate') !== today){ SS('tw_todayDate', today); SS('tw_todayLearned','0'); return 0; }
+  return parseInt(S('tw_todayLearned')||'0');
+})();
+
 function todayStr(){ return new Date().toDateString(); }
-function updateStreakAndSave(){
-  const last = S('lastStudied'), today = todayStr();
-  if(last === today) return;
-  const yesterday = new Date(Date.now()-DAY).toDateString();
-  streak = (last === yesterday) ? streak+1 : 1;
-  SS('streak', streak); SS('lastStudied', today);
-  updateTopbar();
+
+// 每完成 n 词就累加今日进度，达到目标后更新 Streak
+function addTodayLearned(n){
+  const today = todayStr();
+  if(S('tw_todayDate') !== today){ todayLearned=0; SS('tw_todayDate',today); }
+  todayLearned = Math.min(todayLearned + n, DAILY_GOAL * 4); // 上限不影响体验
+  SS('tw_todayLearned', todayLearned);
+  if(todayLearned >= DAILY_GOAL){
+    const last = S('lastStudied');
+    if(last !== today){
+      const yesterday = new Date(Date.now()-DAY).toDateString();
+      streak = (last === yesterday) ? streak+1 : 1;
+      SS('streak', streak); SS('lastStudied', today);
+      updateTopbar();
+      if(streak > 1) toast('🔥 连签 '+streak+' 天，继续加油！');
+    }
+  }
+  updateDailyProgress();
+}
+
+// 更新首页今日进度条
+function updateDailyProgress(){
+  const el = document.getElementById('dailyProgress');
+  if(!el) return;
+  const g = Math.min(todayLearned, DAILY_GOAL);
+  const done = g >= DAILY_GOAL;
+  el.innerHTML = '<div class="daily-wrap">'
+    +'<div class="daily-bar-bg"><div class="daily-bar-fill" style="width:'+(g/DAILY_GOAL*100)+'%"></div></div>'
+    +'<div class="daily-lbl">今日目标 '+g+'/'+DAILY_GOAL+' 词 '+(done?'🔥 已完成，Streak 保住了！':'🎯 再学 '+(DAILY_GOAL-g)+' 词维持连签')+'</div>'
+    +'</div>';
 }
 function getReviewQueue(){
   const now = Date.now(), queue = [];
@@ -2270,18 +2312,22 @@ function updateTopbar(){
 // ══════════════════════════════════════════════
 function renderHome(){
   updateTopbar();
+  updateDailyProgress();
   const reviewQ = getReviewQueue();
   const rs = document.getElementById('reviewSection');
   if(reviewQ.length > 0){
-    rs.innerHTML = '<div class="sec-title">🔄 今日复习 <span style="color:var(--r);font-size:11px;font-weight:700">'+reviewQ.length+' 词到期</span></div>'
-      +'<div style="display:flex;gap:10px;overflow-x:auto;padding:0 16px 14px;scrollbar-width:none;-webkit-overflow-scrolling:touch">'
+    rs.innerHTML = '<div class="sec-title">🔄 今日复习 <span class="review-badge">'+reviewQ.length+' 词到期</span></div>'
+      +'<div style="display:flex;gap:10px;overflow-x:auto;padding:0 16px 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch">'
       +reviewQ.map(({lv,w})=>
         '<div onclick="openCard('+lv.id+',\''+w.id+'\')" style="flex-shrink:0;background:#fff;border-radius:14px;padding:12px 14px;min-width:90px;text-align:center;border:1.5px solid var(--br);box-shadow:var(--sh);cursor:pointer">'
         +'<div style="font-size:22px;margin-bottom:5px">'+w.emoji+'</div>'
         +'<div style="font-size:12px;font-weight:800;color:var(--tx)">'+w.title+'</div>'
         +'<div style="font-size:10px;color:var(--mu);margin-top:2px">'+w.term+'</div>'
         +'</div>'
-      ).join('')+'</div>';
+      ).join('')+'</div>'
+      +'<div style="padding:0 16px 16px">'
+        +'<button class="btn-review" onclick="startReviewQuiz()">🔄 开始复习测验（'+reviewQ.length+' 词）</button>'
+      +'</div>';
   } else { rs.innerHTML = ''; }
   const total = LEVELS.reduce((a,l)=>a+l.words.length,0);
   const done  = Object.keys(learned).length;
@@ -2510,7 +2556,8 @@ function markLearned(){
   const w=curLv.words[curIdx], key=curLv.id+'_'+w.id;
   if(!learned[key]){
     learned[key]=Date.now(); SS('learned',JSON.stringify(learned));
-    xp+=10; SS('xp',xp); updateStreakAndSave(); updateTopbar();
+    xp+=10; SS('xp',xp); updateTopbar();
+    addTodayLearned(1);
     toast('🎉 +10 XP · 已掌握！'); confetti();
   } else { toast('已经掌握了 ✅'); }
   renderCard();
@@ -2523,8 +2570,24 @@ let qWords=[],qIdx=0,qScore=0,qErrN=0,qAnswered=false,qOpts=[];
 
 function startQuiz(){
   if(!curLv) return;
+  isReviewMode = false;
   const pool=[...curLv.words].sort(()=>Math.random()-.5);
   qWords=pool.slice(0,Math.min(10,pool.length));
+  qWordKeys=qWords.map(w=>curLv.id+'_'+w.id);
+  qIdx=0;qScore=0;qErrN=0;qAnswered=false;
+  showScreen('quiz');
+  document.getElementById('n-home').classList.add('active');
+  renderQuiz();
+}
+
+function startReviewQuiz(){
+  const queue = getReviewQueue();
+  if(!queue.length){ toast('暂无到期词汇，再学一些词汇吧！'); return; }
+  isReviewMode = true;
+  curLv = null;
+  const pool = [...queue].sort(()=>Math.random()-.5).slice(0,10);
+  qWords = pool.map(({w})=>w);
+  qWordKeys = pool.map(({lv,w})=>lv.id+'_'+w.id);
   qIdx=0;qScore=0;qErrN=0;qAnswered=false;
   showScreen('quiz');
   document.getElementById('n-home').classList.add('active');
@@ -2542,25 +2605,45 @@ function renderQuiz(){
   document.getElementById('nxtBtn').style.display='none';
   qAnswered=false;
 
-  // Draw distractor options from all levels for diversity
+  // 从全关卡取干扰项
   const allWords = LEVELS.flatMap(lv=>lv.words);
   const pool2 = allWords.filter(x=>x.id!==w.id).sort(()=>Math.random()-.5).slice(0,3);
   qOpts=[w,...pool2].sort(()=>Math.random()-.5);
   const letters=['A','B','C','D'];
+  const shortM = m => m.length>28 ? m.slice(0,28)+'…' : m;
+  const shortT = t => t.length>22 ? t.slice(0,22)+'…' : t;
 
-  // Shorten meanings for display in options
-  const shortMeaning = m => m.length>30 ? m.slice(0,30)+'…' : m;
+  // 判断题型：复习模式 or 已学词 → 主动回忆（看中文选英文）；否则 → 认知识别
+  const useActiveRecall = isReviewMode || !!learned[qWordKeys[qIdx]];
 
-  document.getElementById('qBody').innerHTML =
-    '<div class="qtype-badge" style="background:var(--pl);color:var(--p)">📖 选择含义</div>'
-    +'<div class="qterm">'+w.emoji+' '+w.title
-      +'<button class="audio-btn" onclick="speak(\''+_esc(w.title)+'\')">🔊</button></div>'
-    +'<div class="qquestion">这个词的中文含义是？</div>'
-    +'<div class="qsub">'+w.pron+'</div>'
-    +'<div class="opts" id="opts">'
-      +qOpts.map((o,i)=>'<div class="opt" id="opt'+i+'" onclick="selectOpt('+i+')">'
-        +'<div class="opt-letter">'+letters[i]+'</div><span>'+shortMeaning(o.meaning)+'</span></div>').join('')
-    +'</div>';
+  if(useActiveRecall){
+    // ✍️ 反向测验：展示中文含义，选英文词
+    document.getElementById('qBody').innerHTML =
+      '<div class="qtype-badge" style="background:var(--yl);color:#92400e">✍️ 反向测验</div>'
+      +'<div class="qterm" style="font-size:15px;line-height:1.6;color:var(--tx)">'+w.meaning+'</div>'
+      +'<div class="qquestion">这个词的英文是？</div>'
+      +'<div class="qsub" style="margin-bottom:4px">提示：'+w.pron+'</div>'
+      +'<div class="opts" id="opts">'
+        +qOpts.map((o,i)=>'<div class="opt" id="opt'+i+'" onclick="selectOpt('+i+')">'
+          +'<div class="opt-letter">'+letters[i]+'</div>'
+          +'<div style="display:flex;flex-direction:column;gap:1px;min-width:0">'
+            +'<span style="font-weight:900;font-size:15px;letter-spacing:.3px">'+o.emoji+' '+o.title+'</span>'
+            +'<span style="font-size:11px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+shortT(o.term)+'</span>'
+          +'</div></div>').join('')
+      +'</div>';
+  } else {
+    // 📖 认知识别：展示英文词，选中文含义（原有逻辑）
+    document.getElementById('qBody').innerHTML =
+      '<div class="qtype-badge" style="background:var(--pl);color:var(--p)">📖 选择含义</div>'
+      +'<div class="qterm">'+w.emoji+' '+w.title
+        +'<button class="audio-btn" onclick="speak(\''+_esc(w.title)+'\')">🔊</button></div>'
+      +'<div class="qquestion">这个词的中文含义是？</div>'
+      +'<div class="qsub">'+w.pron+'</div>'
+      +'<div class="opts" id="opts">'
+        +qOpts.map((o,i)=>'<div class="opt" id="opt'+i+'" onclick="selectOpt('+i+')">'
+          +'<div class="opt-letter">'+letters[i]+'</div><span>'+shortM(o.meaning)+'</span></div>').join('')
+      +'</div>';
+  }
 }
 
 function selectOpt(i){
@@ -2600,20 +2683,34 @@ function finishQuiz(){
   const emoji=pct>=90?'🏆':pct>=70?'🎉':pct>=50?'💪':'📚';
   const msg=pct>=90?'完美！你是词汇高手！':pct>=70?'太棒了，继续保持！':pct>=50?'不错，再练练更好！':'多练练，加油！';
   if(pct>=70){
-    qWords.forEach(w=>{const key=curLv.id+'_'+w.id;if(!learned[key]){learned[key]=Date.now();xp+=5;}});
-    SS('learned',JSON.stringify(learned));SS('xp',xp);updateStreakAndSave();updateTopbar();
+    if(isReviewMode){
+      // 复习完成：重置时间戳，3 天后再次出现
+      qWordKeys.forEach(key=>{ if(learned[key]) learned[key]=Date.now(); });
+    } else {
+      // 普通测验：新词标记为已学
+      qWordKeys.forEach((key,i)=>{
+        if(!learned[key]){ learned[key]=Date.now(); xp+=5; }
+      });
+      SS('xp',xp);
+    }
+    SS('learned',JSON.stringify(learned));
+    addTodayLearned(qScore); // 答对数计入今日进度
+    updateTopbar();
   }
+  const subTitle = isReviewMode ? '🔄 完成今日复习测验' : '完成「'+(curLv?curLv.title:'')+'」测验';
   document.getElementById('resultWrap').innerHTML =
     '<span class="r-emoji">'+emoji+'</span>'
     +'<div class="r-title">'+msg+'</div>'
-    +'<div class="r-sub">完成「'+curLv.title+'」测验</div>'
+    +'<div class="r-sub">'+subTitle+'</div>'
     +'<div class="r-stats">'
       +'<div class="r-stat"><div class="num">'+qScore+'/'+qWords.length+'</div><div class="lbl">答对题数</div></div>'
       +'<div class="r-stat"><div class="num" style="color:'+(pct>=70?'var(--g)':'var(--r)')+'">'+pct+'%</div><div class="lbl">正确率</div></div>'
     +'</div>'
     +'<div class="xp-earned"><div class="xi">⚡</div><div><div class="xn">'+xp+' XP</div><div class="xl">累计经验值</div></div></div>'
-    +'<button class="btn btn-p" onclick="startQuiz()" style="margin-bottom:12px">🔄 再来一次</button>'
-    +'<button class="btn btn-o" onclick="openLevel('+curLv.id+')">← 返回关卡</button>';
+    +(isReviewMode
+      ? '<button class="btn btn-g" onclick="goHome()" style="margin-bottom:12px">🏠 返回主页</button>'
+      : '<button class="btn btn-p" onclick="startQuiz()" style="margin-bottom:12px">🔄 再来一次</button>'
+       +'<button class="btn btn-o" onclick="openLevel('+(curLv?curLv.id:0)+')">← 返回关卡</button>');
   if(pct>=80) setTimeout(confetti,200);
 }
 
