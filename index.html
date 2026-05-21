@@ -125,10 +125,9 @@ body{font-family:'Nunito','Noto Sans SC',-apple-system,BlinkMacSystemFont,sans-s
 .audio-btn.speaking{animation:audioAnim .5s ease infinite alternate}
 @keyframes audioAnim{from{transform:scale(1)}to{transform:scale(1.15)}}
 
-/* Card header — image variant */
-.vc-head-img{position:relative;height:240px;overflow:hidden;cursor:zoom-in}
-.vc-head-img img{width:100%;height:100%;object-fit:cover;display:block}
-.vc-head-img::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.15) 0%,transparent 40%)}
+/* Card header — image variant (v2.17.2: contain 完整展示，不再裁切) */
+.vc-head-img{position:relative;background:#F4F5F7;overflow:hidden;cursor:zoom-in;display:flex;align-items:center;justify-content:center;min-height:200px;max-height:340px}
+.vc-head-img img{width:100%;height:auto;max-height:340px;object-fit:contain;display:block}
 .vc-img-expand{position:absolute;top:10px;right:12px;z-index:2;background:rgba(0,0,0,.35);border:none;border-radius:6px;padding:6px 12px;font-size:11px;color:rgba(255,255,255,.9);font-weight:800;cursor:pointer;line-height:1.4;min-height:32px;backdrop-filter:blur(4px)}
 
 /* 词头信息条（图片下方，替代原图片内遮罩文字） */
