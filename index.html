@@ -4249,8 +4249,46 @@ const LEVELS = [
 // ══════════════════════════════════════════════
 // STATE
 // ══════════════════════════════════════════════
-const S  = k => localStorage.getItem('tw_'+k);
-const SS = (k,v) => localStorage.setItem('tw_'+k,v);
+// ── localStorage 容错（v2.15.0）──────────────────────────────
+// Safari 隐私模式 setItem 会 throw，iOS quota 满会 QuotaExceededError
+// 失败时 toast 提示用户，并 throttle 30s 避免轰炸
+let _storageOk = true;
+let _lastStorageWarn = 0;
+function _warnStorage(msg){
+  const now = Date.now();
+  if(now - _lastStorageWarn < 30000) return;
+  _lastStorageWarn = now;
+  if(typeof toast === 'function') toast(msg);
+}
+const S  = k => {
+  try { return localStorage.getItem('tw_'+k); }
+  catch(e){ console.error('[Storage] read failed:', k, e); return null; }
+};
+const SS = (k,v) => {
+  try {
+    localStorage.setItem('tw_'+k, v);
+  } catch(e){
+    console.error('[Storage] write failed:', k, e);
+    if(e.name === 'QuotaExceededError'){
+      _warnStorage('💾 存储已满，请清理浏览器缓存');
+    } else if(e.name === 'SecurityError'){
+      _warnStorage('🔒 隐私模式下进度不会保留');
+    } else {
+      _warnStorage('⚠️ 数据保存失败');
+    }
+    _storageOk = false;
+  }
+};
+// 启动探测：toast 函数定义在更下方，所以延迟 800ms 触发用户提示
+(function probeStorage(){
+  try { localStorage.setItem('tw__probe','1'); localStorage.removeItem('tw__probe'); }
+  catch(e){
+    _storageOk = false;
+    setTimeout(()=>{
+      if(typeof toast === 'function') toast('🔒 存储不可用，本次进度不会保留');
+    }, 800);
+  }
+})();
 let learned = JSON.parse(S('learned')||'{}');
 let wrong   = JSON.parse(S('wrong')||'{}'); // {wordKey: wrongCount}
 let phase   = JSON.parse(S('tw_phase')||'{}'); // {wordKey: 0-3} 词汇学习阶段
@@ -4300,6 +4338,21 @@ function recordCorrect(key){
 }
 function recordWrong(key){
   wrong[key]=(wrong[key]||0)+1; SS('wrong',JSON.stringify(wrong));
+  // v2.15.0: 答错降阶（修复"虚假精通"）
+  // phase ≥ 2 时降一档（phase 0/1 不动，避免惩罚新词）
+  // 同时把 learned 时间戳打回过期状态，让 review queue 立即拾取
+  const p = getPhase(key);
+  let demoted = '';
+  if(p >= 2){
+    phase[key] = p - 1;
+    SS('tw_phase', JSON.stringify(phase));
+    demoted = ' · 🔻 降至「'+PHASE_LABELS[p-1]+'」';
+  }
+  if(learned[key]){
+    learned[key] = Date.now() - getReviewInterval(key) - 1;
+    SS('learned', JSON.stringify(learned));
+  }
+  return demoted;
 }
 
 // ── 关卡内错题重现（v2.9.0）──────────────────────────────────
@@ -5146,11 +5199,11 @@ function selectOpt(i){
     fb.innerHTML='<div class="fb-t">✅ 正确！+5 XP'+phaseUp+'</div><div class="fb-b">'+w.meaning+'</div>';
   } else {
     qErrN++;
-    recordWrong(key);
+    const demoted=recordWrong(key);
     _sessionWrongKeys.add(key);
     const requeued = requeueItem(qItems[qIdx]);
     fb.className='fb err-fb show';
-    fb.innerHTML='<div class="fb-t">❌ 正确答案：'+w.title+'</div><div class="fb-b">'+w.meaning+'</div>'+buildWrongHint(w)+(requeued?'<div class="reappear-hint">📌 稍后会再练一次这个词</div>':'');
+    fb.innerHTML='<div class="fb-t">❌ 正确答案：'+w.title+demoted+'</div><div class="fb-b">'+w.meaning+'</div>'+buildWrongHint(w)+(requeued?'<div class="reappear-hint">📌 稍后会再练一次这个词</div>':'');
   }
   document.getElementById('qOk').textContent=qScore;
   document.getElementById('qErr').textContent=qErrN;
@@ -5175,11 +5228,11 @@ function checkAns(){
     inp.style.borderColor='var(--g)';inp.style.background='var(--gl)';inp.style.color='#2d6a00';
   } else {
     qErrN++;
-    recordWrong(key);
+    const demoted=recordWrong(key);
     _sessionWrongKeys.add(key);
     const requeued = requeueItem(qItems[qIdx]);
     fb.className='fb err-fb show';
-    fb.innerHTML='<div class="fb-t">❌ 正确答案：'+w.title+'</div><div class="fb-b">'+w.meaning+'</div>'+buildWrongHint(w)+(requeued?'<div class="reappear-hint">📌 稍后会再练一次这个词</div>':'');
+    fb.innerHTML='<div class="fb-t">❌ 正确答案：'+w.title+demoted+'</div><div class="fb-b">'+w.meaning+'</div>'+buildWrongHint(w)+(requeued?'<div class="reappear-hint">📌 稍后会再练一次这个词</div>':'');
     inp.style.borderColor='var(--r)';inp.style.background='var(--rl)';inp.style.color='#b91c1c';
   }
   document.getElementById('qOk').textContent=qScore;
