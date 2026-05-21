@@ -186,6 +186,20 @@ body{font-family:'Nunito','Noto Sans SC',-apple-system,BlinkMacSystemFont,sans-s
 .mc-txt{font-size:13px;font-weight:700;color:var(--tx);line-height:1.75}
 /* 例句 — 白底 + 靛蓝左竖线，不再抢绿色 */
 .example-box{background:var(--card);border-radius:var(--rads);padding:14px 16px;border:2px solid var(--br);border-left:4px solid var(--p)}
+/* v2.17.0 结果页本次错题卡 + 再练一次按钮 */
+.session-wrong-card{text-align:left;margin:0 0 16px;border:2px solid var(--r);border-radius:var(--rads);overflow:hidden;background:var(--rl);box-shadow:var(--shr)}
+.session-wrong-head{padding:11px 14px;font-size:13px;font-weight:900;color:#b91c1c;display:flex;justify-content:space-between;align-items:center;background:#fff0f0;border-bottom:1.5px solid var(--r)}
+.session-wrong-count{background:var(--r);color:#fff;font-size:11px;font-weight:800;padding:2px 9px;border-radius:999px}
+.session-wrong-list{padding:8px 10px 10px;display:flex;flex-direction:column;gap:6px}
+.session-wrong-item{display:flex;align-items:center;gap:10px;background:#fff;border:1.5px solid var(--r);border-radius:12px;padding:8px 11px;cursor:pointer;transition:transform .1s}
+.session-wrong-item:active{transform:scale(.98)}
+.swi-emoji{font-size:22px;flex-shrink:0}
+.swi-text{flex:1;min-width:0;overflow:hidden}
+.swi-title{font-size:14px;font-weight:900;color:var(--tx);line-height:1.2}
+.swi-meaning{font-size:11px;color:var(--mu);font-weight:700;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.session-wrong-badge{flex-shrink:0;background:var(--r);color:#fff;font-size:11px;font-weight:800;padding:3px 8px;border-radius:999px}
+.btn-replay{background:var(--r);color:#fff;border:2px solid var(--rd);box-shadow:0 4px 0 0 var(--rd)}
+.btn-replay:active{transform:translateY(2px);box-shadow:0 2px 0 0 var(--rd)}
 .ex-en{display:flex;align-items:flex-start;gap:10px;margin-bottom:7px}
 .ex-en-txt{font-size:13px;font-weight:900;color:var(--tx);line-height:1.5;flex:1}
 .ex-zh{font-size:12px;color:var(--mu);line-height:1.5;font-weight:700}
@@ -198,12 +212,25 @@ body{font-family:'Nunito','Noto Sans SC',-apple-system,BlinkMacSystemFont,sans-s
 .card-actions{padding:10px 16px 12px;display:flex;flex-direction:column;gap:8px;position:sticky;bottom:58px;background:var(--card);border-top:2px solid var(--br);z-index:10}
 .card-actions .btn{flex:1;padding:14px;font-size:13px}
 
-/* QUIZ */
-.quiz-hdr{padding:14px 18px;background:var(--card);border-bottom:2px solid var(--br)}
-.qprog{background:var(--br);border-radius:var(--radp);height:14px;overflow:hidden;margin-bottom:8px;border:2px solid var(--brd)}
-.qprog-fill{height:100%;background:var(--p);border-radius:var(--radp);transition:width .4s ease}
-.qstats{display:flex;justify-content:space-between;font-size:12px;color:var(--mu);font-weight:900}
+/* QUIZ — v2.17.0 Duolingo-style sticky header */
+.quiz-hdr{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--card);border-bottom:2px solid var(--br);min-height:48px}
+.quiz-hdr .qhdr-close{flex-shrink:0;width:32px;height:32px;border-radius:8px;border:none;background:transparent;color:var(--mu);font-size:20px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;line-height:1}
+.quiz-hdr .qhdr-close:active{background:var(--br)}
+.qhdr-mid{flex:1;display:flex;align-items:center;gap:10px;min-width:0}
+.qprog{flex:1;background:var(--br);border-radius:var(--radp);height:14px;overflow:hidden;border:2px solid var(--brd);display:flex}
+.qprog-fill{height:100%;background:var(--g);border-radius:var(--radp);transition:width .4s ease}
+.qhdr-num{font-size:12px;font-weight:900;color:var(--mu);white-space:nowrap;flex-shrink:0}
+.qhdr-err{flex-shrink:0;display:inline-flex;align-items:center;gap:3px;background:var(--r);color:#fff;border-radius:var(--radp);padding:4px 10px;font-size:12px;font-weight:900;min-width:34px;justify-content:center;transition:background .2s,transform .2s}
+.qhdr-err.zero{background:var(--br);color:var(--mu)}
+.qhdr-tts{flex-shrink:0;width:32px;height:32px;border-radius:8px;border:none;background:transparent;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;line-height:1}
+.qhdr-tts:active{background:var(--br)}
+.qstats{display:none}
 .quiz-body{padding:18px 18px 140px}
+@media (max-width:400px){.qhdr-num{display:none}}
+/* v2.17.0 沉浸式：答题中隐藏全局 topbar+bnav；词卡详情页隐藏 bnav */
+body.quiz-active .topbar{display:none}
+body.quiz-active .bnav{display:none}
+body.card-active .bnav{display:none}
 .qtype-badge{display:inline-block;padding:5px 14px;border-radius:var(--radp);font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px;border:2px solid}
 .qterm{background:var(--p);color:#fff;border-radius:var(--rads);padding:20px;text-align:center;font-size:26px;font-weight:900;margin-bottom:18px;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:var(--shp);border:2px solid var(--pd)}
 .qterm .audio-btn{background:rgba(255,255,255,.25)}
@@ -308,6 +335,32 @@ body{font-family:'Nunito','Noto Sans SC',-apple-system,BlinkMacSystemFont,sans-s
 .cloze-input{width:100%;padding:15px;border:2px solid var(--br);border-radius:var(--rads);font-size:22px;font-weight:900;font-family:inherit;color:var(--tx);background:var(--card);box-shadow:var(--sh);outline:none;transition:border-color .2s,box-shadow .2s;text-align:center;letter-spacing:2px;margin:10px 0 6px;display:block}
 .cloze-input:focus{border-color:var(--p);box-shadow:var(--shp)}
 .cloze-hint{font-size:12px;color:var(--mu);text-align:center;font-weight:700;margin-bottom:4px}
+/* v2.17.0 Reteach Modal — 答错后结构化重学 bottom sheet */
+.modal-ov.reteach-mode{align-items:flex-end;padding:0;background:rgba(0,0,0,0);animation:rtFade .2s ease-out forwards}
+.modal-ov.reteach-mode .modal{max-width:520px;width:100%;border-radius:24px 24px 0 0;border-bottom:0;padding:0;text-align:left;max-height:75vh;display:flex;flex-direction:column;animation:rtSlide .3s cubic-bezier(.16,1,.3,1);overflow:hidden}
+@keyframes rtFade{from{background:rgba(0,0,0,0)}to{background:rgba(0,0,0,.5)}}
+@keyframes rtSlide{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.reteach-head{background:var(--rl);border-bottom:2px solid var(--r);padding:18px 20px 16px;flex-shrink:0}
+.reteach-head-tag{display:inline-block;background:var(--r);color:#fff;font-size:12px;font-weight:900;padding:3px 10px;border-radius:999px;margin-bottom:10px;letter-spacing:.5px}
+.reteach-head-ans{font-size:26px;font-weight:900;color:#b91c1c;line-height:1.2;margin-bottom:6px;word-break:break-word}
+.reteach-head-meta{font-size:13px;font-weight:700;color:#b91c1c;opacity:.85}
+.reteach-head-meta .rh-pron{font-family:Georgia,serif;font-style:italic;margin-right:8px}
+.reteach-head-meta .rh-pos{display:inline-block;background:#fff;color:var(--r);padding:1px 7px;border-radius:6px;font-size:11px;font-weight:900;border:1px solid var(--r)}
+.reteach-body{padding:18px 20px 14px;overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch}
+.reteach-section{margin-bottom:16px}
+.reteach-section:last-child{margin-bottom:4px}
+.reteach-section-lbl{font-size:12px;font-weight:900;color:var(--mu);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;display:flex;align-items:center;gap:5px}
+.reteach-section-txt{font-size:15px;font-weight:700;color:var(--tx);line-height:1.55;word-break:break-word}
+.reteach-section-ex{background:#f8fafc;border-left:3px solid var(--p);border-radius:0 10px 10px 0;padding:10px 12px}
+.reteach-section-ex .rte-en{font-size:14px;font-weight:700;color:var(--tx);line-height:1.5;margin-bottom:4px;font-family:Consolas,Monaco,monospace}
+.reteach-section-ex .rte-zh{font-size:13px;font-weight:600;color:var(--mu);line-height:1.5}
+.reteach-section-origin{background:var(--yl);border-radius:10px;padding:10px 12px}
+.reteach-section-origin .reteach-section-txt{color:#92400e;font-size:14px}
+.reteach-section-mis{background:#fef3c7;border:2px solid var(--y);border-radius:12px;padding:11px 13px}
+.reteach-section-mis .reteach-section-lbl{color:#b45309}
+.reteach-section-mis .reteach-section-txt{color:#78350f;font-size:14px;font-weight:800}
+.reteach-foot{padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));border-top:2px solid var(--br);background:var(--card);flex-shrink:0}
+.reteach-foot .btn{width:100%;margin:0}
 </style>
 </head>
 <body>
@@ -370,9 +423,14 @@ body{font-family:'Nunito','Noto Sans SC',-apple-system,BlinkMacSystemFont,sans-s
 <!-- QUIZ -->
 <div class="screen" id="sc-quiz">
   <div class="quiz-hdr">
-    <button class="back" onclick="confirmQuitQuiz()" style="margin-bottom:7px">← 退出</button>
-    <div class="qprog"><div class="qprog-fill" id="qBar" style="width:0%"></div></div>
-    <div class="qstats"><span id="qNum">1/8</span><span>✅<span id="qOk">0</span> ❌<span id="qErr">0</span></span></div>
+    <button class="qhdr-close" onclick="confirmQuitQuiz()" aria-label="退出答题">✕</button>
+    <div class="qhdr-mid">
+      <div class="qprog"><div class="qprog-fill" id="qBar" style="width:0%"></div></div>
+      <span class="qhdr-num" id="qNum">1/8</span>
+    </div>
+    <div class="qhdr-err zero" id="qErrBadge" aria-label="错题数"><span>⚠️</span><span id="qErr">0</span></div>
+    <button class="qhdr-tts" id="qhdrTts" onclick="toggleTTS()" title="开关朗读" aria-label="开关朗读">🔊</button>
+    <span id="qOk" style="display:none">0</span>
   </div>
   <div class="quiz-body" id="qBody"></div>
   <div class="chk-wrap" id="chkWrap">
@@ -4526,6 +4584,17 @@ function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
   document.getElementById('sc-'+id).classList.add('active');
+  // v2.17.0: 答题中隐藏全局 topbar+bnav；词卡详情页隐藏 bnav（沉浸学习 + 防作弊）
+  document.body.classList.toggle('quiz-active', id==='quiz');
+  document.body.classList.toggle('card-active', id==='card');
+  syncQuizHdrTts();
+}
+function syncQuizHdrTts(){
+  const t = document.getElementById('qhdrTts');
+  if(t) t.textContent = (typeof ttsEnabled!=='undefined' && ttsEnabled) ? '🔊' : '🔇';
+  const errEl = document.getElementById('qErr');
+  const badge = document.getElementById('qErrBadge');
+  if(errEl && badge) badge.classList.toggle('zero', (parseInt(errEl.textContent)||0)===0);
 }
 function goHome(){
   showScreen('home');
@@ -4559,6 +4628,7 @@ function updateTopbar(){
   if(sFreeze) sFreeze.textContent = fc;
   const ttsChip = document.getElementById('ttsChip');
   if(ttsChip) ttsChip.textContent = ttsEnabled ? '🔊' : '🔇';
+  syncQuizHdrTts();
 }
 
 // ══════════════════════════════════════════════
@@ -4962,6 +5032,63 @@ function confirmQuitQuiz(){
   document.getElementById('modal').classList.add('show');
 }
 
+// v2.17.0：答错后弹结构化重学 bottom sheet（含义+例句+词源+辨析）
+function showReteachModal(w){
+  const mContent=document.getElementById('mContent');
+  const modal=document.getElementById('modal');
+  const termRest = (w.term && w.term.indexOf('=')>-1) ? w.term.split('=')[1].trim() : '';
+  let html = '<div class="reteach-head">'
+    +'<div class="reteach-head-tag">❌ 答错了</div>'
+    +'<div class="reteach-head-ans">'+w.title+'</div>'
+    +'<div class="reteach-head-meta">'
+    +(w.pron?'<span class="rh-pron">'+w.pron+'</span>':'')
+    +(termRest?'<span class="rh-pos">'+termRest+'</span>':'')
+    +'</div></div>'
+    +'<div class="reteach-body">'
+    +'<div class="reteach-section">'
+    +'<div class="reteach-section-lbl">💡 含义</div>'
+    +'<div class="reteach-section-txt">'+(w.meaning||'')+'</div>'
+    +'</div>';
+  if(w.ex){
+    html += '<div class="reteach-section">'
+      +'<div class="reteach-section-lbl">🌏 例句</div>'
+      +'<div class="reteach-section-ex">'
+      +'<div class="rte-en">'+w.ex+'</div>'
+      +(w.exZh?'<div class="rte-zh">'+w.exZh+'</div>':'')
+      +'</div></div>';
+  }
+  if(w.origin){
+    html += '<div class="reteach-section">'
+      +'<div class="reteach-section-lbl">📐 词源</div>'
+      +'<div class="reteach-section-origin">'
+      +'<div class="reteach-section-txt">'+w.origin+'</div>'
+      +'</div></div>';
+  }
+  if(w.misconception){
+    html += '<div class="reteach-section reteach-section-mis">'
+      +'<div class="reteach-section-lbl">⚠️ 别搞混</div>'
+      +'<div class="reteach-section-txt">'+w.misconception+'</div>'
+      +'</div>';
+  }
+  html += '</div><div class="reteach-foot">'
+    +'<button class="btn btn-p" onclick="closeReteachModal()">✓ 我知道了，继续</button>'
+    +'</div>';
+  mContent.innerHTML = html;
+  modal.classList.add('reteach-mode');
+  modal.classList.add('show');
+  const nxt=document.getElementById('nxtBtn');
+  if(nxt){ nxt.dataset.lockedByReteach='1'; nxt.style.pointerEvents='none'; nxt.style.opacity='.5'; }
+}
+
+function closeReteachModal(){
+  const modal=document.getElementById('modal');
+  modal.classList.remove('show');
+  modal.classList.remove('reteach-mode');
+  const nxt=document.getElementById('nxtBtn');
+  if(nxt){ delete nxt.dataset.lockedByReteach; nxt.style.pointerEvents=''; nxt.style.opacity=''; }
+  nextQ();
+}
+
 function startWrongQuiz(){
   const pool=[];
   LEVELS.forEach(lv=>lv.words.forEach(w=>{
@@ -4973,6 +5100,27 @@ function startWrongQuiz(){
   resetQuizState();
   quizMode=QUIZ_MODE.WRONG; curLv=null;
   qItems=[...pool].sort(()=>Math.random()-.5).slice(0,10);
+  showScreen('quiz');
+  document.getElementById('n-home').classList.add('active');
+  renderQuiz();
+}
+
+// v2.17.0：仅练本 session 的错题（不是全局错题本）
+function startSessionReplay(wrongKeys){
+  if(!wrongKeys||!wrongKeys.length){ toast('没有错题可练'); return; }
+  const pool=[];
+  wrongKeys.forEach(key=>{
+    const parts=key.split('_'), lvId=+parts[0], wId=parts.slice(1).join('_');
+    const lv=LEVELS.find(l=>l.id===lvId);
+    if(!lv) return;
+    const w=lv.words.find(x=>x.id===wId);
+    if(w) pool.push({word:w, key});
+  });
+  if(!pool.length){ toast('错题数据异常'); return; }
+  _quizStartXp=xp; _sessionWrongKeys=new Set();
+  resetQuizState();
+  quizMode=QUIZ_MODE.WRONG; curLv=null;
+  qItems=[...pool].sort(()=>Math.random()-.5);
   showScreen('quiz');
   document.getElementById('n-home').classList.add('active');
   renderQuiz();
@@ -5099,7 +5247,7 @@ function renderQuiz(){
     // ✏️ 填空练习（3种变体随机）
     const cloze = buildClozeContent(w);
     document.getElementById('qBody').innerHTML =
-      '<div class="qtype-badge" style="background:var(--pl);color:var(--pd)">✏️ 填空练习</div>'
+      '<div class="qtype-badge" style="background:var(--pl);color:var(--pd)">✏️ 填空练习 <span style="opacity:.65;font-weight:700;letter-spacing:0;text-transform:none">· 拼写英文</span></div>'
       +'<div class="qterm" style="font-size:16px;display:flex;align-items:center;justify-content:center;gap:10px">'+w.emoji+' <span>'+w.pron+'</span></div>'
       +cloze.html
       +'<input type="text" id="clozeInput" class="cloze-input" placeholder="输入单词…" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">'
@@ -5116,7 +5264,7 @@ function renderQuiz(){
   } else if(useDistinction){
     // 🔍 辨析：展示 misconception 文本，选出对应的词
     document.getElementById('qBody').innerHTML =
-      '<div class="qtype-badge" style="background:#F0FDF4;color:#166534;border:2px solid #86EFAC">🔍 辨析</div>'
+      '<div class="qtype-badge" style="background:#F0FDF4;color:#166534;border:2px solid #86EFAC">🔍 辨析 <span style="opacity:.65;font-weight:700;letter-spacing:0;text-transform:none">· 区分易混词</span></div>'
       +'<div class="qterm" style="font-size:14px;line-height:1.75;background:var(--yl);border-color:var(--y);box-shadow:var(--shy);color:var(--tx);text-align:left">'+w.misconception+'</div>'
       +'<div class="qquestion">这是哪个词的辨析要点？</div>'
       +'<div class="qsub">选出对应的英文术语</div>'
@@ -5131,7 +5279,7 @@ function renderQuiz(){
   } else if(useActiveRecall){
     // ✍️ 反向测验：展示中文含义，选英文词
     document.getElementById('qBody').innerHTML =
-      '<div class="qtype-badge" style="background:var(--yl);color:#92400e">✍️ 反向测验</div>'
+      '<div class="qtype-badge" style="background:var(--yl);color:#92400e">✍️ 反向测验 <span style="opacity:.65;font-weight:700;letter-spacing:0;text-transform:none">· 看中文选英文</span></div>'
       +'<div class="qterm" style="font-size:15px;line-height:1.6;color:var(--tx)">'+w.meaning+'</div>'
       +'<div class="qquestion">这个词的英文是？</div>'
       +'<div class="qsub" style="margin-bottom:4px">提示：'+w.pron+'</div>'
@@ -5146,7 +5294,7 @@ function renderQuiz(){
   } else {
     // 📖 认知识别：展示英文词，选中文含义（原有逻辑）
     document.getElementById('qBody').innerHTML =
-      '<div class="qtype-badge" style="background:var(--pl);color:var(--p)">📖 选择含义</div>'
+      '<div class="qtype-badge" style="background:var(--pl);color:var(--p)">📖 选择含义 <span style="opacity:.65;font-weight:700;letter-spacing:0;text-transform:none">· 看英文选中文</span></div>'
       +'<div class="qterm">'+w.emoji+' '+w.title
         +'<button class="audio-btn" onclick="speak(\''+_esc(w.title)+'\')">🔊</button></div>'
       +'<div class="qquestion">这个词的中文含义是？</div>'
@@ -5205,10 +5353,12 @@ function selectOpt(i){
     const requeued = requeueItem(qItems[qIdx]);
     fb.className='fb err-fb show';
     fb.innerHTML='<div class="fb-t">❌ 正确答案：'+w.title+demoted+'</div><div class="fb-b">'+w.meaning+'</div>'+buildWrongHint(w)+(requeued?'<div class="reappear-hint">📌 稍后会再练一次这个词</div>':'');
+    setTimeout(()=>showReteachModal(w), 400);
   }
   document.getElementById('qOk').textContent=qScore;
   document.getElementById('qErr').textContent=qErrN;
   document.getElementById('nxtBtn').style.display='block';
+  syncQuizHdrTts();
 }
 
 function checkAns(){
@@ -5235,6 +5385,7 @@ function checkAns(){
     fb.className='fb err-fb show';
     fb.innerHTML='<div class="fb-t">❌ 正确答案：'+w.title+demoted+'</div><div class="fb-b">'+w.meaning+'</div>'+buildWrongHint(w)+(requeued?'<div class="reappear-hint">📌 稍后会再练一次这个词</div>':'');
     inp.style.borderColor='var(--r)';inp.style.background='var(--rl)';inp.style.color='#b91c1c';
+    setTimeout(()=>showReteachModal(w), 400);
   }
   document.getElementById('qOk').textContent=qScore;
   document.getElementById('qErr').textContent=qErrN;
@@ -5306,25 +5457,32 @@ function finishQuiz(){
     +'</div>'
     +wrongNote
     +(_wrongItems.length>0
-      ?'<details style="text-align:left;margin:0 0 16px;border:2px solid var(--r);border-radius:var(--rads);overflow:hidden;background:var(--rl)">'
-        +'<summary style="padding:11px 14px;font-size:13px;font-weight:800;color:#b91c1c;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center">'
-          +'📝 本次答错（'+_wrongItems.length+' 词）<span style="font-size:11px;opacity:.7">展开 ▾</span>'
-        +'</summary>'
-        +'<div style="padding:6px 12px 12px;display:flex;flex-wrap:wrap;gap:8px">'
-          +_wrongItems.map(({word:w})=>
-            '<span style="background:#fff;border:1.5px solid var(--r);border-radius:var(--radp);padding:5px 11px;font-size:12px;font-weight:800;display:inline-flex;align-items:center;gap:5px">'
-              +w.emoji+' '+w.title
-              +'<span style="font-size:10px;color:var(--mu);font-weight:700">'+w.meaning.slice(0,10)+'…</span>'
-            +'</span>'
-          ).join('')
+      ?'<div class="session-wrong-card">'
+        +'<div class="session-wrong-head">'
+          +'<span>📝 本次答错</span>'
+          +'<span class="session-wrong-count">'+_wrongItems.length+' 词</span>'
         +'</div>'
-      +'</details>'
+        +'<div class="session-wrong-list">'
+          +_wrongItems.map(({word:w,key:k})=>{
+            const errN=wrong[k]||1;
+            const parts=k.split('_'), lvId=+parts[0], wId=parts.slice(1).join('_');
+            return '<div class="session-wrong-item" onclick="openCard('+lvId+',\''+wId+'\')">'
+              +'<span class="swi-emoji">'+w.emoji+'</span>'
+              +'<div class="swi-text"><div class="swi-title">'+w.title+'</div><div class="swi-meaning">'+(w.meaning||'').slice(0,12)+'</div></div>'
+              +'<span class="session-wrong-badge">❌ ×'+errN+'</span>'
+            +'</div>';
+          }).join('')
+        +'</div>'
+      +'</div>'
       :'')
     +'<div class="xp-earned"><div class="xi">⚡</div><div>'
       +(_sessionXp>0?'<div class="xn">+'+_sessionXp+' XP</div><div class="xl">本次获得 · 累计 '+xp+' XP</div>':'<div class="xn">'+xp+' XP</div><div class="xl">累计经验值</div>')
     +'</div></div>'
+    +(_wrongItems.length>0
+      ?'<button class="btn btn-replay" onclick=\'startSessionReplay('+JSON.stringify(_wrongItems.map(i=>i.key))+')\' style="margin-bottom:12px">🔄 再练一次错题（'+_wrongItems.length+' 词）</button>'
+      :'')
     +(_mode===QUIZ_MODE.WRONG
-      ?'<button class="btn btn-p" onclick="startWrongQuiz()" style="margin-bottom:12px">🔄 再练一遍</button>'
+      ?'<button class="btn btn-p" onclick="startWrongQuiz()" style="margin-bottom:12px">📌 全局错题专练</button>'
        +'<button class="btn btn-g" onclick="goHome()">🏠 返回主页</button>'
       :_mode===QUIZ_MODE.REVIEW
         ?'<button class="btn btn-p" onclick="startReviewQuiz()" style="margin-bottom:12px">🔄 再来一次</button>'
