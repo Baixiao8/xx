@@ -132,14 +132,14 @@ body{font-family:'Nunito','Noto Sans SC',-apple-system,BlinkMacSystemFont,sans-s
 .vc-img-expand{position:absolute;top:10px;right:12px;z-index:2;background:rgba(0,0,0,.35);border:none;border-radius:6px;padding:6px 12px;font-size:11px;color:rgba(255,255,255,.9);font-weight:800;cursor:pointer;line-height:1.4;min-height:32px;backdrop-filter:blur(4px)}
 
 /* 词头信息条（图片下方，替代原图片内遮罩文字） */
-.vc-word-bar{display:flex;align-items:center;gap:12px;padding:14px 18px 12px;border-bottom:2px solid var(--br);background:var(--card)}
+.vc-word-bar{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:2px solid var(--br);background:var(--card)}
 .vc-word-bar .audio-btn-lg{width:40px;height:40px;border-radius:50%;background:var(--pl);border:2px solid var(--p);font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all .15s}
 .vc-word-bar .audio-btn-lg:active{transform:scale(.9);background:var(--p)}
-.vc-word-bar-info{flex:1;min-width:0}
-.vc-word-bar-title{font-size:26px;font-weight:900;color:var(--tx);letter-spacing:-.3px;line-height:1.1}
-.vc-word-bar-full{font-size:11px;color:var(--mu);font-weight:700;margin-top:3px;display:flex;align-items:center;gap:6px;overflow:hidden}
-.vc-word-bar-full .term-part{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:0 1 auto;min-width:0}
-.vc-word-bar-ph{background:#F4F4F6;color:#3a3a44;padding:2px 8px;border-radius:8px;font-size:10px;font-weight:800;white-space:nowrap;flex-shrink:0;border:1px solid var(--br)}
+.vc-word-bar-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.vc-word-bar-row{display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:0}
+.vc-word-bar-title{font-size:24px;font-weight:900;color:var(--tx);letter-spacing:-.3px;line-height:1.15;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1 1 auto;min-width:0}
+.vc-word-bar-full{font-size:11px;color:var(--mu);font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1 1 auto;min-width:0}
+.vc-word-bar-ph{background:#F4F4F6;color:#3a3a44;padding:2px 9px;border-radius:8px;font-size:10px;font-weight:800;white-space:nowrap;flex-shrink:0;border:1px solid var(--br)}
 .vc-word-bar-pron{font-size:12px;font-weight:800;color:var(--p);background:var(--pl);border-radius:var(--radp);padding:4px 10px;flex-shrink:0;white-space:nowrap}
 
 /* Image fullscreen overlay */
@@ -362,7 +362,7 @@ body{font-family:'Nunito','Noto Sans SC',-apple-system,BlinkMacSystemFont,sans-s
     <div id="ctaRow"></div>
     <div style="display:flex;gap:10px">
       <button class="btn btn-o" id="prevBtn" onclick="prevCard()">← 上一个</button>
-      <button class="btn btn-p" id="nextBtn" onclick="nextCard()">下一个 →</button>
+      <button class="btn btn-o" id="nextBtn" onclick="nextCard()">下一个 →</button>
     </div>
   </div>
 </div>
@@ -4748,16 +4748,21 @@ function renderCard(){
   document.getElementById('nextBtn').textContent   = curIdx===lv.words.length-1?'完成 ✓':'下一个 →';
 
   // Build header — image or colored
-  // 词头信息条（图片词和非图片词共用）
+  // 词头信息条（v2.16.0：两行 grid 对齐 — 行1: title + pron / 行2: 全称 + 谐音）
   const phInlineChip = w.ph ? '<span class="vc-word-bar-ph" title="谐音">'+w.ph+'</span>' : '';
   const wordBarHtml =
     '<div class="vc-word-bar">'
       +'<button class="audio-btn-lg" onclick="speak(\''+_esc(w.title)+'\')">🔊</button>'
       +'<div class="vc-word-bar-info">'
-        +'<div class="vc-word-bar-title">'+w.emoji+' '+w.title+'</div>'
-        +'<div class="vc-word-bar-full"><span class="term-part">'+w.term+'</span>'+phInlineChip+'</div>'
+        +'<div class="vc-word-bar-row">'
+          +'<div class="vc-word-bar-title">'+w.emoji+' '+w.title+'</div>'
+          +'<div class="vc-word-bar-pron">'+w.pron+'</div>'
+        +'</div>'
+        +'<div class="vc-word-bar-row">'
+          +'<div class="vc-word-bar-full">'+w.term+'</div>'
+          +phInlineChip
+        +'</div>'
       +'</div>'
-      +'<div class="vc-word-bar-pron">'+w.pron+'</div>'
     +'</div>';
 
   let headerHtml;
@@ -5239,7 +5244,11 @@ function checkAns(){
 function nextQ(){
   qIdx++;
   if(qIdx>=qItems.length) finishQuiz();
-  else renderQuiz();
+  else {
+    renderQuiz();
+    // v2.16.0 修复：渲染新题后强制滚回顶部，避免视口停留在「继续」按钮位置导致用户感觉"页面没变化"
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  }
 }
 
 function finishQuiz(){
