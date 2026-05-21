@@ -293,7 +293,7 @@ body{font-family:'Nunito','Noto Sans SC',-apple-system,BlinkMacSystemFont,sans-s
 /* MODAL */
 .modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:200;padding:22px}
 .modal-ov.show{display:flex}
-.modal{background:var(--card);border-radius:var(--rad);padding:28px 22px;text-align:center;width:100%;max-width:340px;animation:mpop .3s cubic-bezier(.34,1.56,.64,1);border:2px solid var(--br);box-shadow:var(--shl)}
+.modal{background:var(--card);border-radius:var(--rad);padding:28px 22px;text-align:center;width:100%;max-width:340px;animation:mpop .3s cubic-bezier(.34,1.56,.64,1);border:2px solid var(--br);box-shadow:var(--shl);max-height:78vh;overflow-y:auto}
 @keyframes mpop{from{transform:scale(.8);opacity:0}to{transform:scale(1);opacity:1}}
 .modal .be{font-size:60px;margin-bottom:10px;display:block}
 .modal h3{font-size:22px;font-weight:900;margin-bottom:7px}
@@ -367,7 +367,7 @@ body{font-family:'Nunito','Noto Sans SC',-apple-system,BlinkMacSystemFont,sans-s
 <!-- QUIZ -->
 <div class="screen" id="sc-quiz">
   <div class="quiz-hdr">
-    <button class="back" onclick="goLevel()" style="margin-bottom:7px">← 退出</button>
+    <button class="back" onclick="confirmQuitQuiz()" style="margin-bottom:7px">← 退出</button>
     <div class="qprog"><div class="qprog-fill" id="qBar" style="width:0%"></div></div>
     <div class="qstats"><span id="qNum">1/8</span><span>✅<span id="qOk">0</span> ❌<span id="qErr">0</span></span></div>
   </div>
@@ -4828,12 +4828,13 @@ function renderCard(){
   const ctaRow = document.getElementById('ctaRow');
   const cardKey = lv.id+'_'+w.id;
   const cardPhase = getPhase(cardKey);
+  const phaseNextReview = cardPhase<=1?'1天后复习':cardPhase===2?'7天后复习':'16天后复习';
   const phaseBadge = isLearned
-    ? '<div class="phase-badge">词汇学习阶段 '+phaseDots(cardPhase)+'</div>'
+    ? '<div class="phase-badge">'+phaseDots(cardPhase)+'<span style="margin-left:6px;opacity:.7;font-weight:700;font-size:10px">· '+phaseNextReview+'</span></div>'
     : '';
   if(ctaRow) ctaRow.innerHTML = phaseBadge
     + (isLearned
-      ? '<button class="btn btn-g" onclick="testThisWord()">✅ 已掌握 · 再考一次</button>'
+      ? '<button class="btn btn-g" onclick="testThisWord()">🔄 复习考察</button>'
       : '<button class="btn btn-p" onclick="testThisWord()">🎯 考考我</button>');
 
   setTimeout(()=>speak(w.title), 400);
@@ -4864,6 +4865,7 @@ function markLearned(){
 function testThisWord(){
   if(!curLv) return;
   const w=curLv.words[curIdx], key=curLv.id+'_'+w.id;
+  _quizStartXp=xp;
   resetQuizState();
   quizMode=QUIZ_MODE.SINGLE;
   qItems=[{word:w, key}];
@@ -4880,6 +4882,20 @@ function backToCard(){
 // QUIZ
 // ══════════════════════════════════════════════
 let qIdx=0,qScore=0,qErrN=0,qAnswered=false,qOpts=[];
+let _quizStartXp=0; // 本次测验开始时的 XP，用于计算本轮获得量
+
+// 退出确认 modal（防止误触 ← 退出 丢失进度）
+function confirmQuitQuiz(){
+  const mContent=document.getElementById('mContent');
+  mContent.innerHTML=
+    '<span class="be" style="font-size:52px">⚠️</span>'
+    +'<h3>确定退出测验？</h3>'
+    +'<p>本次答题进度将丢失</p>'
+    +'<button class="btn btn-p" style="margin-bottom:12px;background:var(--r);color:#fff;border-color:var(--rd);box-shadow:var(--shr)" '
+      +'onclick="document.getElementById(\'modal\').classList.remove(\'show\');resetQuizState();goLevel()">退出</button>'
+    +'<button class="btn btn-o" onclick="document.getElementById(\'modal\').classList.remove(\'show\')">继续答题</button>';
+  document.getElementById('modal').classList.add('show');
+}
 
 function startWrongQuiz(){
   const pool=[];
@@ -4888,6 +4904,7 @@ function startWrongQuiz(){
     if(wrong[key]>0) pool.push({word:w, key});
   }));
   if(!pool.length){ toast('暂无错题，继续加油！'); return; }
+  _quizStartXp=xp;
   resetQuizState();
   quizMode=QUIZ_MODE.WRONG; curLv=null;
   qItems=[...pool].sort(()=>Math.random()-.5).slice(0,10);
@@ -4898,6 +4915,7 @@ function startWrongQuiz(){
 
 function startQuiz(){
   if(!curLv) return;
+  _quizStartXp=xp;
   resetQuizState();
   quizMode=QUIZ_MODE.LEVEL;
   const pool=[...curLv.words].sort(()=>Math.random()-.5).slice(0,10);
@@ -4915,6 +4933,7 @@ function startReviewQuiz(){
     if(learned[key]) allLearned.push({word:w, key});
   }));
   if(!allLearned.length){ toast('还没有已学词汇，先去学几个词吧！'); return; }
+  _quizStartXp=xp;
   resetQuizState();
   quizMode=QUIZ_MODE.REVIEW; curLv=null;
   qItems=[...allLearned].sort(()=>Math.random()-.5).slice(0,10);
@@ -5191,6 +5210,7 @@ function finishQuiz(){
   // ── 普通模式：结果页（先缓存需要用到的值，再 reset）──
   const _mode=quizMode, _total=origTotal, _curLvId=curLv?curLv.id:0, _curLvTitle=curLv?curLv.title:'';
   const _qScore=qScore, _qErrN=qErrN;
+  const _sessionXp = xp - _quizStartXp; // 本轮获得 XP
   resetQuizState();
 
   showScreen('result');
@@ -5210,7 +5230,9 @@ function finishQuiz(){
       +'<div class="r-stat"><div class="num" style="color:'+(pct>=70?'var(--g)':'var(--r)')+'">'+pct+'%</div><div class="lbl">正确率</div></div>'
     +'</div>'
     +wrongNote
-    +'<div class="xp-earned"><div class="xi">⚡</div><div><div class="xn">'+xp+' XP</div><div class="xl">累计经验值</div></div></div>'
+    +'<div class="xp-earned"><div class="xi">⚡</div><div>'
+      +(_sessionXp>0?'<div class="xn">+'+_sessionXp+' XP</div><div class="xl">本次获得 · 累计 '+xp+' XP</div>':'<div class="xn">'+xp+' XP</div><div class="xl">累计经验值</div>')
+    +'</div></div>'
     +(_mode===QUIZ_MODE.WRONG
       ?'<button class="btn btn-p" onclick="startWrongQuiz()" style="margin-bottom:12px">🔄 再练一遍</button>'
        +'<button class="btn btn-g" onclick="goHome()">🏠 返回主页</button>'
