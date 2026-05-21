@@ -137,7 +137,9 @@ body{font-family:'Nunito','Noto Sans SC',-apple-system,BlinkMacSystemFont,sans-s
 .vc-word-bar .audio-btn-lg:active{transform:scale(.9);background:var(--p)}
 .vc-word-bar-info{flex:1;min-width:0}
 .vc-word-bar-title{font-size:26px;font-weight:900;color:var(--tx);letter-spacing:-.3px;line-height:1.1}
-.vc-word-bar-full{font-size:11px;color:var(--mu);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.vc-word-bar-full{font-size:11px;color:var(--mu);font-weight:700;margin-top:3px;display:flex;align-items:center;gap:6px;overflow:hidden}
+.vc-word-bar-full .term-part{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:0 1 auto;min-width:0}
+.vc-word-bar-ph{background:#F4F4F6;color:#3a3a44;padding:2px 8px;border-radius:8px;font-size:10px;font-weight:800;white-space:nowrap;flex-shrink:0;border:1px solid var(--br)}
 .vc-word-bar-pron{font-size:12px;font-weight:800;color:var(--p);background:var(--pl);border-radius:var(--radp);padding:4px 10px;flex-shrink:0;white-space:nowrap}
 
 /* Image fullscreen overlay */
@@ -4747,12 +4749,13 @@ function renderCard(){
 
   // Build header — image or colored
   // 词头信息条（图片词和非图片词共用）
+  const phInlineChip = w.ph ? '<span class="vc-word-bar-ph" title="谐音">'+w.ph+'</span>' : '';
   const wordBarHtml =
     '<div class="vc-word-bar">'
       +'<button class="audio-btn-lg" onclick="speak(\''+_esc(w.title)+'\')">🔊</button>'
       +'<div class="vc-word-bar-info">'
         +'<div class="vc-word-bar-title">'+w.emoji+' '+w.title+'</div>'
-        +'<div class="vc-word-bar-full">'+w.term+'</div>'
+        +'<div class="vc-word-bar-full"><span class="term-part">'+w.term+'</span>'+phInlineChip+'</div>'
       +'</div>'
       +'<div class="vc-word-bar-pron">'+w.pron+'</div>'
     +'</div>';
@@ -4776,12 +4779,8 @@ function renderCard(){
       +'</div>';
   }
 
-  // Phonetic section
-  const phoneticSec = w.ph ?
-    '<div class="vc-section"><div class="sec-lbl">🗣 谐音记忆</div>'
-      +'<div class="phonetic-box"><div class="ph-icon">💡</div><div class="ph-text">'
-        +'<div class="ph-word">'+w.ph+'</div>'
-      +'</div></div></div>' : '';
+  // Phonetic section（v2.16.0 已移到 word-bar inline chip，此处不再渲染独立 section）
+  const phoneticSec = '';
 
   // Meaning hero
   const meaningSec =
@@ -4799,22 +4798,19 @@ function renderCard(){
     +'</div>' : '';
 
   // Chinese work expression
+  // v2.16.0：中文表达 + 英文搭配合并到「怎么说」一个 section
   const zhExprChips = w.zhExpr ? w.zhExpr.split(' / ').map(e=>
     '<span class="zh-work-chip">'+e+'</span>'
   ).join('') : '';
-  const zhExprSec = zhExprChips ?
-    '<div class="vc-section"><div class="sec-lbl">💼 中文怎么说</div>'
-      +'<div class="zh-work-chips">'+zhExprChips+'</div>'
-    +'</div>' : '';
-
-  // Common phrases
   const phraseChips = w.phrases ? w.phrases.split(' / ').map(p=>
     '<span class="phrase-chip">'+p+'</span>'
   ).join('') : '';
-  const phrasesSec = phraseChips ?
-    '<div class="vc-section"><div class="sec-lbl">💬 常见搭配</div>'
-      +'<div class="phrases-chips">'+phraseChips+'</div>'
+  const zhExprSec = (zhExprChips || phraseChips) ?
+    '<div class="vc-section"><div class="sec-lbl">💬 怎么说</div>'
+      +(zhExprChips ? '<div class="zh-work-chips" style="margin-bottom:'+(phraseChips?'10px':'0')+'">'+zhExprChips+'</div>' : '')
+      +(phraseChips ? '<div class="phrases-chips">'+phraseChips+'</div>' : '')
     +'</div>' : '';
+  const phrasesSec = ''; // 已合并到 zhExprSec
 
   // Example
   const exampleSec =
