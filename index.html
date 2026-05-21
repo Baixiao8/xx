@@ -316,6 +316,7 @@ body{font-family:'Nunito','Noto Sans SC',-apple-system,BlinkMacSystemFont,sans-s
     <div class="chip">🔥<span id="sStreak">0</span></div>
     <div class="chip" id="freezeChip" style="display:none">❄️<span id="sFreeze">0</span></div>
     <div class="chip">⚡<span id="sXP">0</span></div>
+    <div class="chip" id="ttsChip" onclick="toggleTTS()" style="cursor:pointer;padding:6px 10px" title="开关朗读"></div>
   </div>
 </div>
 
@@ -4313,7 +4314,7 @@ function requeueItem(item){
   qItems.push({...item, reappear: true});
   const total = qItems.length;
   document.getElementById('qNum').textContent = (qIdx+1)+'/'+total;
-  document.getElementById('qBar').style.width = (qIdx/total*100)+'%';
+  // 进度条由 renderQuiz() 统一按原始题数绘制，此处不更新
   return true;
 }
 
@@ -4413,8 +4414,17 @@ function toggleScene(btn){
   btn.textContent = collapsed ? '收起' : '展开';
 }
 
+let ttsEnabled = localStorage.getItem('tw_tts') !== '0'; // 默认开启，存 '0' 表示关闭
+function toggleTTS(){
+  ttsEnabled = !ttsEnabled;
+  localStorage.setItem('tw_tts', ttsEnabled ? '1' : '0');
+  const chip = document.getElementById('ttsChip');
+  if(chip) chip.textContent = ttsEnabled ? '🔊' : '🔇';
+  if(!ttsEnabled && window.speechSynthesis) speechSynthesis.cancel();
+  toast(ttsEnabled ? '🔊 朗读已开启' : '🔇 朗读已静音');
+}
 function speak(txt, rate){
-  if(!window.speechSynthesis) return;
+  if(!window.speechSynthesis || !ttsEnabled) return;
   rate = rate||0.88;
   speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(txt);
@@ -4494,6 +4504,8 @@ function updateTopbar(){
   if(freezeChip) freezeChip.style.display = fc > 0 ? '' : 'none';
   const sFreeze = document.getElementById('sFreeze');
   if(sFreeze) sFreeze.textContent = fc;
+  const ttsChip = document.getElementById('ttsChip');
+  if(ttsChip) ttsChip.textContent = ttsEnabled ? '🔊' : '🔇';
 }
 
 // ══════════════════════════════════════════════
@@ -4529,8 +4541,8 @@ function renderHome(){
   const rs = document.getElementById('reviewSection');
   if(totalLearned > 0){
     const showWords = reviewQ.length > 0 ? reviewQ : [];
-    rs.innerHTML = '<div class="sec-title">🔄 今日复习'
-      +(reviewQ.length > 0 ? ' <span class="review-badge">'+reviewQ.length+' 词到期</span>' : '')
+    rs.innerHTML = '<div class="sec-title">'
+      +(reviewQ.length > 0 ? '🔄 今日复习 <span class="review-badge">'+reviewQ.length+' 词到期</span>' : '🔄 随机练习')
       +'</div>'
       +(showWords.length > 0
         ? '<div style="display:flex;gap:10px;overflow-x:auto;padding:0 16px 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch">'
@@ -4865,7 +4877,7 @@ function markLearned(){
 function testThisWord(){
   if(!curLv) return;
   const w=curLv.words[curIdx], key=curLv.id+'_'+w.id;
-  _quizStartXp=xp;
+  _quizStartXp=xp; _sessionWrongKeys=new Set();
   resetQuizState();
   quizMode=QUIZ_MODE.SINGLE;
   qItems=[{word:w, key}];
@@ -4882,7 +4894,8 @@ function backToCard(){
 // QUIZ
 // ══════════════════════════════════════════════
 let qIdx=0,qScore=0,qErrN=0,qAnswered=false,qOpts=[];
-let _quizStartXp=0; // 本次测验开始时的 XP，用于计算本轮获得量
+let _quizStartXp=0;      // 本次测验开始时的 XP，用于计算本轮获得量
+let _sessionWrongKeys=new Set(); // 本轮答错的词 key 集合（去重）
 
 // 退出确认 modal（防止误触 ← 退出 丢失进度）
 function confirmQuitQuiz(){
@@ -4904,7 +4917,7 @@ function startWrongQuiz(){
     if(wrong[key]>0) pool.push({word:w, key});
   }));
   if(!pool.length){ toast('暂无错题，继续加油！'); return; }
-  _quizStartXp=xp;
+  _quizStartXp=xp; _sessionWrongKeys=new Set();
   resetQuizState();
   quizMode=QUIZ_MODE.WRONG; curLv=null;
   qItems=[...pool].sort(()=>Math.random()-.5).slice(0,10);
@@ -4915,7 +4928,7 @@ function startWrongQuiz(){
 
 function startQuiz(){
   if(!curLv) return;
-  _quizStartXp=xp;
+  _quizStartXp=xp; _sessionWrongKeys=new Set();
   resetQuizState();
   quizMode=QUIZ_MODE.LEVEL;
   const pool=[...curLv.words].sort(()=>Math.random()-.5).slice(0,10);
@@ -4933,7 +4946,7 @@ function startReviewQuiz(){
     if(learned[key]) allLearned.push({word:w, key});
   }));
   if(!allLearned.length){ toast('还没有已学词汇，先去学几个词吧！'); return; }
-  _quizStartXp=xp;
+  _quizStartXp=xp; _sessionWrongKeys=new Set();
   resetQuizState();
   quizMode=QUIZ_MODE.REVIEW; curLv=null;
   qItems=[...allLearned].sort(()=>Math.random()-.5).slice(0,10);
@@ -4991,7 +5004,9 @@ function buildClozeContent(w){
 function renderQuiz(){
   assertState();
   const {word:w, key:curKey}=qItems[qIdx], total=qItems.length;
-  document.getElementById('qBar').style.width  = (qIdx/total*100)+'%';
+  // 进度条基于原始题数（不含重现词），防止错题重现时进度视觉倒退
+  const _origN=qItems.filter(i=>!i.reappear).length||total;
+  document.getElementById('qBar').style.width  = Math.min(qIdx/_origN*100,100)+'%';
   document.getElementById('qNum').textContent  = (qIdx+1)+'/'+total;
   document.getElementById('qOk').textContent   = qScore;
   document.getElementById('qErr').textContent  = qErrN;
@@ -5134,6 +5149,7 @@ function selectOpt(i){
   } else {
     qErrN++;
     recordWrong(key);
+    _sessionWrongKeys.add(key);
     const requeued = requeueItem(qItems[qIdx]);
     fb.className='fb err-fb show';
     fb.innerHTML='<div class="fb-t">❌ 正确答案：'+w.title+'</div><div class="fb-b">'+w.meaning+'</div>'+buildWrongHint(w)+(requeued?'<div class="reappear-hint">📌 稍后会再练一次这个词</div>':'');
@@ -5162,6 +5178,7 @@ function checkAns(){
   } else {
     qErrN++;
     recordWrong(key);
+    _sessionWrongKeys.add(key);
     const requeued = requeueItem(qItems[qIdx]);
     fb.className='fb err-fb show';
     fb.innerHTML='<div class="fb-t">❌ 正确答案：'+w.title+'</div><div class="fb-b">'+w.meaning+'</div>'+buildWrongHint(w)+(requeued?'<div class="reappear-hint">📌 稍后会再练一次这个词</div>':'');
@@ -5211,6 +5228,8 @@ function finishQuiz(){
   const _mode=quizMode, _total=origTotal, _curLvId=curLv?curLv.id:0, _curLvTitle=curLv?curLv.title:'';
   const _qScore=qScore, _qErrN=qErrN;
   const _sessionXp = xp - _quizStartXp; // 本轮获得 XP
+  // 本轮答错词单（去重，不含重现题重复项）
+  const _wrongItems = qItems.filter(i=>_sessionWrongKeys.has(i.key)&&!i.reappear);
   resetQuizState();
 
   showScreen('result');
@@ -5230,6 +5249,21 @@ function finishQuiz(){
       +'<div class="r-stat"><div class="num" style="color:'+(pct>=70?'var(--g)':'var(--r)')+'">'+pct+'%</div><div class="lbl">正确率</div></div>'
     +'</div>'
     +wrongNote
+    +(_wrongItems.length>0
+      ?'<details style="text-align:left;margin:0 0 16px;border:2px solid var(--r);border-radius:var(--rads);overflow:hidden;background:var(--rl)">'
+        +'<summary style="padding:11px 14px;font-size:13px;font-weight:800;color:#b91c1c;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center">'
+          +'📝 本次答错（'+_wrongItems.length+' 词）<span style="font-size:11px;opacity:.7">展开 ▾</span>'
+        +'</summary>'
+        +'<div style="padding:6px 12px 12px;display:flex;flex-wrap:wrap;gap:8px">'
+          +_wrongItems.map(({word:w})=>
+            '<span style="background:#fff;border:1.5px solid var(--r);border-radius:var(--radp);padding:5px 11px;font-size:12px;font-weight:800;display:inline-flex;align-items:center;gap:5px">'
+              +w.emoji+' '+w.title
+              +'<span style="font-size:10px;color:var(--mu);font-weight:700">'+w.meaning.slice(0,10)+'…</span>'
+            +'</span>'
+          ).join('')
+        +'</div>'
+      +'</details>'
+      :'')
     +'<div class="xp-earned"><div class="xi">⚡</div><div>'
       +(_sessionXp>0?'<div class="xn">+'+_sessionXp+' XP</div><div class="xl">本次获得 · 累计 '+xp+' XP</div>':'<div class="xn">'+xp+' XP</div><div class="xl">累计经验值</div>')
     +'</div></div>'
