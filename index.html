@@ -137,6 +137,7 @@ body{font-family:'Nunito','Noto Sans SC',-apple-system,BlinkMacSystemFont,sans-s
 .vc-word-bar .audio-btn-lg:active{transform:scale(.9);background:var(--p)}
 .vc-word-bar-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
 .vc-word-bar-row{display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:0}
+.vc-word-bar-row.row-end{justify-content:flex-end}
 .vc-word-bar-title{font-size:24px;font-weight:900;color:var(--tx);letter-spacing:-.3px;line-height:1.15;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1 1 auto;min-width:0}
 .vc-word-bar-full{font-size:11px;color:var(--mu);font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1 1 auto;min-width:0}
 .vc-word-bar-ph{background:#F4F4F6;color:#3a3a44;padding:2px 9px;border-radius:8px;font-size:10px;font-weight:800;white-space:nowrap;flex-shrink:0;border:1px solid var(--br)}
@@ -335,20 +336,22 @@ body.card-active .bnav{display:none}
 .cloze-input{width:100%;padding:15px;border:2px solid var(--br);border-radius:var(--rads);font-size:22px;font-weight:900;font-family:inherit;color:var(--tx);background:var(--card);box-shadow:var(--sh);outline:none;transition:border-color .2s,box-shadow .2s;text-align:center;letter-spacing:2px;margin:10px 0 6px;display:block}
 .cloze-input:focus{border-color:var(--p);box-shadow:var(--shp)}
 .cloze-hint{font-size:12px;color:var(--mu);text-align:center;font-weight:700;margin-bottom:4px}
-/* v2.17.0 Reteach Modal — 答错后结构化重学 bottom sheet */
+/* v2.17.0 Reteach Modal — 答错后结构化重学 bottom sheet（v2.17.1：绿色正确答案 + 紧凑布局） */
 .modal-ov.reteach-mode{align-items:flex-end;padding:0;background:rgba(0,0,0,0);animation:rtFade .2s ease-out forwards}
-.modal-ov.reteach-mode .modal{max-width:520px;width:100%;border-radius:24px 24px 0 0;border-bottom:0;padding:0;text-align:left;max-height:75vh;display:flex;flex-direction:column;animation:rtSlide .3s cubic-bezier(.16,1,.3,1);overflow:hidden}
+.modal-ov.reteach-mode .modal{max-width:520px;width:100%;border-radius:24px 24px 0 0;border-bottom:0;padding:0;text-align:left;max-height:55vh;display:flex;flex-direction:column;animation:rtSlide .3s cubic-bezier(.16,1,.3,1);overflow:hidden}
 @keyframes rtFade{from{background:rgba(0,0,0,0)}to{background:rgba(0,0,0,.5)}}
 @keyframes rtSlide{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.reteach-head{background:var(--rl);border-bottom:2px solid var(--r);padding:18px 20px 16px;flex-shrink:0}
-.reteach-head-tag{display:inline-block;background:var(--r);color:#fff;font-size:12px;font-weight:900;padding:3px 10px;border-radius:999px;margin-bottom:10px;letter-spacing:.5px}
-.reteach-head-ans{font-size:26px;font-weight:900;color:#b91c1c;line-height:1.2;margin-bottom:6px;word-break:break-word}
-.reteach-head-meta{font-size:13px;font-weight:700;color:#b91c1c;opacity:.85}
+.reteach-head{background:var(--gl);border-bottom:2px solid var(--g);padding:12px 20px 12px;flex-shrink:0}
+.reteach-head-tags{margin-bottom:6px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.reteach-head-tag{display:inline-block;background:var(--r);color:#fff;font-size:11px;font-weight:900;padding:2px 9px;border-radius:999px;letter-spacing:.5px}
+.reteach-head-correct{display:inline-block;background:var(--g);color:#fff;font-size:11px;font-weight:900;padding:2px 9px;border-radius:999px;letter-spacing:.5px}
+.reteach-head-ans{font-size:22px;font-weight:900;color:#166534;line-height:1.2;margin-bottom:4px;word-break:break-word}
+.reteach-head-meta{font-size:12px;font-weight:700;color:#166534;opacity:.85}
 .reteach-head-meta .rh-pron{font-family:Georgia,serif;font-style:italic;margin-right:8px}
-.reteach-head-meta .rh-pos{display:inline-block;background:#fff;color:var(--r);padding:1px 7px;border-radius:6px;font-size:11px;font-weight:900;border:1px solid var(--r)}
-.reteach-body{padding:18px 20px 14px;overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch}
-.reteach-section{margin-bottom:16px}
-.reteach-section:last-child{margin-bottom:4px}
+.reteach-head-meta .rh-pos{display:inline-block;background:#fff;color:var(--g);padding:1px 7px;border-radius:6px;font-size:11px;font-weight:900;border:1px solid var(--g)}
+.reteach-body{padding:12px 20px 12px;overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch}
+.reteach-section{margin-bottom:12px}
+.reteach-section:last-child{margin-bottom:2px}
 .reteach-section-lbl{font-size:12px;font-weight:900;color:var(--mu);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;display:flex;align-items:center;gap:5px}
 .reteach-section-txt{font-size:15px;font-weight:700;color:var(--tx);line-height:1.55;word-break:break-word}
 .reteach-section-ex{background:#f8fafc;border-left:3px solid var(--p);border-radius:0 10px 10px 0;padding:10px 12px}
@@ -4818,8 +4821,10 @@ function renderCard(){
   document.getElementById('nextBtn').textContent   = curIdx===lv.words.length-1?'完成 ✓':'下一个 →';
 
   // Build header — image or colored
-  // 词头信息条（v2.16.0：两行 grid 对齐 — 行1: title + pron / 行2: 全称 + 谐音）
+  // 词头信息条（v2.17.1：term === title 时不显示重复 term，只显示谐音 chip）
   const phInlineChip = w.ph ? '<span class="vc-word-bar-ph" title="谐音">'+w.ph+'</span>' : '';
+  const showTerm = w.term && w.term !== w.title;
+  const hasRow2 = showTerm || w.ph;
   const wordBarHtml =
     '<div class="vc-word-bar">'
       +'<button class="audio-btn-lg" onclick="speak(\''+_esc(w.title)+'\')">🔊</button>'
@@ -4828,10 +4833,12 @@ function renderCard(){
           +'<div class="vc-word-bar-title">'+w.emoji+' '+w.title+'</div>'
           +'<div class="vc-word-bar-pron">'+w.pron+'</div>'
         +'</div>'
-        +'<div class="vc-word-bar-row">'
-          +'<div class="vc-word-bar-full">'+w.term+'</div>'
-          +phInlineChip
-        +'</div>'
+        +(hasRow2
+          ?'<div class="vc-word-bar-row'+(showTerm?'':' row-end')+'">'
+            +(showTerm?'<div class="vc-word-bar-full">'+w.term+'</div>':'')
+            +phInlineChip
+          +'</div>'
+          :'')
       +'</div>'
     +'</div>';
 
@@ -5038,7 +5045,10 @@ function showReteachModal(w){
   const modal=document.getElementById('modal');
   const termRest = (w.term && w.term.indexOf('=')>-1) ? w.term.split('=')[1].trim() : '';
   let html = '<div class="reteach-head">'
-    +'<div class="reteach-head-tag">❌ 答错了</div>'
+    +'<div class="reteach-head-tags">'
+    +'<span class="reteach-head-tag">❌ 答错了</span>'
+    +'<span class="reteach-head-correct">✓ 正确答案</span>'
+    +'</div>'
     +'<div class="reteach-head-ans">'+w.title+'</div>'
     +'<div class="reteach-head-meta">'
     +(w.pron?'<span class="rh-pron">'+w.pron+'</span>':'')
@@ -5397,8 +5407,10 @@ function nextQ(){
   if(qIdx>=qItems.length) finishQuiz();
   else {
     renderQuiz();
-    // v2.16.0 修复：渲染新题后强制滚回顶部，避免视口停留在「继续」按钮位置导致用户感觉"页面没变化"
-    window.scrollTo({top: 0, behavior: 'smooth'});
+    // v2.17.1: 改为 instant 避免 smooth scroll 中途被打断导致滚不到顶；document.documentElement + body 双保险
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
   }
 }
 
