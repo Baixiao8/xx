@@ -4723,8 +4723,8 @@ function renderCard(){
       +'</div>';
   }
 
-  // Phonetic section (for non-image cards)
-  const phoneticSec = w.ph && !w.img ?
+  // Phonetic section
+  const phoneticSec = w.ph ?
     '<div class="vc-section"><div class="sec-lbl">🗣 谐音记忆</div>'
       +'<div class="phonetic-box"><div class="ph-icon">💡</div><div class="ph-text">'
         +'<div class="ph-word">'+w.ph+'</div>'
@@ -4821,11 +4821,11 @@ function renderCard(){
     '<div class="vocab-card">'
       +headerHtml
       +'<div class="vc-body">'
-        +phoneticSec
         +meaningSec      // 核心含义前置
         +sceneSec        // 情景故事紧跟含义（情景记忆，帮助理解）
         +memoryToggle    // 记忆技巧（联想/场景）
         +originSec
+        +phoneticSec     // 谐音记忆（词源后）
         +zhExprSec
         +phrasesSec
         +exampleSec
