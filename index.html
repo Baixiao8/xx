@@ -231,6 +231,10 @@ body{font-family:'Nunito','Noto Sans SC',-apple-system,BlinkMacSystemFont,sans-s
 body.quiz-active .topbar{display:none}
 body.quiz-active .bnav{display:none}
 body.card-active .bnav{display:none}
+/* v2.17.3 bnav 隐藏时，sticky 元素的 bottom 偏移要归零，避免下方出现"漏内容"的空隙 */
+body.card-active .card-actions{bottom:0}
+body.quiz-active .chk-wrap{bottom:0}
+body.card-active #sc-card,body.quiz-active #sc-quiz{padding-bottom:0}
 .qtype-badge{display:inline-block;padding:5px 14px;border-radius:var(--radp);font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px;border:2px solid}
 .qterm{background:var(--p);color:#fff;border-radius:var(--rads);padding:20px;text-align:center;font-size:26px;font-weight:900;margin-bottom:18px;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:var(--shp);border:2px solid var(--pd)}
 .qterm .audio-btn{background:rgba(255,255,255,.25)}
