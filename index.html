@@ -108,7 +108,7 @@ body{font-family:'Nunito','Noto Sans SC',-apple-system,BlinkMacSystemFont,sans-s
 .daily-lbl{font-size:12px;font-weight:700;color:var(--mu)}
 
 /* VOCAB CARD */
-.card-nav{padding:14px 18px;display:flex;align-items:center;background:var(--card);border-bottom:2px solid var(--br);gap:10px}
+.card-nav{padding:14px 18px;display:flex;align-items:center;background:var(--card);border-bottom:2px solid var(--br);gap:10px;position:sticky;top:58px;z-index:99}
 .card-ctr{flex:1;text-align:center;font-size:13px;font-weight:800;color:var(--mu)}
 .vocab-card{margin:14px 16px;border-radius:var(--rad);overflow:hidden;box-shadow:var(--shl);border:2px solid var(--br);animation:slideIn .3s ease}
 @keyframes slideIn{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:translateX(0)}}
@@ -4985,10 +4985,10 @@ function renderCard(){
 }
 
 function prevCard(){
-  if(curIdx>0){curIdx--;renderCard();}
+  if(curIdx>0){curIdx--;renderCard();window.scrollTo(0,0);document.documentElement.scrollTop=0;}
 }
 function nextCard(){
-  if(curIdx<curLv.words.length-1){curIdx++;renderCard();}
+  if(curIdx<curLv.words.length-1){curIdx++;renderCard();window.scrollTo(0,0);document.documentElement.scrollTop=0;}
   else{
     const lvWrong=curLv.words.filter(w=>wrong[curLv.id+'_'+w.id]>0).length;
     if(lvWrong>0) toast('🎉 本关浏览完毕！有 '+lvWrong+' 题错误，可在首页错题专练复习');
