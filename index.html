@@ -4988,11 +4988,25 @@ function renderCard(){
   setTimeout(()=>speak(w.title), 400);
 }
 
+// v2.17.7: 彻底滚顶（含 iOS Safari momentum + button focus 抵消问题）
+function _scrollCardTop(){
+  // 1. 主动 blur 当前焦点（避免浏览器 scroll-into-view 把焦点元素拉回视口）
+  if(document.activeElement && document.activeElement.blur) document.activeElement.blur();
+  // 2. 三重 scrollTop 一次性归零（window + html + body 任何一个生效都行）
+  const reset = () => {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  };
+  reset();
+  // 3. RAF 后再保险一次，覆盖 layout 重排后的 race condition / iOS momentum
+  requestAnimationFrame(reset);
+}
 function prevCard(){
-  if(curIdx>0){curIdx--;renderCard();window.scrollTo(0,0);document.documentElement.scrollTop=0;}
+  if(curIdx>0){curIdx--;renderCard();_scrollCardTop();}
 }
 function nextCard(){
-  if(curIdx<curLv.words.length-1){curIdx++;renderCard();window.scrollTo(0,0);document.documentElement.scrollTop=0;}
+  if(curIdx<curLv.words.length-1){curIdx++;renderCard();_scrollCardTop();}
   else{
     const lvWrong=curLv.words.filter(w=>wrong[curLv.id+'_'+w.id]>0).length;
     if(lvWrong>0) toast('🎉 本关浏览完毕！有 '+lvWrong+' 题错误，可在首页错题专练复习');
