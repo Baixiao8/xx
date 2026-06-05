@@ -4322,6 +4322,30 @@ const LEVELS = [
 }
 ];
 
+// ===== v2.18 P3 试点:职场口语黏合关(splice 注入,不动原数组结构) =====
+const SPOKEN_WORDS = [
+  { id:'standup', emoji:'🧍', title:'Standup', term:'Daily Standup', category:'职场沟通', pron:'/ˈstændʌp/', ph:'斯坦德啊普', origin:'stand 站 + up 起,站着开的短会,站着是为了逼大家说短点。', meaning:'每天固定的简短会,逐人快速同步昨天做了啥、今天做啥、有没有卡点。', zhExpr:'站会 / 晨会 / 早会 / 每日同步', visual:'一圈人站着围成半圈,谁啰嗦谁就被腿酸提醒「说重点」。', story:'新人第一次开 standup,把整个需求背景讲了五分钟,组长打断说「standup 只说进度和 blocker,细节会后单聊」。第二天他学乖了,三句话报完,会议十分钟散场。', misconception:'standup 不是汇报会也不是评审会,不解决问题、不讨论细节,只是同步状态对齐卡点,真要深聊就会后拉单独的会。', phrases:'daily standup / standup meeting / skip the standup', ex:'Let\'s keep the standup short today.', exZh:'今天站会简短点。', img:'', rel:[] },
+  { id:'sync', emoji:'🔄', title:'Sync', term:'Sync (up)', category:'职场沟通', pron:'/sɪŋk/', ph:'辛克', origin:'synchronize 同步的缩写,本是让两台机器数据对齐,借来指人和人对齐信息。', meaning:'临时拉个短会或一对一聊聊,把信息、进度、想法对齐到同一页。', zhExpr:'对一下 / 同步一下 / 碰一下 / 拉个会对齐', visual:'两个人各拿一半的拼图坐下来一拼,发现缺口在哪。', story:'设计和前端各做各的,上线前发现交互对不上。组长说「你俩先 sync 一下再动手」,两人花十分钟把字段和状态对齐,省下了一整天返工。', misconception:'sync 是轻量的临时对齐,不是正式立项会;说「sync 一下」往往就是「我们快速碰个头」,别理解成要开大会。', phrases:'sync up / quick sync / let\'s sync / sync offline', ex:'Let\'s sync up after lunch on the API design.', exZh:'午饭后我们对一下 API 设计。', img:'', rel:[] },
+  { id:'async', emoji:'📨', title:'Async', term:'Async', category:'职场沟通', pron:'/ˌeɪˈsɪŋk/', ph:'诶-辛克', origin:'asynchronous 异步的缩写,a- 表「非」,指不在同一时间发生,不用面对面实时。', meaning:'不开会、不实时,靠文档或消息异步推进,各人有空再回。', zhExpr:'异步沟通 / 异步处理 / 不用开会文档里说 / 留言我有空回', visual:'一个人在文档里留了条评论下班走了,另一个人第二天早上看到再回。', story:'跨时区协作,美国同事和国内总凑不上时间。组长说「这事 async 推吧,写清楚在文档里,别等开会」,于是大家在评论区接力,三天就推完了。', misconception:'async 不等于慢或拖延,它强调的是不阻塞彼此、各按节奏推进;很多团队反而靠 async 把会开少了效率更高。', phrases:'async communication / handle it async / async update / go async', ex:'No need to meet, let\'s handle this async in the doc.', exZh:'不用开会,我们在文档里异步处理这事。', img:'', rel:[] },
+  { id:'blocker', emoji:'🚧', title:'Blocker', term:'Blocker', category:'职场沟通', pron:'/ˈblɑːkər/', ph:'布拉克儿', origin:'block 阻挡 + -er 表事物,指把你活儿卡住、让你没法往下走的那个东西。', meaning:'卡住进度、让你没法继续往下做的障碍,常需要别人帮忙才能解。', zhExpr:'卡点 / 卡住了 / 被挡住了 / 拦路虎', visual:'你在跑道上冲刺,前面突然横了一道栏,自己跨不过去得喊人来挪。', story:'standup 上每人都说「没问题」,只有一个人说「我的 blocker 是接口没给,等了两天」。组长当场拉来后端,半小时解了,否则这事还要烂在那。', misconception:'blocker 专指「靠自己解不了、必须别人介入」的卡点,不是所有小困难都叫 blocker;说成 blocker 是在喊求助,别人就该优先帮你解。', phrases:'I\'m blocked / any blockers / remove the blocker / it\'s a blocker', ex:'My only blocker is the API access, still waiting on it.', exZh:'我唯一的卡点是接口权限,还在等。', img:'', rel:[] },
+  { id:'eta', emoji:'⏰', title:'ETA', term:'ETA = Estimated Time of Arrival', category:'职场沟通', pron:'/iː tiː eɪ/', ph:'伊-提-诶', origin:'Estimated Time of Arrival 预计到达时间,本是航班用语,职场借来问「啥时候能好」。', meaning:'某件事预计完成或交付的时间点,对方在问你大概几号能给。', zhExpr:'预计啥时候好 / 大概几号能交 / 这事啥时候完 / 给个时间点', visual:'一个人盯着进度条问「还有多久」,你心里估个数报出去。', story:'产品催功能,工程师没说死「明天」,而是回「ETA 周四下午,中间有依赖可能往后顺」。产品据此排了发布节奏,没出现答应了又跳票的尴尬。', misconception:'ETA 是估计值不是死承诺,给 ETA 时该带上前提(依赖、风险),别人也该当预估看待;但给了就尽量守,老跳票 ETA 就没人信了。', phrases:'what\'s the ETA / give me an ETA / ETA is Friday / push the ETA', ex:'What\'s the ETA on the login fix?', exZh:'登录这个修复预计啥时候好?', img:'', rel:[] },
+  { id:'loop-in', emoji:'➕', title:'Loop in', term:'Loop in', category:'职场沟通', pron:'/luːp ɪn/', ph:'噜普-因', origin:'loop 是信息流转的圈,loop in 就是把人拉进这个圈,让他知情、参与进来。', meaning:'把某人拉进某件事的沟通里,让他知情或一起跟进,常用于邮件、群、会议加人。', zhExpr:'把谁拉进来 / 拉上谁 / 带上谁一起跟 / 加进这个群或会', visual:'一个群聊里你 @ 了一个新人进来,说「这事得让他知道」。', story:'两个人在私聊里把一个改动定了,上线后法务跳出来说没合规。复盘时结论是「这种事一开始就该 loop in 法务」,后来流程里加了一条:涉合规先拉法务。', misconception:'loop in 是拉人进来知情或参与,不是把活儿甩给他;说「loop you in」是出于尊重让你别被蒙在鼓里,不等于这事归你管了。', phrases:'loop in / loop you in / keep me in the loop / loop in legal', ex:'Let me loop in the design team on this thread.', exZh:'我把设计团队拉进这个会话里。', img:'', rel:[] },
+  { id:'follow-up', emoji:'📌', title:'Follow up', term:'Follow up', category:'职场沟通', pron:'/ˈfɑːloʊ ʌp/', ph:'发漏-阿普', origin:'follow 跟 + up 接续,指一件事没完,过段时间再跟进、再确认一下。', meaning:'对没完结的事再跟一次进——追个结果、补个说明、问对方进展。', zhExpr:'跟进一下 / 我再追一下 / 后续再问问 / 回头确认下', visual:'你发出去的消息石沉大海,过两天又冒出来 @ 对方「这事咋样了」。', story:'需求发过去三天没动静,工程师没干等,发了句「just following up on the spec, any updates?」。对方才回「抱歉漏了,今天看」。该追的事不追,往往就烂尾。', misconception:'follow up 是跟进未完结的事,不是催命或施压;礼貌的 follow up 反而显得靠谱,把球接住不让事掉地上。', phrases:'follow up on / just following up / a quick follow-up / follow-up meeting', ex:'Just following up on the design review, any updates?', exZh:'跟进下设计评审这事,有进展吗?', img:'', rel:[] },
+  { id:'heads-up', emoji:'📢', title:'Heads up', term:'Heads up', category:'职场沟通', pron:'/ˈhedz ʌp/', ph:'嘿子-阿普', origin:'字面「抬起头」,原是提醒小心来球别被砸到,引申为提前给你打个招呼让你有准备。', meaning:'提前知会一声,让对方对即将发生的事有个心理准备,不被突然搞到。', zhExpr:'提前知会一声 / 给你打个招呼 / 提个醒 / 先跟你说一声', visual:'同事探头过来「先跟你说一声,下午要发版,你那块留意点」。', story:'运维没声不响重启了服务,业务那边一脸懵以为出故障了。复盘后大家约定:这类操作前先在群里发个 heads up,一句「heads up,三点重启」就能省掉一通慌乱。', misconception:'heads up 是好意的提前预警,不是事后甩锅或正式通知;说「just a heads up」是顺手提醒你一声,语气轻,别当成施压或追责。', phrases:'heads up / just a heads up / give you a heads up / thanks for the heads up', ex:'Just a heads up, the server will restart at 3pm.', exZh:'提前知会一声,服务器下午三点会重启。', img:'', rel:[] }
+];
+const SPOKEN_SCENES = {
+  "Standup":"组长 Leo:「快到点了,开始 standup,一人一句。」<br>新人小陈:「我昨天调通了支付回调,今天接对账,呃这个模块当初是因为……」<br>Leo:「停,standup 只说进度和 blocker,背景咱会后聊。」<br>小陈:「好——进度正常,没 blocker。」<br>Leo:「这就对了,十分钟散会。」",
+  "Sync":"前端阿康:「这字段你接口里到底叫 status 还是 state?我两边都对不上。」<br>后端小马:「啊我也没底,要不咱 sync 一下?」<br>阿康:「行,现在就碰,省得各写各的上线再炸。」<br>小马:「五分钟,我把字段表拉出来一起过。」<br>阿康:「这才叫对齐,刚才差点白干一天。」",
+  "Async":"组长 Leo:「这事别等开会了,美国那边时差对不上。」<br>国内同事小林:「那咋推?」<br>Leo:「async 推,写清楚丢文档评论区,他们上班自然接。」<br>小林:「不用拉会就行,我现在就写。」<br>Leo:「对,能 async 解决的就别占大家时间开会。」",
+  "Blocker":"组长 Leo:「standup 继续,小周你那边?」<br>小周:「我有个 blocker,后端接口没给,等两天了自己解不了。」<br>Leo:「这种早说啊,@后端阿明现在能给吗?」<br>阿明:「半小时,我马上补。」<br>Leo:「blocker 就该当场喊,烂在那才耽误。」",
+  "ETA":"产品丽姐:「登录这 bug 啥时候能好?要排发布。」<br>工程师老吴:「ETA 周四下午,不过卡在第三方依赖,可能往后顺一两天。」<br>丽姐:「行,你给了前提我心里有数,先按周四排。」<br>老吴:「真有变我提前 heads up,不会让你干等。」<br>丽姐:「这样靠谱,最怕答应了又跳票。」",
+  "Loop in":"法务珊姐:「这改动改了用户协议,咋没人告诉我?」<br>负责人阿涛:「确实我俩私聊就定了,该一开始 loop in 你的。」<br>珊姐:「以后这类事先把我拉进来,别上线才发现合规问题。」<br>阿涛:「记下了,往后涉合规第一时间 loop in 法务。」<br>珊姐:「拉我进来不是甩锅给我,是让我能早点把关。」",
+  "Follow up":"工程师小昊:「那份 spec 我发三天了一直没回。」<br>组长 Leo:「别干等,follow up 一下。」<br>小昊(消息):「just following up,spec 那边有进展吗?」<br>产品阿琳:「抱歉漏看了,今天给你。」<br>小昊:「该追就得追,不追这事就烂尾了。」",
+  "Heads up":"运维老郑:「heads up 一下,下午三点我要重启支付服务。」<br>业务小苏:「幸好你说,上次没打招呼直接重启,我们以为出故障了慌一通。」<br>老郑:「对,所以这次先给大家提个醒,留意点别误报。」<br>小苏:「这就好多了,thanks for the heads up。」<br>老郑:「举手之劳,省得大家白慌。」"
+};
+LEVELS.splice(6, 0, { id:12, emoji:'💬', color:'#14B8A6', bg:'#CCFBF1', tier:1, alwaysOpen:true, title:'职场口语黏合词', sub:'Workplace Glue Words', words:SPOKEN_WORDS });
+Object.assign(SCENE_DATA, SPOKEN_SCENES);
+
 // ══════════════════════════════════════════════
 // STATE
 // ══════════════════════════════════════════════
@@ -4736,7 +4760,7 @@ function renderHome(){
     // 解锁逻辑：Tier 1 逐关；Tier 2 首关靠 Tier1 进度；Tier 3 首关靠 Tier2 进度；其他关靠前一关完成
     let unlocked;
     if(!isTier2 && !isTier3) {
-      unlocked = i===0||(prevLv&&prevLv.words.filter(w=>learned[prevLv.id+'_'+w.id]).length===prevLv.words.length);
+      unlocked = i===0||lv.alwaysOpen||(prevLv&&prevLv.words.filter(w=>learned[prevLv.id+'_'+w.id]).length===prevLv.words.length);
     } else if(i===tier2FirstIdx) {
       unlocked = tier2Unlocked;
     } else if(i===tier3FirstIdx) {
