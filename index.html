@@ -4696,9 +4696,11 @@ function renderHome(){
   } else { rs.innerHTML = ''; }
   const total = LEVELS.reduce((a,l)=>a+l.words.length,0);
   const done  = Object.keys(learned).length;
+  let mastered = 0;  // v2.18: 真正精通(phase 3)才算"精通",与"已学"区分 —— 绿勾不再来太早
+  LEVELS.forEach(lv=>lv.words.forEach(w=>{ if(getPhase(lv.id+'_'+w.id)>=3) mastered++; }));
   const pct   = Math.round(done/total*100);
   document.getElementById('heroBar').style.width = pct+'%';
-  document.getElementById('heroLbl').textContent = '已掌握 '+done+' / '+total+' 词 · '+xp+' XP';
+  document.getElementById('heroLbl').textContent = '已学 '+done+' / '+total+' 词 · 精通 '+mastered+' · '+xp+' XP';
 
   const list = document.getElementById('lvList');
   // Tier 1 全部词汇数 & 已学数（用于 Tier 2/3 解锁判断）
@@ -4750,7 +4752,7 @@ function renderHome(){
         +'<h3>Lv.'+(i+1)+' · '+lv.title+'</h3>'
         +'<div class="sub">'+lv.sub+' · '+lv.words.length+'词</div>'
         +'<div class="lv-bar"><div class="lv-fill" style="width:'+lvPct+'%;background:'+lv.color+'"></div></div>'
-        +'<div class="lv-pct">'+lvDone+'/'+lv.words.length+' 已掌握</div>'
+        +'<div class="lv-pct">'+lvDone+'/'+lv.words.length+' 已学</div>'
       +'</div>'
       +'<div class="lv-badge" style="background:'+lv.bg+';color:'+lv.color+'">'+badge+'</div>'
     +'</div>';
@@ -5174,17 +5176,20 @@ function startQuiz(){
 }
 
 function startReviewQuiz(){
-  // 从全部已学词中随机抽题，不限于到期词，保证每次都有新鲜感
-  const allLearned=[];
+  // v2.18: 优先到期词(让 SRS 间隔重复真正起作用),不足 10 再用其它已学词随机补足(保持新鲜感)
+  const now=Date.now(), due=[], rest=[];
   LEVELS.forEach(lv=>lv.words.forEach(w=>{
     const key=lv.id+'_'+w.id;
-    if(learned[key]) allLearned.push({word:w, key});
+    if(!learned[key]) return;
+    const item={word:w, key};
+    if(now - learned[key] > getReviewInterval(key)) due.push(item); else rest.push(item);
   }));
-  if(!allLearned.length){ toast('还没有已学词汇，先去学几个词吧！'); return; }
+  if(!due.length && !rest.length){ toast('还没有已学词汇，先去学几个词吧！'); return; }
+  due.sort(()=>Math.random()-.5); rest.sort(()=>Math.random()-.5);
   _quizStartXp=xp; _sessionWrongKeys=new Set();
   resetQuizState();
   quizMode=QUIZ_MODE.REVIEW; curLv=null;
-  qItems=[...allLearned].sort(()=>Math.random()-.5).slice(0,10);
+  qItems=[...due, ...rest].slice(0,10);  // 到期词排前,优先复习
   showScreen('quiz');
   document.getElementById('n-home').classList.add('active');
   renderQuiz();
@@ -5540,7 +5545,7 @@ function showSingleWordResult(correct, wasReview){
     '<span class="be" style="font-size:52px">'+(correct?'✅':'❌')+'</span>'
     +'<h3 style="color:'+(correct?'var(--g)':'var(--r)')+';font-size:20px;margin-bottom:6px">'+(correct?'答对了！':'答错了')+'</h3>'
     +(correct
-      ?(wasReview?'<p style="margin-bottom:4px">复习完成，记忆强化 💪</p>':'<p style="color:var(--g);font-weight:900;margin-bottom:4px">已标为已掌握 +5 XP 🎉</p>')
+      ?(wasReview?'<p style="margin-bottom:4px">复习完成，记忆强化 💪</p>':'<p style="color:var(--g);font-weight:900;margin-bottom:4px">已学会一次 +5 XP 🎉<br><span style="font-size:11px;color:var(--mu);font-weight:600">隔几天复习答对才算真记牢</span></p>')
       :'<p style="color:var(--r);font-weight:700;margin-bottom:4px">已记入错题本'+(wrongCount>0?'（共 '+wrongCount+' 词）':'')+'<br><span style="font-size:11px;color:var(--mu);font-weight:600">稍后在首页错题专练复习</span></p>')
     +'<button class="btn btn-p" style="padding:12px;font-size:14px;margin-top:16px" onclick="closeSWResult();nextCard()">继续下一词 →</button>';
   document.getElementById('modal').classList.add('show');
