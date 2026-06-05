@@ -369,6 +369,12 @@ body.card-active #sc-card,body.quiz-active #sc-quiz{padding-bottom:0}
 .reteach-section-mis .reteach-section-txt{color:#78350f;font-size:14px;font-weight:800}
 .reteach-foot{padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));border-top:2px solid var(--br);background:var(--card);flex-shrink:0}
 .reteach-foot .btn{width:100%;margin:0}
+/* ===== v2.18 词卡一屏重构 ===== */
+.vc-thumb{width:54px;height:54px;border-radius:12px;object-fit:cover;cursor:zoom-in;border:2px solid var(--br);flex-shrink:0}
+.vc-hook{background:#FFF7E9;border:2px solid #F3D6AD;border-radius:var(--rads);padding:13px 15px;font-size:14px;font-weight:700;line-height:1.6;color:#8a5a10}
+.vc-hook .hk{font-size:11px;font-weight:900;color:#c96d10;display:block;margin-bottom:5px}
+.vc-more-btn{display:block;width:calc(100% - 40px);margin:14px 20px 18px;padding:12px;border:2px dashed var(--br);background:#fafafa;border-radius:14px;font-size:13px;font-weight:800;color:var(--mu);cursor:pointer}
+.vc-more-btn:active{transform:translateY(1px)}
 </style>
 </head>
 <body>
@@ -4537,6 +4543,12 @@ function toggleScene(btn){
   body.style.display = collapsed ? '' : 'none';
   btn.textContent = collapsed ? '收起' : '展开';
 }
+function toggleMore(btn){
+  const more = btn.nextElementSibling;
+  const open = more.style.display==='none';
+  more.style.display = open ? '' : 'none';
+  btn.textContent = open ? '收起 ▴' : '展开更多 · 例句 / 词源 / 怎么说 / 辨析 / 相关词 ▾';
+}
 
 let ttsEnabled = localStorage.getItem('tw_tts') !== '0'; // 默认开启，存 '0' 表示关闭
 function toggleTTS(){
@@ -4853,26 +4865,11 @@ function renderCard(){
           +'</div>'
           :'')
       +'</div>'
+      +(w.img?'<img class="vc-thumb" src="'+w.img+'" alt="" onclick="expandImg(\''+w.img+'\',\''+_esc(w.title)+'\')" onerror="this.remove()">':'')
     +'</div>';
 
-  let headerHtml;
-  if(w.img){
-    const imgJpg = w.img;
-    headerHtml =
-      '<div class="vc-head-img" onclick="expandImg(\''+imgJpg+'\',\''+_esc(w.title)+'\')">'
-        +'<img src="'+imgJpg+'" alt="'+w.title+'" onerror="this.parentElement.style.background=\''+lv.color+'\'">'
-        +'<button class="vc-img-expand" onclick="event.stopPropagation();expandImg(\''+imgJpg+'\',\''+_esc(w.title)+'\')">放大 ↗</button>'
-      +'</div>'
-      +wordBarHtml;
-  } else {
-    headerHtml =
-      '<div class="vc-head" style="background:linear-gradient(135deg,'+lv.color+','+_dk(lv.color,45)+')">'
-        +'<span class="vc-emoji">'+w.emoji+'</span>'
-        +'<div class="vc-term">'+w.title+'</div>'
-        +'<div class="vc-full">'+w.term+'</div>'
-        +'<div class="vc-pron"><button class="audio-btn" onclick="speak(\''+_esc(w.title)+'\')">🔊</button><span>'+w.pron+'</span></div>'
-      +'</div>';
-  }
+  // v2.18 一屏重构:图片缩成 word-bar 内缩略图(不再占首屏 C 位),词头统一用紧凑 word-bar
+  let headerHtml = wordBarHtml;
 
   // Phonetic section（v2.16.0 已移到 word-bar inline chip，此处不再渲染独立 section）
   const phoneticSec = '';
@@ -4961,21 +4958,22 @@ function renderCard(){
       +'<div class="related-chips">'+w.rel.map(r=>'<span class="rchip" onclick="searchWord(\''+_esc(r)+'\')">'+r+'</span>').join('')+'</div>'
     +'</div>' : '';
 
+  // v2.18 一屏重构:首屏只留 词头 + 核心含义 + 一个记忆钩;其余折叠进「更多」
+  const hookText = w.visual || w.story || (SCENE_DATA[w.title]||'');
+  const hookSec = hookText
+    ? '<div class="vc-section" style="border-bottom:none"><div class="vc-hook"><span class="hk">🧠 一句记忆钩</span>'+hookText+'</div></div>'
+    : '';
   document.getElementById('cardContent').innerHTML =
     '<div class="vocab-card">'
       +headerHtml
       +'<div class="vc-body">'
-        +meaningSec      // 核心含义前置
-        +sceneSec        // 情景故事紧跟含义（情景记忆，帮助理解）
-        +memoryToggle    // 记忆技巧（联想/场景）
-        +originSec
-        +phoneticSec     // 谐音记忆（词源后）
-        +zhExprSec
-        +phrasesSec
-        +exampleSec
-        +relSec
+        +meaningSec
+        +hookSec
+        +'<button class="vc-more-btn" onclick="toggleMore(this)">展开更多 · 例句 / 词源 / 怎么说 / 辨析 / 相关词 ▾</button>'
+        +'<div class="vc-more" style="display:none">'
+          +sceneSec+memoryToggle+originSec+phoneticSec+zhExprSec+phrasesSec+exampleSec+relSec+misconceptionToggle
+        +'</div>'
       +'</div>'
-      +misconceptionToggle
     +'</div>';
 
   // 更新底部固定栏的 CTA 按钮
