@@ -4359,11 +4359,14 @@ const SS = (k,v) => {
     }, 800);
   }
 })();
-let learned = JSON.parse(S('learned')||'{}');
-let wrong   = JSON.parse(S('wrong')||'{}'); // {wordKey: wrongCount}
-let phase   = JSON.parse(S('tw_phase')||'{}'); // {wordKey: 0-3} 词汇学习阶段
-let xp      = parseInt(S('xp')||'0');
-let streak  = parseInt(S('streak')||'0');
+// v2.18 白屏修复:localStorage 里 JSON 损坏时不再让顶层 JSON.parse 抛错炸成白屏,降级回默认值
+function loadJSON(k, fb){ try{ return JSON.parse(S(k)||fb); }catch(e){ return JSON.parse(fb); } }
+function loadInt(k, fb){ const n=parseInt(S(k)); return isNaN(n)?fb:n; }
+let learned = loadJSON('learned','{}');
+let wrong   = loadJSON('wrong','{}'); // {wordKey: wrongCount}
+let phase   = loadJSON('tw_phase','{}'); // {wordKey: 0-3} 词汇学习阶段
+let xp      = loadInt('xp',0);
+let streak  = loadInt('streak',0);
 
 // ── 词汇学习阶段 helpers ──
 // Phase 0=初见(recognition) / 1=识别(recall) / 2=回忆(cloze) / 3=精通(distinction/cloze)
@@ -4796,6 +4799,7 @@ function openCard(lvId, wId){
   showScreen('card');
   document.getElementById('n-home').classList.add('active');
   renderCard();
+  _scrollCardTop();   // bug②修复:点开词卡滚顶,词头不再被列表滚动位置/sticky 顶下去
 }
 
 function _esc(s){ return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
@@ -4985,7 +4989,7 @@ function renderCard(){
       ? '<button class="btn btn-g" onclick="testThisWord()">🔄 复习考察</button>'
       : '<button class="btn btn-p" onclick="testThisWord()">🎯 考考我</button>');
 
-  setTimeout(()=>speak(w.title), 400);
+  // v2.18 体验修复:翻卡/进入不再自动朗读(快速翻页音频叠加 + 公共场合尴尬 + iOS 脱离手势栈静默失败);改为点 🔊 手动播
 }
 
 // v2.17.7: 彻底滚顶（含 iOS Safari momentum + button focus 抵消问题）
@@ -5006,7 +5010,7 @@ function prevCard(){
   if(curIdx>0){curIdx--;renderCard();_scrollCardTop();}
 }
 function nextCard(){
-  if(curIdx<curLv.words.length-1){curIdx++;renderCard();_scrollCardTop();}
+  if(curIdx<curLv.words.length-1){curIdx++;showScreen('card');document.getElementById('n-home').classList.add('active');renderCard();_scrollCardTop();}  // bug①修复:补 showScreen,从单词测验走完能切回卡片屏、跳到下一词
   else{
     const lvWrong=curLv.words.filter(w=>wrong[curLv.id+'_'+w.id]>0).length;
     if(lvWrong>0) toast('🎉 本关浏览完毕！有 '+lvWrong+' 题错误，可在首页错题专练复习');
