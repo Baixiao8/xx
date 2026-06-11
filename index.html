@@ -137,12 +137,13 @@ body{font-family:'Nunito','Noto Sans SC',-apple-system,BlinkMacSystemFont,sans-s
 .vc-word-bar .audio-btn-lg{width:40px;height:40px;border-radius:50%;background:var(--pl);border:2px solid var(--p);font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all .15s}
 .vc-word-bar .audio-btn-lg:active{transform:scale(.9);background:var(--p)}
 .vc-word-bar-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
-.vc-word-bar-row{display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:0}
+/* v2.18.1: 标题禁截断——行允许 wrap,放不下时音标 chip 落到下一行(右对齐),单词永远完整可见 */
+.vc-word-bar-row{display:flex;align-items:center;justify-content:space-between;gap:6px 10px;min-width:0;flex-wrap:wrap}
 .vc-word-bar-row.row-end{justify-content:flex-end}
-.vc-word-bar-title{font-size:24px;font-weight:900;color:var(--tx);letter-spacing:-.3px;line-height:1.15;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1 1 auto;min-width:0}
-.vc-word-bar-full{font-size:11px;color:var(--mu);font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1 1 auto;min-width:0}
+.vc-word-bar-title{font-size:24px;font-weight:900;color:var(--tx);letter-spacing:-.3px;line-height:1.15;overflow-wrap:break-word;flex:1 1 auto;min-width:0}
+.vc-word-bar-full{font-size:11px;color:var(--mu);font-weight:700;overflow-wrap:break-word;flex:1 1 auto;min-width:0}
 .vc-word-bar-ph{background:#F4F4F6;color:#3a3a44;padding:2px 9px;border-radius:8px;font-size:10px;font-weight:800;white-space:nowrap;flex-shrink:0;border:1px solid var(--br)}
-.vc-word-bar-pron{font-size:12px;font-weight:800;color:var(--p);background:var(--pl);border-radius:var(--radp);padding:4px 10px;flex-shrink:0;white-space:nowrap}
+.vc-word-bar-pron{font-size:12px;font-weight:800;color:var(--p);background:var(--pl);border-radius:var(--radp);padding:4px 10px;flex-shrink:0;white-space:nowrap;margin-left:auto}
 
 /* Image fullscreen overlay */
 .img-ov{position:fixed;inset:0;background:rgba(0,0,0,.92);display:none;align-items:center;justify-content:center;z-index:300;padding:16px;flex-direction:column;gap:12px}
