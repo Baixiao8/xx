@@ -54,6 +54,7 @@
   .slide.dark .sub{color:#D9CBE6;}
   .slide.dark ul.clean li{color:#EADFF2;}
   .hero-bg{position:absolute;inset:0;background-size:cover;background-position:center;opacity:.42;}
+  .hero-art{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;}
   .hero-veil{position:absolute;inset:0;background:linear-gradient(115deg,rgba(30,18,45,.92) 0%,rgba(46,31,61,.72) 45%,rgba(46,31,61,.35) 100%);}
   .starfield i{position:absolute;width:3px;height:3px;background:var(--gold-soft);border-radius:50%;opacity:.7;box-shadow:0 0 8px var(--gold-soft);}
   .watermark{position:absolute; right:-70px; bottom:-70px; width:430px; height:430px; opacity:.10;}
@@ -102,6 +103,64 @@
       <circle cx="50" cy="50" r="9" fill="currentColor" stroke="none"/>
     </g>
   </symbol>
+  <symbol id="scene-night" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice">
+    <g fill="#F2C66B">
+      <circle cx="90" cy="80" r="2.4" opacity=".7"/><circle cx="200" cy="140" r="1.8" opacity=".5"/>
+      <circle cx="320" cy="70" r="2.6" opacity=".8"/><circle cx="430" cy="160" r="1.6" opacity=".5"/>
+      <circle cx="560" cy="90" r="2.2" opacity=".7"/><circle cx="680" cy="150" r="2.8" opacity=".9"/>
+      <circle cx="800" cy="70" r="1.8" opacity=".6"/><circle cx="930" cy="140" r="2.4" opacity=".7"/>
+      <circle cx="1050" cy="80" r="2" opacity=".6"/><circle cx="1170" cy="150" r="2.6" opacity=".8"/>
+      <circle cx="150" cy="240" r="1.6" opacity=".5"/><circle cx="380" cy="250" r="2.2" opacity=".7"/>
+      <circle cx="620" cy="235" r="1.8" opacity=".6"/><circle cx="1110" cy="250" r="1.8" opacity=".6"/>
+    </g>
+    <g fill="#E8A93B">
+      <circle cx="240" cy="330" r="2.2" opacity=".8"/><circle cx="330" cy="300" r="2.6" opacity=".9"/>
+      <circle cx="430" cy="285" r="3" opacity="1"/><circle cx="540" cy="275" r="2.6" opacity=".9"/>
+      <circle cx="650" cy="290" r="3.2" opacity="1"/><circle cx="760" cy="280" r="2.4" opacity=".85"/>
+      <circle cx="870" cy="300" r="2.8" opacity=".95"/><circle cx="980" cy="285" r="2.2" opacity=".8"/>
+    </g>
+    <path d="M0,720 L0,500 L180,410 L340,520 L520,380 L700,500 L880,340 L1080,480 L1280,400 L1280,720 Z" fill="#2a1b3d"/>
+    <path d="M0,720 L0,590 L240,510 L470,600 L720,490 L980,590 L1280,510 L1280,720 Z" fill="#1b1029"/>
+    <circle cx="700" cy="500" r="34" fill="#E8A93B" opacity=".22"/>
+    <circle cx="700" cy="500" r="14" fill="#E8A93B" opacity=".4"/>
+    <circle cx="700" cy="500" r="6" fill="#FBEFC4"/>
+  </symbol>
+  <symbol id="scene-radiant" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice">
+    <g stroke="#E8A93B" stroke-width="2" opacity=".3">
+      <line x1="920" y1="330" x2="920" y2="120"/><line x1="920" y1="330" x2="920" y2="540"/>
+      <line x1="920" y1="330" x2="710" y2="330"/><line x1="920" y1="330" x2="1130" y2="330"/>
+      <line x1="920" y1="330" x2="775" y2="185"/><line x1="920" y1="330" x2="1065" y2="185"/>
+      <line x1="920" y1="330" x2="775" y2="475"/><line x1="920" y1="330" x2="1065" y2="475"/>
+    </g>
+    <circle cx="920" cy="330" r="140" fill="#E8A93B" opacity=".10"/>
+    <circle cx="920" cy="330" r="80" fill="#E8A93B" opacity=".16"/>
+    <use href="#star" x="855" y="265" width="130" height="130" color="#F4D27A"/>
+    <g fill="#F2C66B">
+      <circle cx="700" cy="200" r="2.4" opacity=".7"/><circle cx="1140" cy="240" r="2.6" opacity=".8"/>
+      <circle cx="760" cy="520" r="2.2" opacity=".7"/><circle cx="1120" cy="500" r="2.4" opacity=".7"/>
+      <circle cx="980" cy="120" r="2" opacity=".6"/><circle cx="880" cy="560" r="2" opacity=".6"/>
+    </g>
+  </symbol>
+  <symbol id="scene-lattice" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice">
+    <g stroke="#B9A4C9" stroke-width="1.6" fill="none" opacity=".45">
+      <polygon points="950,330 1010,365 1010,435 950,470 890,435 890,365"/>
+      <polygon points="1070,330 1130,365 1130,435 1070,470 1010,435 1010,365"/>
+      <polygon points="830,330 890,365 890,435 830,470 770,435 770,365"/>
+      <polygon points="950,470 1010,505 1010,575 950,610 890,575 890,505"/>
+      <polygon points="1070,470 1130,505 1130,575 1070,610 1010,575 1010,505"/>
+      <polygon points="830,470 890,505 890,575 830,610 770,575 770,505"/>
+    </g>
+    <g fill="#E8A93B">
+      <circle cx="950" cy="400" r="5"/><circle cx="1070" cy="400" r="4"/>
+      <circle cx="830" cy="540" r="4"/><circle cx="950" cy="540" r="5"/>
+    </g>
+    <g fill="#F2C66B">
+      <circle cx="900" cy="240" r="2.4" opacity=".7"/><circle cx="1000" cy="200" r="2.8" opacity=".9"/>
+      <circle cx="1090" cy="250" r="2.2" opacity=".7"/><circle cx="820" cy="200" r="2" opacity=".6"/>
+      <circle cx="960" cy="140" r="2.6" opacity=".8"/><circle cx="1140" cy="170" r="2.2" opacity=".7"/>
+      <circle cx="740" cy="260" r="2" opacity=".6"/>
+    </g>
+  </symbol>
 </svg>
 
 <div id="bar">
@@ -113,7 +172,7 @@
 
 <!-- 1 COVER -->
 <section class="slide dark">
-  <div class="hero-bg" style="background-image:url('https://preview.qiantucdn.com/58pic/Ty/er/nl/7PX0Wif1A9pQrrGNzufolsg9NT2RpYJVbq_PIC2018.jpeg?e=1782316341&token=OyzEe_0O8H433pm7zVEjtnSy5dVdfpsIawO2nx3f:3Q8RyL1CFblgnPw9K8o5Gpu1QQQ=')"></div>
+  <svg class="hero-art" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice"><use href="#scene-night"/></svg>
   <div class="hero-veil"></div>
   <svg class="watermark"><use href="#star"/></svg>
   <div class="pad" style="justify-content:center;">
@@ -162,7 +221,7 @@
 
 <!-- 3 为什么做 / 使命 -->
 <section class="slide dark">
-  <div class="hero-bg" style="background-image:url('https://preview.qiantucdn.com/58pic/Bj/57/5t/6VKF0BlNcZpe7daTBgeflOIU2ltu4Qyy8W_PIC2018.jpeg?e=1782316409&token=OyzEe_0O8H433pm7zVEjtnSy5dVdfpsIawO2nx3f:-DD7QLsIVU4zJObsMqkYI5p7vvA=')"></div>
+  <svg class="hero-art" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice"><use href="#scene-radiant"/></svg>
   <div class="hero-veil"></div>
   <div class="pad" style="justify-content:center;max-width:60%;">
     <div class="kicker"><span class="dot"></span>为什么是 ASM 来做　第一性原理</div>
@@ -210,7 +269,7 @@
 
 <!-- 5 主题创意推导 -->
 <section class="slide dark">
-  <div class="hero-bg" style="background-image:url('https://preview.qiantucdn.com/58pic/zZ/55/TQ/tbKm1LgQliuxOIwXitrJOhVbcrWWk344yE_PIC2018.jpeg?e=1782316472&token=OyzEe_0O8H433pm7zVEjtnSy5dVdfpsIawO2nx3f:UZZ0-KFHzTzFNn8v_hxUJUmy50E=')"></div>
+  <svg class="hero-art" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice"><use href="#scene-lattice"/></svg>
   <div class="hero-veil"></div>
   <div class="pad" style="max-width:64%;">
     <div class="kicker"><span class="dot"></span>主题创意推导　Theme Derivation</div>
@@ -351,7 +410,7 @@
 
 <!-- 11 开幕+捐赠 + STEM -->
 <section class="slide">
-  <div class="hero-bg" style="opacity:.16;background-image:url('https://preview.qiantucdn.com/58pic/pu/V2/Sb/ATJy489nggikgHTZ7Ehz7C8cw29Z8l0bb2_PIC2018.jpeg?e=1782317081&token=OyzEe_0O8H433pm7zVEjtnSy5dVdfpsIawO2nx3f:u9ZGrvR0wKigVV0TfbMdiyNKDAA=')"></div>
+  <svg class="hero-art" style="opacity:.5" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice"><use href="#scene-radiant"/></svg>
   <div class="pad">
     <div class="kicker"><span class="dot"></span>DAY 2 · 10:20–12:00</div>
     <h2 class="htxt" style="margin-top:8px;">芯·启 ｜ 亲手点亮你的第一束光</h2>
@@ -384,7 +443,7 @@
 
 <!-- 12 芯·她 WIN -->
 <section class="slide dark">
-  <div class="hero-bg" style="background-image:url('https://preview.qiantucdn.com/58pic/AL/iE/K0/Tg2DkH0T2gqbOGjDrT6dxomKHabsHeTaq1_PIC2018.jpeg?e=1782316636&token=OyzEe_0O8H433pm7zVEjtnSy5dVdfpsIawO2nx3f:IELjRLGdqJF9v6FJcySSvEwiL1U=')"></div>
+  <svg class="hero-art" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice"><use href="#scene-radiant"/></svg>
   <div class="hero-veil"></div>
   <div class="pad" style="max-width:62%;">
     <div class="kicker"><span class="dot"></span>DAY 2 · 13:00–13:40</div>
@@ -406,7 +465,7 @@
 
 <!-- 13 芯·燃 运动会 -->
 <section class="slide">
-  <div class="hero-bg" style="opacity:.14;background-image:url('https://preview.qiantucdn.com/58pic/yl/3q/tX/xjRGzGX6YMamMaRL2U8CoV8oYChG84jOO2_PIC2018.jpeg?e=1782316676&token=OyzEe_0O8H433pm7zVEjtnSy5dVdfpsIawO2nx3f:StJiwwlEE_TtcIneUEVWha_VNGs=')"></div>
+  <svg class="hero-art" style="opacity:.5" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice"><use href="#scene-lattice"/></svg>
   <div class="pad">
     <div class="kicker"><span class="dot"></span>DAY 2 · 13:40–15:10 · 操场 / 篮球场</div>
     <h2 class="htxt" style="margin-top:8px;">芯·燃 ｜ 火，越烧越旺</h2>
@@ -435,7 +494,7 @@
 
 <!-- 14 芯·山 收尾 -->
 <section class="slide dark">
-  <div class="hero-bg" style="background-image:url('https://preview.qiantucdn.com/58pic/ZR/eu/rm/LaLL07UVMJy5XOoW1A4IxK0oSnifSVgRmm_PIC2018.jpeg?e=1782317219&token=OyzEe_0O8H433pm7zVEjtnSy5dVdfpsIawO2nx3f:8LxAcsRlI5Wtrd2neN6l2iPixME=')"></div>
+  <svg class="hero-art" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice"><use href="#scene-night"/></svg>
   <div class="hero-veil"></div>
   <div class="pad">
     <div class="kicker"><span class="dot"></span>DAY 2 · 15:10–16:00 · 收尾压轴</div>
@@ -659,7 +718,7 @@
 
 <!-- 21 CLOSING -->
 <section class="slide dark">
-  <div class="hero-bg" style="background-image:url('https://preview.qiantucdn.com/58pic/Ty/er/nl/7PX0Wif1A9pQrrGNzufolsg9NT2RpYJVbq_PIC2018.jpeg?e=1782316341&token=OyzEe_0O8H433pm7zVEjtnSy5dVdfpsIawO2nx3f:3Q8RyL1CFblgnPw9K8o5Gpu1QQQ=')"></div>
+  <svg class="hero-art" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice"><use href="#scene-night"/></svg>
   <div class="hero-veil" style="background:linear-gradient(0deg,rgba(30,18,45,.95),rgba(46,31,61,.7));"></div>
   <svg class="watermark"><use href="#star"/></svg>
   <div class="pad" style="justify-content:center;align-items:flex-start;">
