@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ASM 2026 木贡小学公益 · 芯火计划 · 执行方案</title>
+<style>
+  :root{
+    --purple:#5B3E70; --purple-deep:#2E1F3D; --purple-mid:#46315C;
+    --gold:#E8A93B; --gold-soft:#F2C66B; --lilac:#B9A4C9;
+    --ivory:#F7F3EF; --ink:#2C2433; --muted:#6E6478; --line:#E3D9EA;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{background:#1c1426; font-family:"PingFang SC","Microsoft YaHei","Source Han Sans SC","Noto Sans CJK SC",sans-serif; color:var(--ink); -webkit-font-smoothing:antialiased;}
+  .deck{display:flex; flex-direction:column; align-items:center; gap:26px; padding:34px 0 80px;}
+  .slide{
+    position:relative; width:1280px; height:720px; background:var(--ivory);
+    overflow:hidden; border-radius:14px; box-shadow:0 18px 60px rgba(0,0,0,.45);
+    flex:0 0 auto;
+  }
+  /* ---------- shared bits ---------- */
+  .pad{position:absolute; inset:0; padding:64px 76px; display:flex; flex-direction:column;}
+  .kicker{display:inline-flex; align-items:center; gap:9px; font-size:15px; letter-spacing:3px; color:var(--gold); font-weight:700; text-transform:uppercase;}
+  .kicker .dot{width:7px;height:7px;background:var(--gold);transform:rotate(45deg);}
+  h1.title{font-size:54px; line-height:1.18; color:var(--purple); font-weight:800; letter-spacing:1px;}
+  h2.htxt{font-size:40px; line-height:1.2; color:var(--purple); font-weight:800; margin-bottom:6px;}
+  .sub{font-size:19px; color:var(--muted); line-height:1.7; font-weight:500;}
+  .pagenum{position:absolute; right:34px; bottom:26px; font-size:13px; color:var(--lilac); letter-spacing:1px;}
+  .brand{position:absolute; left:40px; bottom:26px; font-size:13px; color:var(--lilac); letter-spacing:2px; font-weight:700;}
+  .rule{height:4px;width:74px;background:var(--gold);border-radius:3px;margin:14px 0 22px;}
+  .star{color:var(--gold);}
+  .star.purple{color:var(--purple);}
+  .tag{display:inline-block;background:rgba(232,169,59,.16);color:#A9711A;border:1px solid rgba(232,169,59,.5);
+       font-size:13px;font-weight:700;padding:4px 11px;border-radius:20px;margin:3px 6px 3px 0;letter-spacing:.5px;}
+  .tag.care{background:rgba(91,62,112,.12);color:var(--purple);border-color:rgba(91,62,112,.4);}
+  ul.clean{list-style:none;}
+  ul.clean li{position:relative; padding-left:26px; margin:11px 0; font-size:18px; line-height:1.6; color:#3a3340;}
+  ul.clean li::before{content:""; position:absolute; left:2px; top:9px; width:9px; height:9px; background:var(--gold); transform:rotate(45deg);}
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:22px;}
+  .grid3{display:grid; grid-template-columns:repeat(3,1fr); gap:18px;}
+  .card{background:#fff; border:1px solid var(--line); border-radius:12px; padding:22px 24px; box-shadow:0 4px 18px rgba(91,62,112,.06);}
+  .card h3{font-size:20px;color:var(--purple);margin-bottom:8px;font-weight:800;}
+  .card p{font-size:16px;color:#4b4350;line-height:1.6;}
+  .big{font-size:62px;font-weight:800;color:var(--gold);line-height:1;}
+  table{width:100%; border-collapse:collapse; font-size:15.5px;}
+  th,td{text-align:left; padding:10px 13px; border-bottom:1px solid var(--line); vertical-align:top; line-height:1.5;}
+  th{background:var(--purple); color:#fff; font-weight:700; letter-spacing:.5px;}
+  tr:nth-child(even) td{background:#faf6f2;}
+  td .hl{color:#A9711A; font-weight:700;}
+  .chip{display:inline-block;background:var(--purple);color:#fff;border-radius:8px;padding:3px 10px;font-size:13px;font-weight:700;}
+  /* ---------- dark / hero slides ---------- */
+  .slide.dark{background:var(--purple-deep);}
+  .slide.dark .htxt,.slide.dark h1.title{color:#fff;}
+  .slide.dark .sub{color:#D9CBE6;}
+  .slide.dark ul.clean li{color:#EADFF2;}
+  .hero-bg{position:absolute;inset:0;background-size:cover;background-position:center;opacity:.42;}
+  .hero-art{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;}
+  .hero-veil{position:absolute;inset:0;background:linear-gradient(115deg,rgba(30,18,45,.92) 0%,rgba(46,31,61,.72) 45%,rgba(46,31,61,.35) 100%);}
+  .starfield i{position:absolute;width:3px;height:3px;background:var(--gold-soft);border-radius:50%;opacity:.7;box-shadow:0 0 8px var(--gold-soft);}
+  .watermark{position:absolute; right:-70px; bottom:-70px; width:430px; height:430px; opacity:.10;}
+  .watermark.tl{right:auto;left:-90px;top:-90px;bottom:auto;}
+  .slogan{font-size:30px;color:var(--gold-soft);font-weight:700;letter-spacing:2px;}
+  .quote{font-size:34px;line-height:1.45;color:#fff;font-weight:700;}
+  .quote em{color:var(--gold-soft);font-style:normal;}
+  /* timeline */
+  .tl{display:flex;gap:0;margin-top:24px;}
+  .tl .step{flex:1;position:relative;padding:0 10px;text-align:center;}
+  .tl .step .node{width:54px;height:54px;margin:0 auto 12px;border-radius:50%;background:#fff;border:3px solid var(--gold);
+      display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--purple);font-weight:800;position:relative;z-index:2;}
+  .slide.dark .tl .step .node{background:var(--purple-mid);}
+  .tl .step::before{content:"";position:absolute;top:27px;left:-50%;width:100%;height:3px;background:var(--gold);opacity:.5;z-index:1;}
+  .tl .step:first-child::before{display:none;}
+  .tl .step .ttl{font-size:18px;font-weight:800;color:var(--purple);}
+  .slide.dark .tl .step .ttl{color:#fff;}
+  .tl .step .desc{font-size:13.5px;color:var(--muted);margin-top:4px;line-height:1.45;}
+  .slide.dark .tl .step .desc{color:#C9B9D8;}
+  .legend{font-size:14px;color:var(--muted);margin-top:8px;}
+  .note{font-size:14.5px;color:var(--muted);margin-top:auto;padding-top:14px;line-height:1.55;}
+  .twocol{column-count:2;column-gap:40px;}
+  /* toolbar */
+  #bar{position:fixed;top:0;left:0;right:0;height:0;z-index:50;}
+  #bar .btn{position:fixed;top:16px;right:18px;background:var(--gold);color:#3a2a14;border:none;padding:10px 16px;border-radius:24px;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.3);}
+  #bar .hint{position:fixed;top:18px;left:18px;color:#C9B9D8;font-size:13px;background:rgba(0,0,0,.35);padding:8px 13px;border-radius:18px;}
+  @media print{
+    html,body{background:#fff;}
+    #bar{display:none;}
+    .deck{gap:0;padding:0;}
+    .slide{border-radius:0;box-shadow:none;page-break-after:always;break-after:page;margin:0;}
+    @page{size:1280px 720px;margin:0;}
+  }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="star" viewBox="0 0 100 100">
+    <g stroke="currentColor" fill="none" stroke-width="2.4" stroke-linejoin="round">
+      <polygon points="50,5 88.97,27.5 88.97,72.5 50,95 11.03,72.5 11.03,27.5"/>
+      <line x1="50" y1="5" x2="50" y2="95"/>
+      <line x1="11.03" y1="27.5" x2="88.97" y2="72.5"/>
+      <line x1="88.97" y1="27.5" x2="11.03" y2="72.5"/>
+      <line x1="11.03" y1="50" x2="88.97" y2="50"/>
+      <circle cx="50" cy="50" r="9" fill="currentColor" stroke="none"/>
+    </g>
+  </symbol>
+  <symbol id="scene-night" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice">
+    <g fill="#F2C66B">
+      <circle cx="90" cy="80" r="2.4" opacity=".7"/><circle cx="200" cy="140" r="1.8" opacity=".5"/>
+      <circle cx="320" cy="70" r="2.6" opacity=".8"/><circle cx="430" cy="160" r="1.6" opacity=".5"/>
+      <circle cx="560" cy="90" r="2.2" opacity=".7"/><circle cx="680" cy="150" r="2.8" opacity=".9"/>
+      <circle cx="800" cy="70" r="1.8" opacity=".6"/><circle cx="930" cy="140" r="2.4" opacity=".7"/>
+      <circle cx="1050" cy="80" r="2" opacity=".6"/><circle cx="1170" cy="150" r="2.6" opacity=".8"/>
+      <circle cx="150" cy="240" r="1.6" opacity=".5"/><circle cx="380" cy="250" r="2.2" opacity=".7"/>
+      <circle cx="620" cy="235" r="1.8" opacity=".6"/><circle cx="1110" cy="250" r="1.8" opacity=".6"/>
+    </g>
+    <g fill="#E8A93B">
+      <circle cx="240" cy="330" r="2.2" opacity=".8"/><circle cx="330" cy="300" r="2.6" opacity=".9"/>
+      <circle cx="430" cy="285" r="3" opacity="1"/><circle cx="540" cy="275" r="2.6" opacity=".9"/>
+      <circle cx="650" cy="290" r="3.2" opacity="1"/><circle cx="760" cy="280" r="2.4" opacity=".85"/>
+      <circle cx="870" cy="300" r="2.8" opacity=".95"/><circle cx="980" cy="285" r="2.2" opacity=".8"/>
+    </g>
+    <path d="M0,720 L0,500 L180,410 L340,520 L520,380 L700,500 L880,340 L1080,480 L1280,400 L1280,720 Z" fill="#2a1b3d"/>
+    <path d="M0,720 L0,590 L240,510 L470,600 L720,490 L980,590 L1280,510 L1280,720 Z" fill="#1b1029"/>
+    <circle cx="700" cy="500" r="34" fill="#E8A93B" opacity=".22"/>
+    <circle cx="700" cy="500" r="14" fill="#E8A93B" opacity=".4"/>
+    <circle cx="700" cy="500" r="6" fill="#FBEFC4"/>
+  </symbol>
+  <symbol id="scene-radiant" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice">
+    <g stroke="#E8A93B" stroke-width="2" opacity=".3">
+      <line x1="920" y1="330" x2="920" y2="120"/><line x1="920" y1="330" x2="920" y2="540"/>
+      <line x1="920" y1="330" x2="710" y2="330"/><line x1="920" y1="330" x2="1130" y2="330"/>
+      <line x1="920" y1="330" x2="775" y2="185"/><line x1="920" y1="330" x2="1065" y2="185"/>
+      <line x1="920" y1="330" x2="775" y2="475"/><line x1="920" y1="330" x2="1065" y2="475"/>
+    </g>
+    <circle cx="920" cy="330" r="140" fill="#E8A93B" opacity=".10"/>
+    <circle cx="920" cy="330" r="80" fill="#E8A93B" opacity=".16"/>
+    <use href="#star" x="855" y="265" width="130" height="130" color="#F4D27A"/>
+    <g fill="#F2C66B">
+      <circle cx="700" cy="200" r="2.4" opacity=".7"/><circle cx="1140" cy="240" r="2.6" opacity=".8"/>
+      <circle cx="760" cy="520" r="2.2" opacity=".7"/><circle cx="1120" cy="500" r="2.4" opacity=".7"/>
+      <circle cx="980" cy="120" r="2" opacity=".6"/><circle cx="880" cy="560" r="2" opacity=".6"/>
+    </g>
+  </symbol>
+  <symbol id="scene-lattice" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice">
+    <g stroke="#B9A4C9" stroke-width="1.6" fill="none" opacity=".45">
+      <polygon points="950,330 1010,365 1010,435 950,470 890,435 890,365"/>
+      <polygon points="1070,330 1130,365 1130,435 1070,470 1010,435 1010,365"/>
+      <polygon points="830,330 890,365 890,435 830,470 770,435 770,365"/>
+      <polygon points="950,470 1010,505 1010,575 950,610 890,575 890,505"/>
+      <polygon points="1070,470 1130,505 1130,575 1070,610 1010,575 1010,505"/>
+      <polygon points="830,470 890,505 890,575 830,610 770,575 770,505"/>
+    </g>
+    <g fill="#E8A93B">
+      <circle cx="950" cy="400" r="5"/><circle cx="1070" cy="400" r="4"/>
+      <circle cx="830" cy="540" r="4"/><circle cx="950" cy="540" r="5"/>
+    </g>
+    <g fill="#F2C66B">
+      <circle cx="900" cy="240" r="2.4" opacity=".7"/><circle cx="1000" cy="200" r="2.8" opacity=".9"/>
+      <circle cx="1090" cy="250" r="2.2" opacity=".7"/><circle cx="820" cy="200" r="2" opacity=".6"/>
+      <circle cx="960" cy="140" r="2.6" opacity=".8"/><circle cx="1140" cy="170" r="2.2" opacity=".7"/>
+      <circle cx="740" cy="260" r="2" opacity=".6"/>
+    </g>
+  </symbol>
+  <symbol id="sp-umbrella" viewBox="0 0 360 220">
+    <g fill="#F2C66B"><circle cx="120" cy="50" r="7"/><circle cx="180" cy="35" r="6"/><circle cx="240" cy="55" r="7"/><circle cx="150" cy="72" r="5"/><circle cx="210" cy="74" r="5"/></g>
+    <path d="M70,150 Q180,40 290,150 Z" fill="#5B3E70"/>
+    <path d="M70,150 Q180,40 290,150" fill="none" stroke="#B9A4C9" stroke-width="2"/>
+    <g stroke="#2E1F3D" stroke-width="2" opacity=".5"><line x1="112" y1="118" x2="125" y2="150"/><line x1="150" y1="96" x2="156" y2="150"/><line x1="180" y1="88" x2="180" y2="150"/><line x1="210" y1="96" x2="204" y2="150"/><line x1="248" y1="118" x2="235" y2="150"/></g>
+    <rect x="55" y="170" width="250" height="6" rx="3" fill="#46315C"/>
+    <g fill="#E8A93B"><circle cx="72" cy="160" r="9"/><circle cx="180" cy="166" r="9"/><circle cx="288" cy="160" r="9"/></g>
+  </symbol>
+  <symbol id="sp-chip" viewBox="0 0 360 220">
+    <path d="M40,185 L320,185" stroke="#F2C66B" stroke-width="2" stroke-dasharray="6 7"/>
+    <g fill="#B9A4C9"><path d="M60,185 L70,160 L80,185 Z"/><path d="M280,185 L290,160 L300,185 Z"/></g>
+    <ellipse cx="150" cy="150" rx="80" ry="15" fill="#46315C"/>
+    <rect x="222" y="146" width="74" height="8" rx="4" fill="#5B3E70"/>
+    <rect x="120" y="108" width="58" height="42" rx="5" fill="#E8A93B"/>
+    <g stroke="#2E1F3D" stroke-width="3"><line x1="120" y1="120" x2="107" y2="120"/><line x1="120" y1="138" x2="107" y2="138"/><line x1="178" y1="120" x2="191" y2="120"/><line x1="178" y1="138" x2="191" y2="138"/></g>
+    <circle cx="149" cy="129" r="8" fill="#FBEFC4"/>
+  </symbol>
+  <symbol id="sp-caterpillar" viewBox="0 0 360 220">
+    <g stroke="#F2C66B" stroke-width="2" opacity=".6"><line x1="55" y1="105" x2="80" y2="105"/><line x1="50" y1="120" x2="75" y2="120"/><line x1="55" y1="135" x2="80" y2="135"/></g>
+    <g stroke="#2E1F3D" stroke-width="3"><line x1="110" y1="146" x2="110" y2="164"/><line x1="155" y1="146" x2="155" y2="164"/><line x1="200" y1="146" x2="200" y2="164"/><line x1="245" y1="146" x2="245" y2="164"/></g>
+    <circle cx="110" cy="120" r="26" fill="#5B3E70"/><circle cx="155" cy="120" r="26" fill="#6a4a7e"/><circle cx="200" cy="120" r="26" fill="#5B3E70"/><circle cx="245" cy="120" r="26" fill="#6a4a7e"/><circle cx="290" cy="118" r="28" fill="#E8A93B"/>
+    <circle cx="298" cy="112" r="4" fill="#2E1F3D"/><path d="M286,128 Q298,138 308,127" fill="none" stroke="#2E1F3D" stroke-width="3"/>
+  </symbol>
+  <symbol id="sp-relay" viewBox="0 0 360 220">
+    <path d="M160,118 Q235,40 300,108" fill="none" stroke="#F2C66B" stroke-width="2" stroke-dasharray="5 6"/>
+    <ellipse cx="118" cy="118" rx="40" ry="50" fill="none" stroke="#B9A4C9" stroke-width="6"/>
+    <g stroke="#46315C" stroke-width="2"><line x1="98" y1="80" x2="98" y2="158"/><line x1="118" y1="73" x2="118" y2="164"/><line x1="138" y1="80" x2="138" y2="158"/><line x1="82" y1="100" x2="154" y2="100"/><line x1="80" y1="118" x2="156" y2="118"/><line x1="82" y1="136" x2="154" y2="136"/></g>
+    <line x1="118" y1="168" x2="118" y2="205" stroke="#5B3E70" stroke-width="8" stroke-linecap="round"/>
+    <circle cx="300" cy="108" r="22" fill="#E8A93B" opacity=".25"/><circle cx="300" cy="108" r="13" fill="#E8A93B"/>
+  </symbol>
+  <symbol id="sp-tug" viewBox="0 0 360 220">
+    <line x1="30" y1="132" x2="330" y2="132" stroke="#9a7a52" stroke-width="6"/>
+    <line x1="180" y1="96" x2="180" y2="136" stroke="#2E1F3D" stroke-width="3"/><path d="M180,99 L206,107 L180,115 Z" fill="#E8A93B"/>
+    <g fill="#5B3E70"><circle cx="68" cy="126" r="13"/><circle cx="100" cy="130" r="13"/></g>
+    <g fill="#E8A93B"><circle cx="292" cy="126" r="13"/><circle cx="260" cy="130" r="13"/></g>
+    <g stroke="#F2C66B" stroke-width="2" opacity=".6"><line x1="38" y1="152" x2="54" y2="152"/><line x1="306" y1="152" x2="322" y2="152"/></g>
+  </symbol>
+  <symbol id="sp-basket" viewBox="0 0 360 220">
+    <path d="M70,182 Q150,40 246,110" fill="none" stroke="#F2C66B" stroke-width="2" stroke-dasharray="5 6"/>
+    <rect x="248" y="38" width="72" height="52" rx="4" fill="none" stroke="#B9A4C9" stroke-width="4"/>
+    <line x1="284" y1="90" x2="284" y2="108" stroke="#46315C" stroke-width="4"/>
+    <ellipse cx="270" cy="110" rx="22" ry="6" fill="none" stroke="#E8A93B" stroke-width="4"/>
+    <path d="M250,112 Q270,138 290,112" fill="none" stroke="#F2C66B" stroke-width="2"/>
+    <circle cx="70" cy="182" r="24" fill="#E8A93B"/>
+    <g stroke="#2E1F3D" stroke-width="2" fill="none"><path d="M46,182 H94"/><path d="M70,158 V206"/><path d="M52,166 Q70,182 52,198"/><path d="M88,166 Q70,182 88,198"/></g>
+  </symbol>
+  <symbol id="f-canvas" viewBox="0 0 360 260">
+    <rect x="30" y="40" width="300" height="150" rx="8" fill="#2E1F3D" stroke="#B9A4C9" stroke-width="2"/>
+    <path d="M30,190 L30,150 L110,112 L190,160 L270,122 L330,160 L330,190 Z" fill="#46315C"/>
+    <g stroke="#E8A93B" stroke-width="1.5" opacity=".7"><line x1="80" y1="80" x2="140" y2="70"/><line x1="140" y1="70" x2="200" y2="90"/><line x1="200" y1="90" x2="262" y2="70"/></g>
+    <g fill="#F2C66B"><circle cx="80" cy="80" r="5"/><circle cx="140" cy="70" r="6"/><circle cx="200" cy="90" r="5"/><circle cx="262" cy="70" r="6"/><circle cx="110" cy="100" r="3"/><circle cx="232" cy="104" r="3"/></g>
+    <line x1="250" y1="228" x2="300" y2="200" stroke="#5B3E70" stroke-width="8" stroke-linecap="round"/><path d="M242,231 L259,240 L251,222 Z" fill="#E8A93B"/>
+  </symbol>
+  <symbol id="f-pass" viewBox="0 0 360 220">
+    <g fill="#F2C66B"><circle cx="40" cy="40" r="3"/><circle cx="180" cy="34" r="3"/><circle cx="305" cy="42" r="3"/></g>
+    <g transform="translate(45,95)"><circle r="32" fill="#E8A93B" opacity=".22"/><polygon points="0,-22 19,-11 19,11 0,22 -19,11 -19,-11" fill="#E8A93B"/></g>
+    <g transform="translate(115,95)"><circle r="24" fill="#E8A93B" opacity=".16"/><polygon points="0,-22 19,-11 19,11 0,22 -19,11 -19,-11" fill="#E8A93B"/></g>
+    <g transform="translate(185,95)"><polygon points="0,-22 19,-11 19,11 0,22 -19,11 -19,-11" fill="#c79f48"/></g>
+    <g transform="translate(255,95)"><polygon points="0,-22 19,-11 19,11 0,22 -19,11 -19,-11" fill="#5B3E70" stroke="#B9A4C9" stroke-width="1.5"/></g>
+    <g transform="translate(322,95)"><polygon points="0,-22 19,-11 19,11 0,22 -19,11 -19,-11" fill="#46315C" stroke="#B9A4C9" stroke-width="1.5"/></g>
+    <g stroke="#F2C66B" stroke-width="2" stroke-dasharray="4 5" opacity=".85"><path d="M78,95 H92"/><path d="M148,95 H162"/></g>
+  </symbol>
+  <symbol id="f-capsule" viewBox="0 0 360 240">
+    <rect x="34" y="92" width="146" height="26" rx="8" fill="#46315C"/>
+    <rect x="42" y="112" width="130" height="100" rx="10" fill="#5B3E70"/>
+    <use href="#star" x="88" y="135" width="38" height="38" color="#E8A93B"/>
+    <rect x="200" y="98" width="120" height="112" rx="8" fill="#2E1F3D" stroke="#E8A93B" stroke-width="2"/>
+    <line x1="200" y1="98" x2="200" y2="210" stroke="#E8A93B" stroke-width="6"/>
+    <use href="#star" x="238" y="118" width="42" height="42" color="#F2C66B"/>
+    <rect x="304" y="118" width="10" height="68" fill="#E8A93B"/>
+    <line x1="250" y1="226" x2="298" y2="206" stroke="#B9A4C9" stroke-width="6" stroke-linecap="round"/>
+  </symbol>
+</svg>
+
+<div id="bar">
+  <div class="hint">← → 翻页 ｜ 汇报时按浏览器全屏</div>
+  <button class="btn" onclick="window.print()">⬇ 导出 PDF（打印）</button>
+</div>
+
+<div class="deck">
+
+<!-- 1 COVER -->
+<section class="slide dark">
+  <svg class="hero-art" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice"><use href="#scene-night"/></svg>
+  <div class="hero-veil"></div>
+  <svg class="watermark"><use href="#star"/></svg>
+  <div class="pad" style="justify-content:center;">
+    <div class="kicker"><span class="dot"></span>ASM × 木贡小学 · 2026 助学公益</div>
+    <h1 class="title" style="font-size:72px;margin-top:18px;">芯火计划</h1>
+    <div class="rule"></div>
+    <div class="slogan">每个孩子，都是一束等待被点亮的光</div>
+    <div class="slogan" style="color:#fff;font-size:26px;margin-top:6px;">— 一束芯火，照亮一座山 —</div>
+    <div class="sub" style="margin-top:30px;color:#CBB9DC;">贵州 · 六盘水 · 木贡小学　|　线下公益面对面专场　|　执行方案</div>
+  </div>
+  <div class="brand">ASM · WE CARE</div>
+</section>
+
+<!-- 2 项目概览 -->
+<section class="slide">
+  <div class="pad">
+    <div class="kicker"><span class="dot"></span>项目概览　Project Overview</div>
+    <h2 class="htxt" style="margin-top:10px;">一次把"陪伴"做实的线下公益专场</h2>
+    <div class="rule"></div>
+    <div class="grid3" style="margin-bottom:22px;">
+      <div class="card"><div class="big">3<span style="font-size:24px;">天</span></div><p style="margin-top:8px;">重点设计 Day1 晚间破冰 + Day2 全天面对面公益</p></div>
+      <div class="card"><div class="big">20<span style="font-size:24px;">+20</span></div><p style="margin-top:8px;">ASM 工程师约 20 人（含女性工程师）× 木贡学生约 20 人，<span class="hl">1:1 结对</span></p></div>
+      <div class="card"><div class="big">5<span style="font-size:24px;">年</span></div><p style="margin-top:8px;">自 2021 定点帮扶至今，2026 升级为线下专场</p></div>
+    </div>
+    <div class="grid2">
+      <div>
+        <h3 style="color:var(--purple);font-size:20px;margin-bottom:6px;">背景</h3>
+        <ul class="clean">
+          <li>木贡留守儿童占比高，科创、文体、线下陪伴资源稀缺</li>
+          <li>以往以物资捐赠、远程研学为主；2026 落地<span class="hl">校园线下专场</span></li>
+          <li>融合科创科普 + 文体互动 + 物资捐赠，以面对面陪伴深化校企长效合作</li>
+        </ul>
+      </div>
+      <div>
+        <h3 style="color:var(--purple);font-size:20px;margin-bottom:6px;">本方案目标（可衡量）</h3>
+        <ul class="clean">
+          <li>20 个孩子，每人<span class="hl">亲手点亮一颗 LED</span>、完成一件科创作品</li>
+          <li>每个孩子获得 1 位工程师全程 1:1 陪伴与一封"未来之信"</li>
+          <li>留下：星河长卷 + 时间胶囊 + 运动角，延续到下次回访</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="brand">芯火计划</div><div class="pagenum">02</div>
+</section>
+
+<!-- 3 为什么做 / 使命 -->
+<section class="slide dark">
+  <svg class="hero-art" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice"><use href="#scene-radiant"/></svg>
+  <div class="hero-veil"></div>
+  <div class="pad" style="justify-content:center;max-width:60%;">
+    <div class="kicker"><span class="dot"></span>为什么是 ASM 来做　第一性原理</div>
+    <div class="quote" style="margin-top:20px;">"科技本身不改变世界，<br><em>是人，改变世界。</em>"</div>
+    <div class="sub" style="margin-top:16px;color:#CBB9DC;">—— ASM 官方使命：People are at the heart of ASM</div>
+    <ul class="clean" style="margin-top:22px;">
+      <li>ASM 造世界上最精密的芯片设备，但 ASM 自己相信：真正改变世界的是<span style="color:var(--gold-soft);font-weight:700;">人</span></li>
+      <li>所以对"人"的投资，才是 ASM 使命最真实的表达</li>
+      <li>山区的孩子，正是<span style="color:var(--gold-soft);font-weight:700;">未来可能改变世界的人</span></li>
+      <li>→ 这不是科技公司顺便做善事，而是 ASM 使命最纯粹的一次落地</li>
+    </ul>
+  </div>
+  <svg class="watermark"><use href="#star"/></svg>
+  <div class="brand">芯火计划</div><div class="pagenum">03</div>
+</section>
+
+<!-- 4 价值观DNA -->
+<section class="slide">
+  <div class="pad">
+    <div class="kicker"><span class="dot"></span>价值观地基　全程对齐，绝不偏离</div>
+    <h2 class="htxt" style="margin-top:10px;">每个环节，都长在 ASM 的价值观上</h2>
+    <div class="rule"></div>
+    <div class="grid3">
+      <div class="card" style="border-top:5px solid var(--gold);">
+        <h3>We Innovate · 创新</h3>
+        <p>STEM 科研讲座、亲手点亮 LED、动手实验——激发好奇心与创新思维。</p>
+      </div>
+      <div class="card" style="border-top:5px solid var(--gold);">
+        <h3>We Deliver · 兑现</h3>
+        <p>2021 至今 5 年定点帮扶；时间胶囊、长期之约——说到做到，持续兑现。</p>
+      </div>
+      <div class="card" style="border-top:5px solid var(--gold);">
+        <h3>We Care · 关怀</h3>
+        <p>1:1 面对面陪伴、平等不俯视、孩子是主人——把陪伴做实。</p>
+      </div>
+    </div>
+    <div class="card" style="margin-top:22px;background:#faf6f2;">
+      <p style="font-size:17px;color:#4b4350;">
+      <span class="chip">WIN</span>　Women's Initiative Network：「当有抱负、多元的头脑汇聚，才有开创性的进步」——本次由女性工程师把这份信念，从 ASM 员工延伸给大山里的女孩。
+      &nbsp;&nbsp;<span class="chip" style="background:var(--gold);color:#3a2a14;">STEM</span>　ASM 全球长期支持 STEM 与社区项目，与学校、NGO 合作——本次正是该战略的一环。</p>
+    </div>
+  </div>
+  <div class="brand">芯火计划</div><div class="pagenum">04</div>
+</section>
+
+<!-- 5 主题创意推导 -->
+<section class="slide dark">
+  <svg class="hero-art" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice"><use href="#scene-lattice"/></svg>
+  <div class="hero-veil"></div>
+  <div class="pad" style="max-width:64%;">
+    <div class="kicker"><span class="dot"></span>主题创意推导　Theme Derivation</div>
+    <h2 class="htxt" style="margin-top:8px;color:#fff;">为什么叫「芯火计划」</h2>
+    <div class="rule"></div>
+    <div class="grid2" style="gap:16px;">
+      <div class="card" style="background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.16);">
+        <h3 style="color:var(--gold-soft);">「芯」一字三义</h3>
+        <p style="color:#EADFF2;"><b>芯</b>＝芯片（ASM 基因）｜谐音 <b>心</b>（We Care 的温度）｜谐音 <b>星</b>，「芯火」即「星火」——星星之火，可以燎原。</p>
+      </div>
+      <div class="card" style="background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.16);">
+        <h3 style="color:var(--gold-soft);">方法＝ALD 逐层点亮</h3>
+        <p style="color:#EADFF2;">ASM 的本业是 <b>ALD 原子层沉积</b>：伟大不是一蹴而就，而是一层一层、精准而耐心地生长出来——这正是教育与成长的真相。</p>
+      </div>
+    </div>
+    <ul class="clean" style="margin-top:14px;">
+      <li><b style="color:#fff;">每个孩子，都是一束等待被点亮的光</b>（前提：光本就在）</li>
+      <li><b style="color:#fff;">我们像做 ALD 一样点亮它</b>——一层陪伴、一层赋能、不急于求成（方法）</li>
+      <li><b style="color:var(--gold-soft);">每束光连起来，照亮一座山</b>（结果：人汇聚成改变世界的力量）</li>
+    </ul>
+  </div>
+  <svg class="watermark"><use href="#star"/></svg>
+  <div class="brand">芯火计划</div><div class="pagenum">05</div>
+</section>
+
+<!-- 6 视觉母题 -->
+<section class="slide">
+  <div class="pad">
+    <div class="kicker"><span class="dot"></span>视觉母题　Visual Key</div>
+    <h2 class="htxt" style="margin-top:10px;">让 ASM 的品牌符号，长进公益的视觉里</h2>
+    <div class="rule"></div>
+    <div class="grid2" style="align-items:center;">
+      <div style="text-align:center;">
+        <svg style="width:230px;height:230px;color:var(--purple);"><use href="#star"/></svg>
+        <p class="legend" style="font-size:16px;">ASM logo ＝ 六边形里的星形 / 晶格结构</p>
+      </div>
+      <div>
+        <ul class="clean">
+          <li>它像一颗 <b class="star purple">星</b> → 呼应"星河长卷"与"照亮一座山"</li>
+          <li>它又像 <b class="star purple">晶格 / 原子层</b> → 对上 ALD 逐层生长的技术内核</li>
+          <li>孩子画的每一颗"星" = logo 的星形几何（统一图形语言）</li>
+          <li>星河上"星与星的连线" = logo 内部的线条结构</li>
+          <li>每页以星形做隐性栅格与装饰，<b>品牌符号自然生长，而非贴角标</b></li>
+        </ul>
+        <div class="card" style="margin-top:10px;background:#faf6f2;">
+          <p><b style="color:var(--purple);">三位一体：</b>视觉（星河/晶格）＝ 技术（ALD）＝ 价值观（点亮人）。一眼看懂，无法复制。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="brand">芯火计划</div><div class="pagenum">06</div>
+</section>
+
+<!-- 7 情感主线 全景故事线 -->
+<section class="slide dark">
+  <div class="pad">
+    <div class="kicker"><span class="dot"></span>全景故事线　Emotional Arc</div>
+    <h2 class="htxt" style="color:#fff;margin-top:8px;">从一束火，到照亮一座山</h2>
+    <div class="rule"></div>
+    <div class="tl">
+      <div class="step"><div class="node">遇</div><div class="ttl">芯·遇</div><div class="desc">Day1 晚<br>破冰结对<br><b>相遇</b></div></div>
+      <div class="step"><div class="node">启</div><div class="ttl">芯·启</div><div class="desc">Day2 上午<br>STEM 讲座<br><b>开眼界</b></div></div>
+      <div class="step"><div class="node">她</div><div class="ttl">芯·她</div><div class="desc">Day2 午后<br>WIN 领导力<br><b>榜样</b></div></div>
+      <div class="step"><div class="node">燃</div><div class="ttl">芯·燃</div><div class="desc">Day2 下午<br>运动会篮球<br><b>并肩</b></div></div>
+      <div class="step"><div class="node">山</div><div class="ttl">芯·山</div><div class="desc">Day2 收尾<br>星河·传光·胶囊<br><b>升华·回响</b></div></div>
+    </div>
+    <div class="grid2" style="margin-top:34px;gap:30px;">
+      <div class="card" style="background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.16);">
+        <p style="color:#EADFF2;font-size:17px;">五章以「芯·X」串联，每一章都让 slogan 回响一次；情绪层层升温，最终收束到 <b style="color:var(--gold-soft);">"一束芯火，照亮一座山"</b>。</p>
+      </div>
+      <div class="card" style="background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.16);">
+        <p style="color:#EADFF2;font-size:17px;">孩子的内心变化：陌生 → "我有搭档" → "我也是工程师" → "女孩也能当领导" → "我能赢" → <b style="color:var(--gold-soft);">"我留下了光，未来会回响"</b>。</p>
+      </div>
+    </div>
+  </div>
+  <svg class="watermark tl"><use href="#star"/></svg>
+  <div class="brand">芯火计划</div><div class="pagenum">07</div>
+</section>
+
+<!-- 8 三天总行程 -->
+<section class="slide">
+  <div class="pad">
+    <div class="kicker"><span class="dot"></span>整体行程　3-Day Itinerary</div>
+    <h2 class="htxt" style="margin-top:8px;">三天总览（重点：Day1 晚 + Day2 全天）</h2>
+    <div class="rule"></div>
+    <table>
+      <tr><th style="width:90px;">日期</th><th style="width:150px;">时间</th><th>活动</th><th style="width:150px;">地点</th></tr>
+      <tr><td rowspan="2"><b>Day1</b></td><td>17:00–18:00</td><td>抵达六盘水 · 入住休整</td><td>市区酒店</td></tr>
+      <tr><td><span class="hl">18:00–19:30</span></td><td><b>芯·遇：公益破冰 + 结对晚宴</b>（重点）</td><td>酒店会议室</td></tr>
+      <tr><td rowspan="3"><b>Day2</b></td><td>08:00–10:00</td><td>前往木贡小学（车程约 90 分钟）</td><td>大巴</td></tr>
+      <tr><td><span class="hl">10:00–16:00</span></td><td><b>公益面对面：芯·启 / 芯·她 / 芯·燃 / 芯·山</b>（重点）</td><td>木贡小学</td></tr>
+      <tr><td>16:00–19:00</td><td>返回市区 · 团队晚餐复盘</td><td>市区</td></tr>
+      <tr><td><b>Day3</b></td><td>09:00–17:00</td><td>返程（贵阳龙洞堡 → 上海浦东）</td><td>返程</td></tr>
+    </table>
+    <p class="note">本方案聚焦两个"重点时段"的玩法与执行；其余为行程衔接，按既定安排执行。</p>
+  </div>
+  <div class="brand">芯火计划</div><div class="pagenum">08</div>
+</section>
+
+<!-- 9 Day1 芯·遇 -->
+<section class="slide">
+  <div class="pad">
+    <div class="kicker"><span class="dot"></span>DAY 1 · 18:00–19:30 · 酒店会议室</div>
+    <h2 class="htxt" style="margin-top:8px;">芯·遇 ｜ 相遇，是点亮的开始</h2>
+    <div><span class="tag">We Care</span><span class="tag care">人遇见人，光才亮</span></div>
+    <div class="rule" style="margin-top:14px;"></div>
+    <table>
+      <tr><th style="width:120px;">时间</th><th>环节 & 玩法</th><th style="width:150px;">负责人</th><th style="width:210px;">物料</th></tr>
+      <tr><td>18:00–18:20</td><td><b>寻找点亮你的那个人</b>：每人拿到芯片造型徽章的一半，正确两半拼合才亮灯；找到搭档 = 三天"芯火搭档"</td><td>主持 + 全员</td><td>发光拼合徽章 ×40</td></tr>
+      <tr><td>18:20–19:10</td><td><b>搭档共进晚餐 + 暖场小游戏</b>（三个关键词 / 猜职业），快速破冰</td><td>主持</td><td>桌签、游戏卡</td></tr>
+      <tr><td>19:10–19:30</td><td><b>点亮第一束芯火</b>：女性"首席点灯人"点亮"芯火树"，留钩子——"明天，你会亲手点亮自己的光"</td><td>首席点灯人</td><td>芯火树灯组</td></tr>
+    </table>
+    <p class="note"><b>话术示例：</b>"今晚我们点亮了第一束火。明天，每个人都会亲手点亮属于自己的光；而所有人的光连在一起，会照亮整座山。" &nbsp;｜&nbsp; 邀约 20 名学生到酒店共进晚餐，当晚完成结对，为 Day2 铺垫情感。</p>
+  </div>
+  <div class="brand">芯火计划</div><div class="pagenum">09</div>
+</section>
+
+<!-- 10 Day2 总览 -->
+<section class="slide dark">
+  <div class="pad">
+    <div class="kicker"><span class="dot"></span>DAY 2 · 木贡小学 · 10:00–16:00</div>
+    <h2 class="htxt" style="color:#fff;margin-top:8px;">公益面对面 · 全天 Run-of-show</h2>
+    <div class="rule"></div>
+    <table>
+      <tr><th style="width:130px;">时间</th><th>章节 / 环节</th><th style="width:150px;">场地</th></tr>
+      <tr><td>10:00–10:20</td><td>抵达 · <b>孩子带路</b>（孩子当东道主，带工程师参观学校）</td><td>校园</td></tr>
+      <tr><td>10:20–11:00</td><td><b>开幕 + 公益捐赠仪式</b>（交火种 + 孩子回赠）</td><td>教室 / 礼堂</td></tr>
+      <tr><td>11:00–12:00</td><td><b>芯·启</b>：STEM 科研讲座 + 亲手点亮 LED</td><td>教室</td></tr>
+      <tr><td>12:00–13:00</td><td>搭档共进午餐</td><td>食堂</td></tr>
+      <tr><td>13:00–13:40</td><td><b>芯·她</b>：WIN 女性领导力</td><td>教室</td></tr>
+      <tr><td>13:40–15:10</td><td><b>芯·燃</b>：趣味运动会 + 篮球友谊赛</td><td>操场 / 篮球场</td></tr>
+      <tr><td>15:10–16:00</td><td><b>芯·山</b>：共绘星河 + 传光仪式 + 时间胶囊</td><td>操场 / 教室</td></tr>
+    </table>
+  </div>
+  <svg class="watermark"><use href="#star"/></svg>
+  <div class="brand">芯火计划</div><div class="pagenum">10</div>
+</section>
+
+<!-- 11 开幕+捐赠 + STEM -->
+<section class="slide">
+  <svg class="hero-art" style="opacity:.5" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice"><use href="#scene-radiant"/></svg>
+  <div class="pad">
+    <div class="kicker"><span class="dot"></span>DAY 2 · 10:20–12:00</div>
+    <h2 class="htxt" style="margin-top:8px;">芯·启 ｜ 亲手点亮你的第一束光</h2>
+    <div><span class="tag">We Deliver</span><span class="tag">We Innovate</span><span class="tag care">STEM</span></div>
+    <div class="rule" style="margin-top:14px;"></div>
+    <div class="grid2">
+      <div class="card">
+        <h3>① 开幕 + 公益捐赠仪式</h3>
+        <ul class="clean" style="margin-top:2px;">
+          <li>主语从"捐给你们"→"<b>把火种交到你们手里</b>"</li>
+          <li>助学金 + 科教物资 + STEM 套件捐赠</li>
+          <li>孩子<b>回赠</b>画 / 信 → 孩子也成为给予者</li>
+          <li>女性点灯人 + 校方共同启动【对齐 We Deliver】</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>② STEM 科研讲座 + 点亮 LED</h3>
+        <ul class="clean" style="margin-top:2px;">
+          <li>工程师把 ASM 内部 STEM 课改成"<b>山区孩子听得懂的科研课</b>"</li>
+          <li>用"一层一层造芯片(ALD)"的通俗讲法</li>
+          <li>1:1 带教，<b>孩子亲手点亮一颗 LED</b></li>
+          <li>作品归孩子所有，可带回家展示【对齐 We Innovate】</li>
+        </ul>
+      </div>
+    </div>
+    <p class="note"><b>工程师话术：</b>"你刚做的，和我们工厂里做的是同一件事——让芯片发光。这，就是你点亮的第一束芯火。<b>你今天就是一名工程师。</b>"</p>
+  </div>
+  <div class="brand">芯火计划</div><div class="pagenum">11</div>
+</section>
+
+<!-- 12 芯·她 WIN -->
+<section class="slide dark">
+  <svg class="hero-art" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice"><use href="#scene-radiant"/></svg>
+  <div class="hero-veil"></div>
+  <div class="pad" style="max-width:62%;">
+    <div class="kicker"><span class="dot"></span>DAY 2 · 13:00–13:40</div>
+    <h2 class="htxt" style="color:#fff;margin-top:8px;">芯·她 ｜ 她的故事，你的可能</h2>
+    <div><span class="tag">We Care</span><span class="tag">WIN 女性领导力</span></div>
+    <div class="rule" style="margin-top:14px;"></div>
+    <ul class="clean">
+      <li>女性"首席点灯人"主讲，<b style="color:#fff;">尤其触达留守女童</b></li>
+      <li>核心信息："女孩，也可以造芯片、当工程师、当领导者"</li>
+      <li>把领导力翻译给孩子：<b style="color:var(--gold-soft);">先点亮自己，再去照亮别人</b></li>
+      <li>安排<b style="color:#fff;">女工程师专门结对女学生</b>，让榜样可触摸、可对话</li>
+      <li>引用 WIN 理念：多元的头脑汇聚，才有开创性的进步</li>
+    </ul>
+    <p class="note" style="color:#CBB9DC;"><b>设计点：</b>WIN 与"芯火"主题严丝合缝——领导力的本质，就是"点亮人"。女性榜样不再是台上一个遥远的名字，而是孩子今天真实对话过的人。</p>
+  </div>
+  <svg class="watermark"><use href="#star"/></svg>
+  <div class="brand">芯火计划</div><div class="pagenum">12</div>
+</section>
+
+<!-- 13 芯·燃 运动会 -->
+<section class="slide">
+  <svg class="hero-art" style="opacity:.5" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice"><use href="#scene-lattice"/></svg>
+  <div class="pad">
+    <div class="kicker"><span class="dot"></span>DAY 2 · 13:40–15:10 · 操场 / 篮球场</div>
+    <h2 class="htxt" style="margin-top:8px;">芯·燃 ｜ 火，越烧越旺</h2>
+    <div><span class="tag">We Care</span><span class="tag">We Deliver · 道具留校</span></div>
+    <div class="rule" style="margin-top:12px;"></div>
+    <div class="grid2" style="gap:26px;">
+      <table>
+        <tr><th>玩法（工程师与孩子混队）</th><th style="width:130px;">道具（留校）</th></tr>
+        <tr><td><b>彩虹伞·点亮星空</b>：齐力把"星星"软球抛上伞面</td><td>大彩虹伞、软球</td></tr>
+        <tr><td><b>芯片运输大挑战</b>：平衡盘端"芯片"过障碍，零掉落</td><td>平衡盘、沙包</td></tr>
+        <tr><td><b>毛毛虫赛跑</b>：多人同行，谁都不掉队</td><td>毛毛虫/跳袋</td></tr>
+        <tr><td><b>能量传递接力</b>：球拍运"能量球"</td><td>羽毛球拍、软球</td></tr>
+        <tr><td><b>芯火大拔河</b>：最有气氛的一战</td><td>安全拔河绳</td></tr>
+        <tr><td><b>篮球友谊赛 + 定点投篮</b>：人人能得分</td><td>篮球 ×6</td></tr>
+      </table>
+      <div class="card" style="background:#faf6f2;align-self:start;">
+        <h3>🎁 「ASM 芯火快乐运动角」</h3>
+        <p style="margin-top:6px;">所有器材打包<b>捐给学校</b>，活动后建一个长期运动角：</p>
+        <p style="margin-top:8px;font-size:15px;color:#4b4350;">彩虹伞 ×2 · 软球一批 · 篮球 ×6 · 足球 ×4 · 跳绳 ×20 · 拔河绳 ×2 · 沙包/平衡盘 · 呼啦圈 ×20 · 飞盘 ×20 · 羽毛球拍球 · 收纳袋 + 标牌</p>
+        <p style="margin-top:10px;color:#A9711A;font-weight:700;">巧思：孩子和工程师一起挂上"运动角"牌——"以后你们每次来玩，就是我们还在陪你们。"</p>
+      </div>
+    </div>
+  </div>
+  <div class="brand">芯火计划</div><div class="pagenum">13</div>
+</section>
+
+<!-- 13·1 芯·燃详解① -->
+<section class="slide">
+  <div class="pad" style="padding:40px 56px;">
+    <div class="kicker"><span class="dot"></span>DAY 2 · 芯·燃 玩法详解　①/③</div>
+    <h2 class="htxt" style="margin-top:6px;font-size:32px;">趣味运动会 · 逐项拆解</h2>
+    <div class="rule" style="margin:8px 0 16px;"></div>
+    <div class="grid2">
+      <div class="card" style="padding:14px 16px;">
+        <svg viewBox="0 0 360 220" preserveAspectRatio="xMidYMid meet" style="width:100%;height:158px;background:#2E1F3D;border-radius:10px;"><use href="#sp-umbrella"/></svg>
+        <h3 style="font-size:18px;margin-top:9px;">① 彩虹伞 · 点亮星空</h3>
+        <p style="font-size:13.5px;color:#4b4350;line-height:1.5;margin-top:3px;">全员抓住大彩虹伞边缘，把软球"星星"抛上伞面，齐心抖动让它跳跃不落；听口令一起高抛，满天星腾空。</p>
+        <p style="font-size:12px;color:#6E6478;margin-top:5px;">👥 全员一圈·40人　⏱ 10′　🎒 彩虹伞·软球</p>
+        <p style="font-size:12.5px;color:#A9711A;font-weight:700;margin-top:2px;">亮点：零门槛·强协作，直扣"星河/点亮"。</p>
+      </div>
+      <div class="card" style="padding:14px 16px;">
+        <svg viewBox="0 0 360 220" preserveAspectRatio="xMidYMid meet" style="width:100%;height:158px;background:#2E1F3D;border-radius:10px;"><use href="#sp-chip"/></svg>
+        <h3 style="font-size:18px;margin-top:9px;">② 芯片运输大挑战</h3>
+        <p style="font-size:13.5px;color:#4b4350;line-height:1.5;margin-top:3px;">4-5 人一队接力，用平衡盘端着"易碎芯片"(沙包)走过障碍区，全程不能用手扶、不能掉落；最快且零掉落者胜。</p>
+        <p style="font-size:12px;color:#6E6478;margin-top:5px;">👥 4-5人/队　⏱ 15′　🎒 平衡盘·沙包·桩筒</p>
+        <p style="font-size:12.5px;color:#A9711A;font-weight:700;margin-top:2px;">亮点：呼应 ASM 高精度搬运，玩专注与配合。</p>
+      </div>
+    </div>
+  </div>
+  <div class="brand">芯火计划</div><div class="pagenum">13·1</div>
+</section>
+
+<!-- 13·2 芯·燃详解② -->
+<section class="slide">
+  <div class="pad" style="padding:40px 56px;">
+    <div class="kicker"><span class="dot"></span>DAY 2 · 芯·燃 玩法详解　②/③</div>
+    <h2 class="htxt" style="margin-top:6px;font-size:32px;">趣味运动会 · 逐项拆解</h2>
+    <div class="rule" style="margin:8px 0 16px;"></div>
+    <div class="grid2">
+      <div class="card" style="padding:14px 16px;">
+        <svg viewBox="0 0 360 220" preserveAspectRatio="xMidYMid meet" style="width:100%;height:158px;background:#2E1F3D;border-radius:10px;"><use href="#sp-caterpillar"/></svg>
+        <h3 style="font-size:18px;margin-top:9px;">③ 毛毛虫赛跑</h3>
+        <p style="font-size:13.5px;color:#4b4350;line-height:1.5;margin-top:3px;">多人坐进"毛毛虫"道具或一字搭肩蹲走，齐步前进，谁掉队就重来；先到终点的队获胜。</p>
+        <p style="font-size:12px;color:#6E6478;margin-top:5px;">👥 6-8人/队　⏱ 12′　🎒 毛毛虫道具/无道具版</p>
+        <p style="font-size:12.5px;color:#A9711A;font-weight:700;margin-top:2px;">亮点："一个都不能少"，团队感拉满。</p>
+      </div>
+      <div class="card" style="padding:14px 16px;">
+        <svg viewBox="0 0 360 220" preserveAspectRatio="xMidYMid meet" style="width:100%;height:158px;background:#2E1F3D;border-radius:10px;"><use href="#sp-relay"/></svg>
+        <h3 style="font-size:18px;margin-top:9px;">④ 能量传递接力</h3>
+        <p style="font-size:13.5px;color:#4b4350;line-height:1.5;margin-top:3px;">用球拍(或勺)托着"能量球"跑过赛道交给下一棒，球掉了回到掉落点继续；最快队获胜。</p>
+        <p style="font-size:12px;color:#6E6478;margin-top:5px;">👥 5-6人/队　⏱ 12′　🎒 球拍/勺·软球</p>
+        <p style="font-size:12.5px;color:#A9711A;font-weight:700;margin-top:2px;">亮点：简单刺激、人人上手，紧张又好笑。</p>
+      </div>
+    </div>
+  </div>
+  <div class="brand">芯火计划</div><div class="pagenum">13·2</div>
+</section>
+
+<!-- 13·3 芯·燃详解③ -->
+<section class="slide">
+  <div class="pad" style="padding:40px 56px;">
+    <div class="kicker"><span class="dot"></span>DAY 2 · 芯·燃 玩法详解　③/③</div>
+    <h2 class="htxt" style="margin-top:6px;font-size:32px;">趣味运动会 · 逐项拆解</h2>
+    <div class="rule" style="margin:8px 0 16px;"></div>
+    <div class="grid2">
+      <div class="card" style="padding:14px 16px;">
+        <svg viewBox="0 0 360 220" preserveAspectRatio="xMidYMid meet" style="width:100%;height:158px;background:#2E1F3D;border-radius:10px;"><use href="#sp-tug"/></svg>
+        <h3 style="font-size:18px;margin-top:9px;">⑤ 芯火大拔河</h3>
+        <p style="font-size:13.5px;color:#4b4350;line-height:1.5;margin-top:3px;">工程师+孩子混合两队，中线插"芯火旗"，听哨拔河，把旗拉过己方线者胜；三局两胜。</p>
+        <p style="font-size:12px;color:#6E6478;margin-top:5px;">👥 两队各15-20人　⏱ 12′　🎒 安全拔河绳·中线旗</p>
+        <p style="font-size:12.5px;color:#A9711A;font-weight:700;margin-top:2px;">亮点：最团结的一战，全场欢呼。</p>
+      </div>
+      <div class="card" style="padding:14px 16px;">
+        <svg viewBox="0 0 360 220" preserveAspectRatio="xMidYMid meet" style="width:100%;height:158px;background:#2E1F3D;border-radius:10px;"><use href="#sp-basket"/></svg>
+        <h3 style="font-size:18px;margin-top:9px;">⑥ 篮球友谊赛 + 定点投篮</h3>
+        <p style="font-size:13.5px;color:#4b4350;line-height:1.5;margin-top:3px;">混合组队半场友谊赛，规则放宽重在参与；穿插定点投篮，每人3投，进球积分累计到队伍。</p>
+        <p style="font-size:12px;color:#6E6478;margin-top:5px;">👥 两队各5-8人轮换　⏱ 余下时间　🎒 篮球×6</p>
+        <p style="font-size:12.5px;color:#A9711A;font-weight:700;margin-top:2px;">亮点：大人孩子平起平坐当队友。</p>
+      </div>
+    </div>
+  </div>
+  <div class="brand">芯火计划</div><div class="pagenum">13·3</div>
+</section>
+
+<!-- 14 芯·山 收尾 -->
+<section class="slide dark">
+  <svg class="hero-art" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice"><use href="#scene-night"/></svg>
+  <div class="hero-veil"></div>
+  <div class="pad">
+    <div class="kicker"><span class="dot"></span>DAY 2 · 15:10–16:00 · 收尾压轴</div>
+    <h2 class="htxt" style="color:#fff;margin-top:8px;">芯·山 ｜ 一束芯火，照亮一座山</h2>
+    <div><span class="tag">We Innovate</span><span class="tag">We Deliver</span><span class="tag">We Care</span></div>
+    <div class="rule" style="margin-top:12px;"></div>
+    <div class="grid3">
+      <div class="card" style="background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.16);">
+        <h3 style="color:var(--gold-soft);">① 共绘星河（25′）</h3>
+        <p style="color:#EADFF2;">预印画布 + 金银<b>马克笔</b>（速干不洒、无需水电）。每对画一颗 logo 星形的"星"+ 梦想，连成星河。<b>永久留校。</b></p>
+      </div>
+      <div class="card" style="background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.16);">
+        <h3 style="color:var(--gold-soft);">② 传光仪式（12′）</h3>
+        <p style="color:#EADFF2;">人手一盏<b>电池 LED 小灯</b>（无明火/无需供电，已砍掉 UV 暗房）。一束传四十束，齐念 slogan。<b>小灯送给孩子。</b></p>
+      </div>
+      <div class="card" style="background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.16);">
+        <h3 style="color:var(--gold-soft);">③ 时间胶囊（13′）</h3>
+        <p style="color:#EADFF2;">孩子写《给未来的自己》，工程师写给搭档，封存约定回访开启。<b>可选「时光手账」</b>带回家延续。</p>
+      </div>
+    </div>
+    <p class="note" style="color:#CBB9DC;"><b>为什么打动 ASM：</b>传光让每位工程师<b style="color:#fff;">亲手</b>完成"点亮"，写信让他们真正走进一个孩子，胶囊给所有人一个<b style="color:#fff;">必须再回来的理由</b>。｜留校：星河长卷 + 时间胶囊 + 运动角。</p>
+  </div>
+  <svg class="watermark"><use href="#star"/></svg>
+  <div class="brand">芯火计划</div><div class="pagenum">14</div>
+</section>
+
+<!-- 14·1 共绘星河 -->
+<section class="slide">
+  <div class="pad" style="padding:48px 64px;">
+    <div class="kicker"><span class="dot"></span>DAY 2 · 芯·山 玩法详解 · 第一幕</div>
+    <h2 class="htxt" style="margin-top:6px;">共绘「星河长卷」（约 25′）</h2>
+    <div class="rule"></div>
+    <div class="grid2" style="align-items:center;gap:34px;">
+      <svg viewBox="0 0 360 260" preserveAspectRatio="xMidYMid meet" style="width:100%;height:300px;background:#F7F3EF;border:1px solid var(--line);border-radius:12px;"><use href="#f-canvas"/></svg>
+      <div>
+        <ul class="clean" style="margin-top:0;">
+          <li>铺开预印画布（淡星形栅格 + 山的剪影 + slogan）</li>
+          <li>每对搭档用金/银马克笔描一颗 <b>ASM 星形的星</b>，写名字 + 一个梦想词</li>
+          <li>用线把自己的星和邻座的星连起来 → 全场连成<b>照亮山顶的星河</b></li>
+        </ul>
+        <p style="font-size:13px;color:#6E6478;margin-top:6px;">🎒 星河画布×1 · 金银马克笔×20 · 星形模板×20　｜　🏫 永久挂校墙</p>
+        <p class="note" style="margin-top:10px;padding-top:0;"><b>话术：</b>"你画的不是普通的星——它有你的名字和梦想。看，它和大家的星连在一起，就照亮了整座山。"</p>
+        <div style="margin-top:8px;"><span class="tag">We Innovate</span><span class="tag care">We Care</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="brand">芯火计划</div><div class="pagenum">14·1</div>
+</section>
+
+<!-- 14·2 传光仪式 -->
+<section class="slide">
+  <div class="pad" style="padding:48px 64px;">
+    <div class="kicker"><span class="dot"></span>DAY 2 · 芯·山 玩法详解 · 第二幕</div>
+    <h2 class="htxt" style="margin-top:6px;">传光仪式（约 12′）</h2>
+    <div class="rule"></div>
+    <div class="grid2" style="align-items:center;gap:34px;">
+      <svg viewBox="0 0 360 220" preserveAspectRatio="xMidYMid meet" style="width:100%;height:280px;background:#2E1F3D;border-radius:12px;"><use href="#f-pass"/></svg>
+      <div>
+        <ul class="clean" style="margin-top:0;">
+          <li>每人发一盏<b>电池 LED 小灯</b>（无明火、无需供电）</li>
+          <li>由女性"首席点灯人"手中<b>唯一亮着的灯</b>开始，手手相传点亮下一盏</li>
+          <li>直到 40 人全部亮起，举灯齐念 <b>"一束芯火，照亮一座山"</b></li>
+        </ul>
+        <p style="font-size:13px;color:#6E6478;margin-top:6px;">🎒 电池 LED 小灯×40　｜　🏫 留存：小灯全部送孩子带回家</p>
+        <p class="note" style="margin-top:10px;padding-top:0;"><b>话术：</b>"光不会因为分给别人而变少——它只会让更多人亮起来。这盏灯送给你，它会一直亮着。"</p>
+        <p style="font-size:12.5px;color:#A9711A;font-weight:700;margin-top:6px;">已砍掉 UV 暗房依赖，简易学校可稳稳跑完。</p>
+        <div style="margin-top:6px;"><span class="tag">We Deliver</span><span class="tag care">We Care</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="brand">芯火计划</div><div class="pagenum">14·2</div>
+</section>
+
+<!-- 14·3 时间胶囊 + 时光手账 -->
+<section class="slide">
+  <div class="pad" style="padding:40px 60px;">
+    <div class="kicker"><span class="dot"></span>DAY 2 · 芯·山 玩法详解 · 第三幕</div>
+    <h2 class="htxt" style="margin-top:6px;font-size:34px;">时间胶囊 + 时光手账（约 13′）</h2>
+    <div class="rule" style="margin:8px 0 14px;"></div>
+    <svg viewBox="0 0 360 240" preserveAspectRatio="xMidYMid meet" style="width:100%;height:140px;background:#2E1F3D;border-radius:10px;"><use href="#f-capsule"/></svg>
+    <div class="grid2" style="margin-top:14px;">
+      <div class="card" style="padding:14px 18px;">
+        <h3 style="font-size:18px;">🕰 时间胶囊（集体记忆 · 留校）</h3>
+        <ul class="clean" style="margin-top:2px;">
+          <li>孩子写《给未来的自己》</li>
+          <li>每位工程师写一封给搭档孩子</li>
+          <li>一起封进胶囊盒，交校方保管，约定<b>下次回访开启</b></li>
+        </ul>
+      </div>
+      <div class="card" style="padding:14px 18px;background:#faf6f2;">
+        <h3 style="font-size:18px;">📖 时光手账（个人陪伴 · 带回家）</h3>
+        <p style="font-size:13.5px;color:#4b4350;margin-top:2px;line-height:1.5;">每个孩子获赠一本「芯火时光手账」（深紫×暖金、印 ASM 星形母题）：</p>
+        <ul class="clean" style="margin-top:3px;">
+          <li style="font-size:14.5px;">内页：今日打卡（我点亮的第一颗灯/我的搭档/今天学会的）、给未来的自己、梦想清单、双师课堂记录页、成长贴纸</li>
+          <li style="font-size:14.5px;">工程师在搭档手账上<b>亲笔留一页寄语</b></li>
+          <li style="font-size:14.5px;">带回家持续书写，<b>衔接后续线上双师课堂</b></li>
+        </ul>
+      </div>
+    </div>
+    <p class="note" style="padding-top:10px;"><b>区别：</b>胶囊＝集体记忆留校；手账＝个人陪伴带回家——二者并存。　<span class="tag">We Deliver</span><span class="tag care">We Care</span></p>
+  </div>
+  <div class="brand">芯火计划</div><div class="pagenum">14·3</div>
+</section>
+
+<!-- 15 推荐方案2 -->
+<section class="slide">
+  <div class="pad">
+    <div class="kicker"><span class="dot"></span>推荐方案 2（可选预案）</div>
+    <h2 class="htxt" style="margin-top:8px;">两座城，一片天 ｜ 上海孩子同行</h2>
+    <div class="rule"></div>
+    <div class="grid2">
+      <div>
+        <h3 style="color:var(--purple);font-size:20px;margin-bottom:6px;">核心设计</h3>
+        <ul class="clean">
+          <li>不是城里孩子来"看"山里孩子，而是<b>两个世界互相照亮</b></li>
+          <li><b>三人组结对</b>：1 上海孩子 + 1 木贡孩子 + 1 工程师</li>
+          <li><b>角色反转</b>：木贡孩子当东道主、向导，在带路/自然/运动/篮球中是"专家"，在主场收获自信</li>
+          <li>收尾升华：两座城的星，连进<b>同一条星河</b></li>
+        </ul>
+      </div>
+      <div>
+        <h3 style="color:var(--purple);font-size:20px;margin-bottom:6px;">价值 & 注意</h3>
+        <ul class="clean">
+          <li>✅ 故事性、传播性、ESG 叙事更强（消除城乡认知鸿沟）</li>
+          <li>✅ 双向成长：上海孩子收获感恩与坚韧</li>
+          <li>⚠ 增加招募、监护、保险与安全成本</li>
+          <li>⚠ 做好引导，<b>规避任何"贫富对比/猎奇"观感</b>（已在角色设计上规避）</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="brand">芯火计划</div><div class="pagenum">15</div>
+</section>
+
+<!-- 16 人员分工 -->
+<section class="slide">
+  <div class="pad">
+    <div class="kicker"><span class="dot"></span>执行 · 人员分工　ASM 约 20 人</div>
+    <h2 class="htxt" style="margin-top:8px;">每个人既是"搭档"，也有一份岗位</h2>
+    <div class="rule"></div>
+    <table>
+      <tr><th style="width:200px;">角色</th><th style="width:90px;">人数</th><th>职责</th></tr>
+      <tr><td><b>总协调 / 主持</b></td><td>1</td><td>全程节奏、串场、对接校方与时间把控</td></tr>
+      <tr><td><b>首席点灯人（女性工程师）</b></td><td>1</td><td>Day1 点火 → 芯·她 WIN 主讲 → 收尾长期之约</td></tr>
+      <tr><td><b>STEM 讲师</b></td><td>2–3</td><td>科研讲座主讲 + 实验带教总指挥</td></tr>
+      <tr><td><b>运动会裁判 / 安全员</b></td><td>2</td><td>趣味赛与篮球赛组织、规则、安全</td></tr>
+      <tr><td><b>影像（摄影 + 摄像）</b></td><td>2</td><td>高光时刻记录，供后续传播与 ESG 报告</td></tr>
+      <tr><td><b>后勤 / 物料</b></td><td>2</td><td>物料分发、场地布置、捐赠物资交接</td></tr>
+      <tr><td><b>1:1 芯火搭档</b></td><td><b>全体 20</b></td><td>以上岗位<b>叠加</b>在 20 人身上；每人全程陪伴 1 个孩子</td></tr>
+    </table>
+    <p class="note">20 名 ASM 人员 = 20 名搭档，岗位角色叠加分配；确保 20:20 严格 1:1，无孩子掉队。</p>
+  </div>
+  <div class="brand">芯火计划</div><div class="pagenum">16</div>
+</section>
+
+<!-- 17 物料清单 -->
+<section class="slide">
+  <div class="pad">
+    <div class="kicker"><span class="dot"></span>执行 · 物料采购总清单</div>
+    <h2 class="htxt" style="margin-top:8px;">物料一览（含数量 · 是否留校）</h2>
+    <div class="rule"></div>
+    <div class="grid2" style="gap:26px;">
+      <table>
+        <tr><th>仪式 / 课程物料</th><th style="width:80px;">数量</th><th style="width:70px;">留校</th></tr>
+        <tr><td>发光拼合徽章</td><td>40</td><td>—</td></tr>
+        <tr><td>STEM 点灯实验套件</td><td>20</td><td>✓</td></tr>
+        <tr><td>芯火树灯组</td><td>1</td><td>—</td></tr>
+        <tr><td>电池 LED 小灯</td><td>40</td><td>✓</td></tr>
+        <tr><td>星河画布 + 金银马克笔 + 星形模板</td><td>1+20</td><td>✓</td></tr>
+        <tr><td>时间胶囊盒 + 卡片 / 时光手账</td><td>1 + 40</td><td>✓</td></tr>
+        <tr><td>助学金 + 科教物资</td><td>—</td><td>✓</td></tr>
+      </table>
+      <table>
+        <tr><th>运动 / 通用物料</th><th style="width:80px;">数量</th><th style="width:70px;">留校</th></tr>
+        <tr><td>彩虹伞</td><td>2</td><td>✓</td></tr>
+        <tr><td>篮球 / 足球</td><td>6 / 4</td><td>✓</td></tr>
+        <tr><td>跳绳 / 呼啦圈 / 飞盘</td><td>20/20/20</td><td>✓</td></tr>
+        <tr><td>拔河绳 / 沙包 / 平衡盘</td><td>2 / 批</td><td>✓</td></tr>
+        <tr><td>横幅 · 桌签 · 物料牌</td><td>—</td><td>部分</td></tr>
+        <tr><td>影像设备 · 备用电源</td><td>—</td><td>—</td></tr>
+        <tr><td>医药急救箱</td><td>2</td><td>—</td></tr>
+      </table>
+    </div>
+    <p class="note">原则：凡能留下的，全部留给学校——让陪伴在我们离开后继续。</p>
+  </div>
+  <div class="brand">芯火计划</div><div class="pagenum">17</div>
+</section>
+
+<!-- 18 动线 + 应急 -->
+<section class="slide">
+  <div class="pad">
+    <div class="kicker"><span class="dot"></span>执行 · 场地动线 & 应急预案</div>
+    <h2 class="htxt" style="margin-top:8px;">把"意外"提前想到</h2>
+    <div class="rule"></div>
+    <div class="grid2">
+      <div class="card">
+        <h3>场地动线</h3>
+        <ul class="clean" style="margin-top:2px;">
+          <li><b>教室</b>：开幕 / 捐赠 / STEM 讲座 / WIN / 时间胶囊</li>
+          <li><b>操场</b>：趣味运动会 / 传光仪式 / 共绘星河</li>
+          <li><b>篮球场</b>：篮球友谊赛 + 定点投篮</li>
+          <li>动线就近，午餐在食堂，全程 1:1 不分散</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>应急预案</h3>
+        <ul class="clean" style="margin-top:2px;">
+          <li><b>天气</b>：雨天运动会改室内 / 走廊版；星河、传光移入教室</li>
+          <li><b>电力</b>：LED 全电池供电、已砍 UV，<b>不依赖现场供电</b></li>
+          <li><b>医疗</b>：2 个急救箱 + 预先确认最近医院与路线</li>
+          <li><b>情绪</b>：班主任全程陪同，留守儿童情绪引导预案</li>
+          <li><b>人数浮动</b>：1:1 弹性分组，多备 2 套物料</li>
+        </ul>
+      </div>
+    </div>
+    <p class="note"><b>落地铁律：</b>所有环节"不依赖暗房 / 不依赖稳定电力 / 不依赖网络"，简易学校也能稳稳跑完。</p>
+  </div>
+  <div class="brand">芯火计划</div><div class="pagenum">18</div>
+</section>
+
+<!-- 19 儿童保护与合规 -->
+<section class="slide">
+  <div class="pad">
+    <div class="kicker"><span class="dot"></span>执行 · 儿童保护与合规（不可省略）</div>
+    <h2 class="htxt" style="margin-top:8px;">把孩子的安全，放在创意之前</h2>
+    <div class="rule"></div>
+    <div class="grid2">
+      <div class="card">
+        <h3>儿童保护</h3>
+        <ul class="clean" style="margin-top:2px;">
+          <li>肖像 / 影像须<b>监护人书面授权</b>，对外传播去隐私化</li>
+          <li>志愿者签<b>儿童保护行为准则</b>：不与儿童单独相处</li>
+          <li>全程班主任 / 校方在场陪同</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>安全与物料合规</h3>
+        <ul class="clean" style="margin-top:2px;">
+          <li>发光物料一律<b>电子烛火、无明火</b>，3C / 无毒认证、低压安全</li>
+          <li>定制件预留<b>打样周期</b>，备足备用件 + 故障兜底</li>
+          <li>2 个急救箱 + 预确认最近医院路线；保险覆盖全员</li>
+        </ul>
+      </div>
+    </div>
+    <p class="note"><b>待官方确认：</b>本方案中 ASM 价值观 / 使命金句 / WIN 理念 / Logo 描述 / 帮扶年限等，系依据简报整理，正式定稿前请以 ASM 品牌 · CSR 官方表述为准。</p>
+  </div>
+  <div class="brand">芯火计划</div><div class="pagenum">19</div>
+</section>
+
+<!-- 20 倒排期 -->
+<section class="slide dark">
+  <div class="pad">
+    <div class="kicker"><span class="dot"></span>执行 · 筹备倒排期 Checklist</div>
+    <h2 class="htxt" style="color:#fff;margin-top:8px;">从今天到现场，倒着排</h2>
+    <div class="rule"></div>
+    <table>
+      <tr><th style="width:120px;">节点</th><th>关键动作</th></tr>
+      <tr><td><b>T-30 天</b></td><td>确认行程/人数；校方对接（学生名单、场地、电力）；STEM 课程包与讲师定稿；物料采购下单</td></tr>
+      <tr><td><b>T-14 天</b></td><td>徽章/手账/胶囊等定制件到货；讲师试讲彩排；影像与传播脚本；女性点灯人内容定稿</td></tr>
+      <tr><td><b>T-7 天</b></td><td>全流程桌面推演（含应急）；物料清点装箱；1:1 搭档名单与岗位分工锁定；安全/保险确认</td></tr>
+      <tr><td><b>T-1 天</b></td><td>抵达布场预演（芯火树、星河画布、运动场地）；设备充电；Day1 破冰最终走位</td></tr>
+      <tr><td><b>现场</b></td><td>按 Run-of-show 执行；总协调控时；影像抓高光；当晚团队复盘</td></tr>
+    </table>
+  </div>
+  <svg class="watermark tl"><use href="#star"/></svg>
+  <div class="brand">芯火计划</div><div class="pagenum">20</div>
+</section>
+
+<!-- 20 影响 + 长期回响 -->
+<section class="slide">
+  <div class="pad">
+    <div class="kicker"><span class="dot"></span>影响 · 认知拔升 & 长期回响</div>
+    <h2 class="htxt" style="margin-top:8px;">这一天，会留在孩子的认知里很久</h2>
+    <div class="rule"></div>
+    <div class="grid2" style="gap:26px;">
+      <table>
+        <tr><th>升级前</th><th>经由</th><th>升级后</th></tr>
+        <tr><td>我是被资助的孩子</td><td>带路·回赠</td><td>我是主人，也能给予</td></tr>
+        <tr><td>高科技离我很远</td><td>点亮 LED</td><td>我也是工程师</td></tr>
+        <tr><td>女孩读书没用</td><td>芯·她 WIN</td><td>女孩也能当领导</td></tr>
+        <tr><td>我没什么潜力</td><td>芯火隐喻</td><td>我是一束有光的芯</td></tr>
+        <tr><td>帮一次就走</td><td>时间胶囊</td><td>有一个长期的约定</td></tr>
+      </table>
+      <div>
+        <div class="card" style="margin-bottom:16px;">
+          <h3>长期回响机制</h3>
+          <p>时间胶囊回访开启 · 线上双师课堂延续 · 择优上海科创夏令营 · 星河墙与运动角永久留校</p>
+        </div>
+        <div class="card" style="background:#faf6f2;">
+          <h3>成效追踪（KPI）</h3>
+          <p>结对覆盖 20/20 · 人均 1 件科创作品 · 40 封"未来之信" · 回访开启率 · 影像与 ESG 传播产出</p>
+        </div>
+      </div>
+    </div>
+    <p class="note">从"给物资"升级到"给视野、给榜样、给自我效能、给成长型思维"——这比任何物资都留得久。</p>
+  </div>
+  <div class="brand">芯火计划</div><div class="pagenum">21</div>
+</section>
+
+<!-- 21 CLOSING -->
+<section class="slide dark">
+  <svg class="hero-art" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice"><use href="#scene-night"/></svg>
+  <div class="hero-veil" style="background:linear-gradient(0deg,rgba(30,18,45,.95),rgba(46,31,61,.7));"></div>
+  <svg class="watermark"><use href="#star"/></svg>
+  <div class="pad" style="justify-content:center;align-items:flex-start;">
+    <div class="kicker"><span class="dot"></span>ASM · WE INNOVATE · WE DELIVER · WE CARE</div>
+    <div class="quote" style="margin-top:18px;font-size:40px;">ASM 不是去"帮"这些孩子，<br>而是去做它最擅长的事——<br><em>把一颗颗被埋没的"芯"，<br>连接、点亮，然后让它发光。</em></div>
+    <div class="slogan" style="margin-top:26px;">一束芯火，照亮一座山。</div>
+  </div>
+  <div class="brand">芯火计划 · 2026</div><div class="pagenum">22</div>
+</section>
+
+</div>
+
+<script>
+  const slides=[...document.querySelectorAll('.slide')];
+  let i=0;
+  function go(n){i=Math.max(0,Math.min(slides.length-1,n));slides[i].scrollIntoView({behavior:'smooth',block:'center'});}
+  document.addEventListener('keydown',e=>{
+    if(e.key==='ArrowRight'||e.key==='ArrowDown'||e.key===' '){e.preventDefault();go(i+1);}
+    if(e.key==='ArrowLeft'||e.key==='ArrowUp'){e.preventDefault();go(i-1);}
+  });
+  // track current slide on manual scroll
+  const io=new IntersectionObserver(es=>{es.forEach(en=>{if(en.isIntersecting)i=slides.indexOf(en.target);});},{threshold:.6});
+  slides.forEach(s=>io.observe(s));
+</script>
+</body>
+</html>
